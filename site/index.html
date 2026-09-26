@@ -82,6 +82,17 @@
   .keysec .grid p{margin-top:var(--s-2);font-size:var(--fs-0);color:var(--ink)}
   .note{margin-top:var(--s-6);background:var(--green-100);border-radius:var(--r-2);padding:var(--s-4) var(--s-5);font-size:var(--fs-0);color:var(--green-700)}
 
+  /* trust */
+  .trust .two{align-items:start}
+  .repo{display:flex;gap:var(--s-4);align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-2);padding:var(--s-5);margin-top:var(--s-5)}
+  .repo svg{width:40px;height:40px;flex:none;fill:var(--green-700)}
+  .repo p{font-size:var(--fs-0);color:var(--muted);margin-top:var(--s-1)}
+  .repo a.btn{display:inline-block;margin-top:var(--s-3);background:var(--green-500);color:#fff;text-decoration:none;font-weight:600;padding:10px 16px;border-radius:var(--r-pill);font-size:var(--fs-0)}
+  .promise{list-style:none;padding:0;margin:var(--s-5) 0 0;display:grid;gap:var(--s-3)}
+  .promise li{padding:var(--s-4) var(--s-4) var(--s-4) 44px;position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-2);font-size:var(--fs-0)}
+  .promise li::before{content:"";position:absolute;left:16px;top:20px;width:14px;height:14px;border-radius:50%;border:3px solid var(--green-400)}
+  .promise strong{display:block;color:var(--green-700);margin-bottom:2px}
+
   /* sections shared */
   section{padding:var(--s-8) 0}
   section.alt{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -218,7 +229,36 @@
     <p class="note"><strong>Which key to buy:</strong> any FIDO2 security key with a USB-C plug. Several makers sell them, and they need no app or account. Pawl does not sell keys and does not take a cut.</p>
   </div>
 </section>
-<!-- CHUNK 6: open source + what it does not promise -->
+<section id="open" class="alt trust">
+  <div class="wrap two">
+    <div>
+      <h2>Open source</h2>
+      <p class="lead">You should not have to take a blocker's word for it. All of Pawl's code is public, so you or anyone you trust can read exactly what it does.</p>
+      <div class="repo">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        <div>
+          <h3>github.com/jasonepage/Pawl</h3>
+          <p>Licensed under the Mozilla Public License 2.0. Read it, build it yourself, report a problem, or send a fix.</p>
+          <a class="btn" href="https://github.com/jasonepage/Pawl">View the code</a>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h2>What it does not promise</h2>
+      <p class="lead">Pawl makes the 1am version of you slow. It does not make anything impossible. The details, in plain words:</p>
+      <ul class="promise">
+        <li><strong>iOS lets the phone's owner turn Screen Time off.</strong> No app can stop that. Pawl notices the next time it runs and, if you have a sponsor, sends them an alert. For a real lock, a sponsor can set the Screen Time passcode in person and keep it. iOS enforces that passcode, not Pawl.</li>
+        <li><strong>The key check is simple.</strong> Pawl asks iOS for the key and checks that it is the one you registered. It does not verify the key's signature. On a normal iPhone this still proves the key was physically there, but it is not a cryptographic proof.</li>
+        <li><strong>The clock is not locked yet.</strong> Moving the phone's clock forward may shorten the wait. Code to require automatic date and time exists but is not switched on, and this has not been tested either way.</li>
+        <li><strong>No blocklist is complete.</strong> Pawl ships about 4,000 gambling domains. New sites appear every week.</li>
+        <li><strong>A determined person can get around any blocker on a phone they own,</strong> with another phone, a laptop, or a friend's device.</li>
+        <li><strong>Most of the code has no automated tests.</strong> The unlock loop does. The rest was tested by hand on real phones.</li>
+        <li><strong>You cannot prove the App Store build came from this exact source.</strong> There are no reproducible builds.</li>
+      </ul>
+      <p style="margin-top:var(--s-4);font-size:var(--fs-0);color:var(--muted)">The full list, including notes for reviewers, is in the <a href="https://github.com/jasonepage/Pawl#what-it-does-not-promise">README</a>.</p>
+    </div>
+  </div>
+</section>
 
 <section id="privacy">
   <div class="wrap two">

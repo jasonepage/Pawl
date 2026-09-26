@@ -3,60 +3,87 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Support — Pawl</title>
-<meta name="description" content="Help with Pawl: how it works, how to delete your account, how to remove the app, and where to get problem-gambling support.">
+<title>Support. Pawl</title>
+<meta name="description" content="Help with Pawl: how it works, accounts, deleting your account, removing the app, and which security key to buy.">
+<link rel="canonical" href="https://getpawl.com/support">
+<meta name="theme-color" content="#3c6a14">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pawl">
+<meta property="og:url" content="https://getpawl.com/support">
+<meta property="og:title" content="Support. Pawl">
+<meta property="og:description" content="Help with Pawl: how it works, accounts, deleting your account, removing the app, and which security key to buy.">
+<meta property="og:image" content="https://getpawl.com/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/img/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="stylesheet" href="/pawl.css">
 <style>
-  :root{ --green:#356310; --green-dark:#21400a; --amber:#EFA02A; --ink:#1c2417; --muted:#5a6450; --paper:#faf8f1; --card:#ffffff; --line:#e4e0d2; }
-  *{box-sizing:border-box}
-  html,body{margin:0}
-  body{ background:var(--paper); color:var(--ink);
-        font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-        line-height:1.6; -webkit-font-smoothing:antialiased; }
-  a{color:var(--green)}
-  header.brand{ background:linear-gradient(135deg,var(--green),var(--green-dark)); color:#F2EEE2; padding:28px 24px; }
-  header.brand .wrap{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:14px}
-  header.brand svg{width:40px;height:40px;flex:none}
-  header.brand a{color:#F2EEE2;text-decoration:none;font-weight:600;font-size:22px;letter-spacing:.2px}
-  main{max-width:760px;margin:0 auto;padding:32px 24px 64px}
-  h1{font-size:30px;line-height:1.2;margin:8px 0 18px}
-  h2{font-size:19px;margin:30px 0 6px;color:var(--green-dark)}
-  p,li{font-size:16px}
-  ul{padding-left:22px}
-  li{margin:6px 0}
-  .callout{ background:var(--card); border:1px solid var(--line); border-left:4px solid var(--amber);
-            border-radius:10px; padding:16px 18px; margin:20px 0; }
-  .callout strong{color:var(--green-dark)}
-  footer{border-top:1px solid var(--line);margin-top:40px;padding-top:18px;color:var(--muted);font-size:14px}
-  footer a{margin-right:16px}
+  .top{position:sticky;top:0;z-index:10;background:var(--green-700);color:var(--on-green)}
+  .top .wrap{display:flex;align-items:center;gap:var(--s-4);height:60px}
+  .top a{color:var(--on-green);text-decoration:none}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;margin-right:auto}
+  .brand img{width:32px;height:32px;border-radius:8px}
+  .links{display:flex;align-items:center;gap:var(--s-5)}
+  .links a{opacity:.9;font-size:var(--fs-0)}
+  .links a:hover{opacity:1;text-decoration:underline}
+  .links .nav-cta{background:var(--on-green);color:var(--green-700);padding:8px 16px;border-radius:var(--r-pill);font-weight:600;opacity:1}
+  @media(max-width:640px){.links a:not(.nav-cta){display:none}}
+  main{max-width:760px;margin:0 auto;padding:var(--s-7) var(--gutter) var(--s-8)}
+  main h1{font-size:var(--fs-3);color:var(--green-700)}
+  .updated{color:var(--muted);font-size:var(--fs-0);margin:var(--s-2) 0 var(--s-6)}
+  main h2{font-size:var(--fs-2);margin:var(--s-7) 0 var(--s-2)}
+  main h3{font-size:var(--fs-1);margin:var(--s-5) 0 var(--s-2)}
+  main p{margin:0 0 var(--s-4)}
+  ul,ol{padding-left:22px;margin:0 0 var(--s-4)}
+  li{margin:var(--s-2) 0}
+  .callout{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--green-500);border-radius:var(--r-2);padding:var(--s-4) var(--s-5);margin:var(--s-5) 0}
+  .callout p{margin:0}
+  .callout strong{color:var(--green-700)}
+  table{border-collapse:collapse;width:100%;margin:var(--s-4) 0;font-size:var(--fs-0)}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:var(--green-100)}
+  code{background:var(--green-100);padding:1px 6px;border-radius:5px;font-size:14px}
+  footer{background:var(--green-900);color:var(--on-green-muted);font-size:var(--fs-0)}
+  footer .wrap{padding:var(--s-6) var(--gutter);display:flex;flex-wrap:wrap;gap:var(--s-3) var(--s-5);align-items:center}
+  footer a{color:var(--on-green);text-decoration:none;opacity:.9}
+  footer a:hover{text-decoration:underline}
+  footer .sp{margin-left:auto}
+  footer .help{width:100%;border-top:1px solid rgba(255,255,255,.14);padding-top:var(--s-4);margin-top:var(--s-2);line-height:1.5}
 </style>
 </head>
 <body>
-<header class="brand">
+
+<nav class="top" aria-label="Main">
   <div class="wrap">
-    <svg viewBox="0 0 1024 1024" aria-hidden="true">
-      <polyline points="300,582 512,338 724,582" fill="none" stroke="#F2EEE2" stroke-width="112" stroke-linecap="round" stroke-linejoin="round"/>
-      <rect x="312" y="648" width="400" height="100" rx="50" fill="#EFA02A"/>
-    </svg>
-    <a href="/">Pawl</a>
+    <a class="brand" href="/"><img src="/img/pawl-mark.svg" alt="" width="32" height="32">Pawl</a>
+    <span class="links">
+      <a href="/#how">How it works</a>
+      <a href="/#key">The key</a>
+      <a href="/#open">Open source</a>
+      <a href="/support">Support</a>
+      <a class="nav-cta" href="https://apps.apple.com/app/id6783119309">Get Pawl</a>
+    </span>
   </div>
-</header>
+</nav>
 
 <main>
+
   <h1>Support</h1>
 
-  <p>Pawl helps you quit something you're struggling with — gambling, adult content, or any distracting
-  app — by blocking it with Apple's Screen Time and making unblocking deliberately hard. Here's help with
+  <p>Pawl helps you quit something you're struggling with, such as gambling, adult content, or any distracting
+  app, by blocking it with Apple's Screen Time and making unblocking deliberately hard. Here's help with
   the most common questions. Can't find what you need? Email
   <a href="mailto:support@getpawl.com">support@getpawl.com</a>.</p>
 
   <h2>How does Pawl work?</h2>
   <p>You choose what to block. Pawl shields it with Apple's Screen Time and shows a calm “Locked by Pawl”
   screen in its place. Unblocking requires a physical USB-C security key (FIDO2, bought separately) you've
-  put out of reach, plus a 15-minute cooling-off timer — so the impulsive choice becomes a deliberate one.</p>
+  put out of reach, plus a 15-minute cooling-off timer, so the impulsive choice becomes a deliberate one.</p>
 
   <h2>Do I need an account?</h2>
   <p>No. The blocker works fully without signing in. Signing in with Apple is optional and only enables the
-  sponsor feature — a trusted person who approves your unlock requests and is alerted if your protection is
+  sponsor feature: a trusted person who approves your unlock requests and is alerted if your protection is
   removed.</p>
 
   <h2>How do I delete my account?</h2>
@@ -74,20 +101,35 @@
   remove Pawl under “Apps with Screen Time Access”), then delete Pawl from your Home Screen.</p>
 
   <h2>What security key do I need?</h2>
-  <p>Any standard USB-C FIDO2 security key works (for example YubiKey 5C or Google Titan). You buy it
-  separately from any maker — there's no in-app purchase.</p>
+  <p>Any FIDO2 security key with a USB-C plug works. Several makers sell them, and they need no app or account.
+  You buy the key separately; Pawl does not sell keys and does not take a cut.</p>
+
+  <h2>Is Pawl free?</h2>
+  <p>Yes. Blocking, the security key, the cooling-off wait, your streak, and the crisis tools are free and stay
+  free. Pawl Pro is an optional subscription that adds a sponsor: a trusted person who approves your unlock
+  requests and is alerted if your protection drops. You can restore a subscription from Settings inside the app.</p>
 
   <h2>Get help with gambling</h2>
   <p>If gambling is affecting your life, free and confidential help is available 24/7:</p>
   <ul>
-    <li>National Council on Problem Gambling — call or text <strong>1-800-GAMBLER</strong>, or visit
+    <li>National Council on Problem Gambling: call or text <strong>1-800-GAMBLER</strong>, or visit
         <a href="https://www.ncpgambling.org/help-treatment/">ncpgambling.org</a>.</li>
     <li>If you're in crisis, call or text <strong>988</strong> (U.S. Suicide &amp; Crisis Lifeline).</li>
   </ul>
-
-  <footer>
-    <a href="/">Home</a><a href="/support">Support</a><a href="/privacy">Privacy</a>
-  </footer>
 </main>
+
+<footer>
+  <div class="wrap">
+    <a href="/" style="font-weight:600">Pawl</a>
+    <a href="/#how">How it works</a>
+    <a href="/support">Support</a>
+    <a href="/privacy">Privacy</a>
+    <a href="https://github.com/jasonepage/Pawl">GitHub</a>
+    <a href="https://apps.apple.com/app/id6783119309">App Store</a>
+    <span class="sp">&copy; 2026 Jason Page</span>
+    <div class="help">If gambling is hurting you or someone you know, free and confidential help is available 24 hours a day. Call or text 1-800-GAMBLER (US).</div>
+  </div>
+</footer>
+
 </body>
 </html>

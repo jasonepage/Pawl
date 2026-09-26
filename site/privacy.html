@@ -3,56 +3,77 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Privacy Policy — Pawl</title>
-<meta name="description" content="How Pawl handles your data: most of it never leaves your device, we never see which apps or sites you block, we don't track or sell anything, and you can delete your account and all its data from inside the app at any time.">
+<title>Privacy Policy. Pawl</title>
+<meta name="description" content="How Pawl handles your data: most of it never leaves your device, Pawl never sees which apps or sites you block, and there is no tracking or advertising. You can delete your account inside the app.">
+<link rel="canonical" href="https://getpawl.com/privacy">
+<meta name="theme-color" content="#3c6a14">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pawl">
+<meta property="og:url" content="https://getpawl.com/privacy">
+<meta property="og:title" content="Privacy Policy. Pawl">
+<meta property="og:description" content="How Pawl handles your data: most of it never leaves your device, Pawl never sees which apps or sites you block, and there is no tracking or advertising. You can delete your account inside the app.">
+<meta property="og:image" content="https://getpawl.com/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/img/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="stylesheet" href="/pawl.css">
 <style>
-  :root{ --green:#356310; --green-dark:#21400a; --amber:#EFA02A; --ink:#1c2417; --muted:#5a6450; --paper:#faf8f1; --card:#ffffff; --line:#e4e0d2; }
-  *{box-sizing:border-box}
-  html,body{margin:0}
-  body{ background:var(--paper); color:var(--ink);
-        font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-        line-height:1.6; -webkit-font-smoothing:antialiased; }
-  a{color:var(--green)}
-  header.brand{ background:linear-gradient(135deg,var(--green),var(--green-dark)); color:#F2EEE2; padding:28px 24px; }
-  header.brand .wrap{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:14px}
-  header.brand svg{width:40px;height:40px;flex:none}
-  header.brand a{color:#F2EEE2;text-decoration:none;font-weight:600;font-size:22px;letter-spacing:.2px}
-  main{max-width:760px;margin:0 auto;padding:32px 24px 64px}
-  h1{font-size:30px;line-height:1.2;margin:8px 0 4px}
-  .updated{color:var(--muted);font-size:14px;margin:0 0 28px}
-  h2{font-size:20px;margin:36px 0 8px;color:var(--green-dark)}
-  h3{font-size:16px;margin:22px 0 6px}
-  p,li{font-size:16px}
-  ul{padding-left:22px}
-  li{margin:6px 0}
-  .callout{ background:var(--card); border:1px solid var(--line); border-left:4px solid var(--amber);
-            border-radius:10px; padding:16px 18px; margin:20px 0; }
-  .callout strong{color:var(--green-dark)}
-  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:15px}
+  .top{position:sticky;top:0;z-index:10;background:var(--green-700);color:var(--on-green)}
+  .top .wrap{display:flex;align-items:center;gap:var(--s-4);height:60px}
+  .top a{color:var(--on-green);text-decoration:none}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;margin-right:auto}
+  .brand img{width:32px;height:32px;border-radius:8px}
+  .links{display:flex;align-items:center;gap:var(--s-5)}
+  .links a{opacity:.9;font-size:var(--fs-0)}
+  .links a:hover{opacity:1;text-decoration:underline}
+  .links .nav-cta{background:var(--on-green);color:var(--green-700);padding:8px 16px;border-radius:var(--r-pill);font-weight:600;opacity:1}
+  @media(max-width:640px){.links a:not(.nav-cta){display:none}}
+  main{max-width:760px;margin:0 auto;padding:var(--s-7) var(--gutter) var(--s-8)}
+  main h1{font-size:var(--fs-3);color:var(--green-700)}
+  .updated{color:var(--muted);font-size:var(--fs-0);margin:var(--s-2) 0 var(--s-6)}
+  main h2{font-size:var(--fs-2);margin:var(--s-7) 0 var(--s-2)}
+  main h3{font-size:var(--fs-1);margin:var(--s-5) 0 var(--s-2)}
+  main p{margin:0 0 var(--s-4)}
+  ul,ol{padding-left:22px;margin:0 0 var(--s-4)}
+  li{margin:var(--s-2) 0}
+  .callout{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--green-500);border-radius:var(--r-2);padding:var(--s-4) var(--s-5);margin:var(--s-5) 0}
+  .callout p{margin:0}
+  .callout strong{color:var(--green-700)}
+  table{border-collapse:collapse;width:100%;margin:var(--s-4) 0;font-size:var(--fs-0)}
   th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
-  th{background:#f0eddf}
-  code{background:#eef0e6;padding:1px 6px;border-radius:5px;font-size:14px}
-  footer{border-top:1px solid var(--line);margin-top:40px;padding-top:18px;color:var(--muted);font-size:14px}
-  footer a{margin-right:16px}
+  th{background:var(--green-100)}
+  code{background:var(--green-100);padding:1px 6px;border-radius:5px;font-size:14px}
+  footer{background:var(--green-900);color:var(--on-green-muted);font-size:var(--fs-0)}
+  footer .wrap{padding:var(--s-6) var(--gutter);display:flex;flex-wrap:wrap;gap:var(--s-3) var(--s-5);align-items:center}
+  footer a{color:var(--on-green);text-decoration:none;opacity:.9}
+  footer a:hover{text-decoration:underline}
+  footer .sp{margin-left:auto}
+  footer .help{width:100%;border-top:1px solid rgba(255,255,255,.14);padding-top:var(--s-4);margin-top:var(--s-2);line-height:1.5}
 </style>
 </head>
 <body>
-<header class="brand">
+
+<nav class="top" aria-label="Main">
   <div class="wrap">
-    <svg viewBox="0 0 1024 1024" aria-hidden="true">
-      <polyline points="300,582 512,338 724,582" fill="none" stroke="#F2EEE2" stroke-width="112" stroke-linecap="round" stroke-linejoin="round"/>
-      <rect x="312" y="648" width="400" height="100" rx="50" fill="#EFA02A"/>
-    </svg>
-    <a href="/">Pawl</a>
+    <a class="brand" href="/"><img src="/img/pawl-mark.svg" alt="" width="32" height="32">Pawl</a>
+    <span class="links">
+      <a href="/#how">How it works</a>
+      <a href="/#key">The key</a>
+      <a href="/#open">Open source</a>
+      <a href="/support">Support</a>
+      <a class="nav-cta" href="https://apps.apple.com/app/id6783119309">Get Pawl</a>
+    </span>
   </div>
-</header>
+</nav>
 
 <main>
+
   <h1>Privacy Policy</h1>
   <p class="updated">Last updated: June 28, 2026</p>
 
-  <p>Pawl is a self-control tool that helps you stop something you're struggling with — gambling, adult
-  content, or any distracting app — by blocking it with Apple's Screen Time and making it deliberately
+  <p>Pawl is a self-control tool that helps you stop something you're struggling with, such as gambling, adult
+  content, or any distracting app, by blocking it with Apple's Screen Time and making it deliberately
   hard to unblock. This policy explains what Pawl does and doesn't collect, how the small amount of data
   we do handle is used, and how you can delete it.</p>
 
@@ -60,7 +81,7 @@
     <p style="margin:0"><strong>The short version.</strong> Pawl works without an account, and most of
     your data never leaves your iPhone. We never see which specific apps or websites you block. We don't
     use advertising, we don't track you across other apps, and we never sell your data. If you create an
-    account, you can delete it and everything tied to it from right inside the app — Settings → Account →
+    account, you can delete it and everything tied to it from right inside the app: Settings → Account →
     Delete account.</p>
   </div>
 
@@ -70,7 +91,7 @@
 
   <h2>2. What Pawl never sees</h2>
   <p>Pawl blocks apps and sites using Apple's <strong>Screen Time / Family Controls</strong> framework.
-  Apple hands the app only <em>opaque tokens</em> that stand in for your selections — Pawl cannot read,
+  Apple hands the app only <em>opaque tokens</em> that stand in for your selections. Pawl cannot read,
   and never receives, the identities of the specific apps or websites you choose to block. Your blocking
   choices are not transmitted to us.</p>
 
@@ -102,7 +123,7 @@
   <div class="callout">
     <p style="margin:0"><strong>Sensitive by nature.</strong> The fact that you use Pawl can imply you're
     working on a gambling, adult-content, or focus problem. We treat your information as sensitive. Your
-    <strong>relapse and urge entries are private to you</strong> — they are never shared with your sponsor.
+    <strong>relapse and urge entries are private to you</strong> and are never shared with your sponsor.
     A sponsor only ever sees your display name, your unlock requests, and alerts that your protection was
     removed.</p>
   </div>
@@ -118,7 +139,7 @@
 
   <h2>6. Who we share data with</h2>
   <ul>
-    <li><strong>Your chosen sponsor</strong> — only your display name, unlock requests, and protection
+    <li><strong>Your chosen sponsor:</strong> only your display name, unlock requests, and protection
         alerts, and only while the link is active. Never your relapse/urge log.</li>
     <li><strong>Service providers</strong> that run the backend on our behalf: <strong>Supabase</strong>
         (database and authentication) and <strong>Apple</strong> (Sign in with Apple and push
@@ -135,7 +156,7 @@
   <p>We keep account data for as long as your account exists. When you delete your account, the associated
   data is deleted (see below). On-device data is kept until you remove it.</p>
 
-  <h2 id="delete">9. Your choices and rights — including deleting your account</h2>
+  <h2 id="delete">9. Your choices and rights, including deleting your account</h2>
   <p>You can request access to, correction of, or deletion of your personal data. You also have a built-in,
   one-tap way to delete everything:</p>
 
@@ -143,9 +164,9 @@
     <p style="margin:0 0 8px"><strong>Delete your account from inside the app:</strong></p>
     <p style="margin:0">Open Pawl → <strong>Settings</strong> tab → <strong>Account</strong> →
     <strong>Delete account</strong> → confirm. This permanently and immediately deletes your Pawl account
-    and all data tied to it — profile, sponsor link, unlock history, devices, heartbeats, and alerts — and
+    and all data tied to it (profile, sponsor link, unlock history, devices, heartbeats, and alerts) and
     revokes Sign in with Apple. It cannot be undone. (Your on-device protection and streak remain on your
-    iPhone; remove those by deleting the app — Section&nbsp;9 below.)</p>
+    iPhone; remove those by deleting the app; see below.)</p>
   </div>
 
   <p>If you can no longer access the app and want your account deleted, email us at the address below from
@@ -165,10 +186,20 @@
 
   <h2>12. Contact</h2>
   <p>Questions, requests, or account-deletion help: <a href="mailto:privacy@getpawl.com">privacy@getpawl.com</a>.</p>
-
-  <footer>
-    <a href="/">Home</a><a href="/support">Support</a><a href="/privacy">Privacy</a>
-  </footer>
 </main>
+
+<footer>
+  <div class="wrap">
+    <a href="/" style="font-weight:600">Pawl</a>
+    <a href="/#how">How it works</a>
+    <a href="/support">Support</a>
+    <a href="/privacy">Privacy</a>
+    <a href="https://github.com/jasonepage/Pawl">GitHub</a>
+    <a href="https://apps.apple.com/app/id6783119309">App Store</a>
+    <span class="sp">&copy; 2026 Jason Page</span>
+    <div class="help">If gambling is hurting you or someone you know, free and confidential help is available 24 hours a day. Call or text 1-800-GAMBLER (US).</div>
+  </div>
+</footer>
+
 </body>
 </html>
