@@ -19,8 +19,12 @@
 //    1. The template returns .defer for the secondary button. Defer leaves the blocked app
 //       open behind the shield. Pawl returns .close on every path, so the person is put back
 //       on the home screen and out of the app they were trying to open.
-//    2. The template calls fatalError() in @unknown default. ShieldAction has five cases,
-//       including three submenu items, so that line is a crash waiting for an iOS release.
+//    2. The template calls fatalError() in @unknown default. Pawl never crashes here.
+//
+//  Deployment target is iOS 18, the same as the app (2.1; it was 26.5 by accident, which
+//  left the block screen buttons dead on iOS 18 through 26.4). The submenu actions are not
+//  named in the switch, so this compiles on the iOS 18 SDK floor: anything that is not the
+//  primary button is treated as the secondary button, which opens the urge flow.
 //
 //  Setup that must be true or this silently does nothing:
 //    * App Group group.io.github.jasonepage.Pawl on this target (writes go to the wrong
@@ -46,15 +50,11 @@ class ShieldActionExtension: ShieldActionDelegate {
         switch action {
         case .primaryButtonPressed:
             break
-        case .secondaryButtonPressed,
-             .firstSecondarySubmenuItemPressed,
-             .secondSecondarySubmenuItemPressed,
-             .thirdSecondarySubmenuItemPressed:
+        default:
+            // The secondary button, its submenu items on newer iOS, and any action a future
+            // iOS adds. All of them mean somebody hit the shield and asked for help, so leave
+            // the note for the urge flow. Never crash here.
             SharedState.setPendingUrge()
-        @unknown default:
-            // Never crash here. An unknown action still means somebody hit the shield, and
-            // the safest thing to do with a person in an urge is close the app.
-            break
         }
 
         return .close

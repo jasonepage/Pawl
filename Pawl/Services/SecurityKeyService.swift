@@ -114,7 +114,7 @@ public final class SecurityKeyService: NSObject {
     /// Throws only when the tap didn't happen (cancelled, OS error). A tap that fails a check
     /// comes back as `.rejected`, so callers keep the same "not your key" path as 2.0.
     public func verifyPresence(of paired: RegisteredKey) async throws -> KeyPresence {
-        let assertion = try await assert()
+        let assertion = try await assert(allowing: paired.credentialID)
         do {
             let updated = try WebAuthnVerifier.verifyAssertion(
                 credentialID: assertion.credentialID,
@@ -153,11 +153,22 @@ public final class SecurityKeyService: NSObject {
     }
 
     /// Ask for an assertion from a registered key. Returns the full, unverified response.
-    public func assert() async throws -> KeyAssertion {
+    /// Naming the paired credential matters when the same physical key holds more than one
+    /// getpawl.com credential (re-pairing the same key makes a second one): without it, the
+    /// key or iOS may pick the old credential and the check would say "not your paired key".
+    public func assert(allowing credentialID: Data? = nil) async throws -> KeyAssertion {
         let challenge = Self.randomChallenge()
         let provider = ASAuthorizationSecurityKeyPublicKeyCredentialProvider(relyingPartyIdentifier: relyingPartyID)
         let request = provider.createCredentialAssertionRequest(challenge: challenge)
         request.userVerificationPreference = .preferred
+        if let credentialID {
+            request.allowedCredentials = [
+                ASAuthorizationSecurityKeyPublicKeyCredentialDescriptor(
+                    credentialID: credentialID,
+                    transports: ASAuthorizationSecurityKeyPublicKeyCredentialDescriptor.Transport.allSupported
+                )
+            ]
+        }
         guard case let .assertion(id, clientData, authData, signature, userID) = try await perform(request) else {
             throw SecurityKeyError.noCredential
         }

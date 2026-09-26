@@ -13,6 +13,10 @@ A hardening release. The screens, the cooling off wait and the sponsor flow are 
 - The paired key now lives in the Keychain (this device only) instead of UserDefaults.
   2.0 values are moved over on first launch.
 - 28 new unit tests for the key check.
+- Unlocking now asks the key for the exact credential you paired. Re-pairing the same
+  physical key no longer risks the key answering with its old credential.
+- The buttons on the block screen now work on iOS 18 through 26.4. The block screen
+  extension was set to require iOS 26.5 by mistake.
 
 ## 2.0
 
