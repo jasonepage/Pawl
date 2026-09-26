@@ -26,6 +26,7 @@
       <rect x="84" y="76" width="22" height="22" rx="3" fill="#fff"/>
     </g>
   </defs>
+  <rect width="900" height="300" rx="24" fill="#e6efdc"/>
 
   <!-- panel 1: plug in once -->
   <g transform="translate(60,40)">

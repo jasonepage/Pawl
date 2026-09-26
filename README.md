@@ -100,7 +100,9 @@ Read this before you trust it with anything.
    somewhere that takes real effort to reach. Any FIDO2 key with a USB-C
    plug works.
 
-   <img src="site/img/security-key.svg" width="320" alt="A drawing of a small green security key with a USB-C plug and a keyring loop">
+   <img src="site/img/key-steps.svg" width="720" alt="Three drawings. One: a small security key plugged into the bottom of a phone. Two: the same key left inside a house that is not yours. Three: a moon over a long road between a phone and the house.">
+
+   <img src="site/img/security-key.svg" width="320" alt="A drawing of a small green security key with a metal USB-C plug, a round touch button and a keyring">
 
 3. **The shield goes on.** While a commitment is active, Pawl also turns on
    Screen Time's "block app deletion", so you cannot delete Pawl to get out.
