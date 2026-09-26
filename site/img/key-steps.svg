@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" role="img" aria-labelledby="t d">
+  <title id="t">How the key works</title>
+  <desc id="d">Three drawings. One: a small security key plugged into the bottom of a phone. Two: the same key left inside a house that is not yours. Three: a moon over a long road between a phone and the house.</desc>
+  <defs>
+    <g id="key">
+      <rect x="0" y="0" width="86" height="34" rx="9" fill="#3c6a14"/>
+      <circle cx="18" cy="17" r="7" fill="none" stroke="#e6efdc" stroke-width="3"/>
+      <rect x="64" y="10" width="24" height="14" rx="4" fill="#c9ddb4"/>
+      <rect x="70" y="14" width="12" height="6" rx="2" fill="#3c6a14"/>
+      <circle cx="44" cy="17" r="9" fill="#4c7f1c"/>
+      <circle cx="44" cy="17" r="4" fill="#e6efdc"/>
+    </g>
+    <g id="phone">
+      <rect x="0" y="0" width="90" height="180" rx="18" fill="#16300a"/>
+      <rect x="6" y="6" width="78" height="168" rx="14" fill="#e6efdc"/>
+      <rect x="30" y="10" width="30" height="6" rx="3" fill="#16300a"/>
+      <path d="M45 62 L67 73 V88 C67 106 55 116 45 121 C35 116 23 106 23 88 V73 Z" fill="#3c6a14"/>
+      <rect x="39" y="88" width="12" height="11" rx="3" fill="#fff"/>
+      <path d="M41 88 V84 a4 4 0 0 1 8 0 V88" fill="none" stroke="#fff" stroke-width="2.5"/>
+    </g>
+    <g id="house">
+      <path d="M0 60 L60 10 L120 60 V130 H0 Z" fill="#c9ddb4"/>
+      <path d="M-8 64 L60 6 L128 64" fill="none" stroke="#2c550d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="46" y="84" width="28" height="46" rx="3" fill="#2c550d"/>
+      <rect x="14" y="76" width="22" height="22" rx="3" fill="#fff"/>
+      <rect x="84" y="76" width="22" height="22" rx="3" fill="#fff"/>
+    </g>
+  </defs>
+
+  <!-- panel 1: plug in once -->
+  <g transform="translate(60,40)">
+    <g transform="scale(.8)"><use href="#phone" x="75" y="0"/><use href="#key" transform="translate(103,266) rotate(-90)"/></g>
+    <text x="96" y="250" text-anchor="middle" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="16" font-weight="600" fill="#2c550d">1. Plug it in once</text>
+  </g>
+
+  <!-- panel 2: leave it somewhere else -->
+  <g transform="translate(360,40)">
+    <use href="#house" x="30" y="30"/>
+    <use href="#key" transform="translate(52,138) scale(.6)"/>
+    <text x="90" y="250" text-anchor="middle" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="16" font-weight="600" fill="#2c550d">2. Leave it somewhere else</text>
+  </g>
+
+  <!-- panel 3: 1am, across town -->
+  <g transform="translate(600,40)">
+    <circle cx="70" cy="40" r="22" fill="#c9ddb4"/>
+    <circle cx="82" cy="32" r="20" fill="#ffffff"/>
+    <use href="#phone" transform="translate(0,70) scale(.5)"/>
+    <path d="M52 160 C120 160 160 120 230 120" fill="none" stroke="#2c550d" stroke-width="4" stroke-dasharray="8 8" stroke-linecap="round"/>
+    <use href="#house" transform="translate(190,50) scale(.5)"/>
+    <text x="140" y="250" text-anchor="middle" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="16" font-weight="600" fill="#2c550d">3. At 1am it is across town</text>
+  </g>
+</svg>

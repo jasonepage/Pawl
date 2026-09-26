@@ -1,0 +1,47 @@
+/* Pawl brand tokens. Greens are sampled from the App Store icon
+   (top-left #4c7f1c, middle #3c6a14, bottom-right #2c550d, padlock #3b6914). */
+:root{
+  --green-100:#e6efdc;   /* pale tint for backgrounds and borders on white */
+  --green-200:#c9ddb4;   /* soft tint, muted text on dark green */
+  --green-400:#4c7f1c;   /* icon top-left */
+  --green-500:#3c6a14;   /* icon middle, primary brand green */
+  --green-600:#3b6914;   /* padlock */
+  --green-700:#2c550d;   /* icon bottom-right */
+  --green-900:#16300a;   /* footer, deepest */
+  --brand-gradient:linear-gradient(135deg,var(--green-400) 0%,var(--green-500) 50%,var(--green-700) 100%);
+
+  --ink:#1b2416;         /* body text */
+  --muted:#5b6653;       /* secondary text */
+  --paper:#f7f8f3;       /* page background */
+  --card:#ffffff;
+  --line:#dfe6d6;
+  --on-green:#ffffff;
+  --on-green-muted:var(--green-200);
+
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --fs-0:15px; --fs-1:17px; --fs-2:19px; --fs-3:clamp(22px,3vw,30px); --fs-4:clamp(30px,5vw,48px);
+  --lh:1.6;
+
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:24px; --s-6:32px; --s-7:48px; --s-8:64px; --s-9:96px;
+  --r-1:8px; --r-2:12px; --r-3:18px; --r-pill:999px;
+  --shadow:0 8px 28px rgba(22,48,10,.14);
+  --wrap:1040px; --gutter:20px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--font);font-size:var(--fs-1);line-height:var(--lh);-webkit-font-smoothing:antialiased}
+img,svg,video{max-width:100%;height:auto;display:block}
+a{color:var(--green-500)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--green-400);outline-offset:3px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 var(--gutter)}
+h1,h2,h3{line-height:1.15;letter-spacing:-.01em;margin:0}
+h1{font-size:var(--fs-4);font-weight:700}
+h2{font-size:var(--fs-3);font-weight:700;color:var(--green-700)}
+h3{font-size:var(--fs-2);font-weight:600;color:var(--green-700)}
+p{margin:0}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
