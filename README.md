@@ -21,10 +21,11 @@
 </p>
 
 <p align="center">
-  <img src="site/img/screens/01-friction.png" width="180" alt="Ride it out: a breathing circle, the current streak, and a place to log the urge">
-  <img src="site/img/screens/02-streaks.png" width="180" alt="Home: 24 days on track, a tough moment button, and the apps and sites marked protected">
-  <img src="site/img/screens/03-wait.png" width="180" alt="Unlocking soon: a 14 minute 59 second countdown until apps unlock, with a cancel button that keeps them locked">
-  <img src="site/img/screens/04-block.png" width="180" alt="Apps are blocked: a tap to unlock button and a note that using the key starts a 15 minute wait">
+  <img src="site/img/screens/00-shield.png" width="150" alt="What a blocked app shows: Locked by Pawl, open Pawl and use your security key, then wait out the cooling-off. No unlock button.">
+  <img src="site/img/screens/01-friction.png" width="150" alt="Ride it out: a breathing circle, the current streak, and a place to log the urge">
+  <img src="site/img/screens/02-streaks.png" width="150" alt="Home: 24 days on track, a tough moment button, and the apps and sites marked protected">
+  <img src="site/img/screens/03-wait.png" width="150" alt="Unlocking soon: a 14 minute 59 second countdown until apps unlock, with a cancel button that keeps them locked">
+  <img src="site/img/screens/04-block.png" width="150" alt="Apps are blocked: a tap to unlock button and a note that using the key starts a 15 minute wait">
 </p>
 
 ---
