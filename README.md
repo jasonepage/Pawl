@@ -20,6 +20,13 @@
   <a href="SECURITY.md">Report a vulnerability</a>
 </p>
 
+<p align="center">
+  <img src="site/img/screens/01-friction.png" width="180" alt="Ride it out: a breathing circle, the current streak, and a place to log the urge">
+  <img src="site/img/screens/02-streaks.png" width="180" alt="Home: 24 days on track, a tough moment button, and the apps and sites marked protected">
+  <img src="site/img/screens/03-wait.png" width="180" alt="Unlocking soon: a 14 minute 59 second countdown until apps unlock, with a cancel button that keeps them locked">
+  <img src="site/img/screens/04-block.png" width="180" alt="Apps are blocked: a tap to unlock button and a note that using the key starts a 15 minute wait">
+</p>
+
 ---
 
 Most blockers can be undone by the same person who set them up, in about
