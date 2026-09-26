@@ -68,6 +68,11 @@ Read this before you trust it with anything.
   exists (`ShieldService.setClockLock`) but nothing calls it yet. Until it is
   switched on, moving the phone's clock forward may shorten the cooling off
   wait. This has not been tested either way.
+- **Debug builds have developer buttons.** "Skip the wait", "simulate
+  sponsor approve" and "allow deletion" exist for testing. They sit inside
+  `#if DEBUG`, which is only switched on in the Debug build setting, so they
+  are not in the App Store build. If you build Pawl yourself in Debug, you
+  get them. That is on purpose: it is your own phone.
 - **No blocklist is complete.** Pawl ships about 4,000 gambling domains. New
   sites appear every week.
 - **A determined person can get around any blocker on a phone they own**
