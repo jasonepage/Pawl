@@ -1,0 +1,899 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BC8410E12FE9D26000F0888C /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC8410E02FE9D26000F0888C /* DeviceActivity.framework */; };
+		BC8410E92FE9D26100F0888C /* PawlMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC8410DE2FE9D26000F0888C /* PawlMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BC8410F62FE9D33D00F0888C /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC8410F52FE9D33D00F0888C /* ManagedSettings.framework */; };
+		BC8410F82FE9D33D00F0888C /* ManagedSettingsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC8410F72FE9D33D00F0888C /* ManagedSettingsUI.framework */; };
+		BC8411002FE9D33D00F0888C /* PawlShield.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC8410F42FE9D33D00F0888C /* PawlShield.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BC8411212FE9F34000F0888C /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = BC8411202FE9F34000F0888C /* Supabase */; };
+		BC8AB0D5304914E90001384D /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC8410F52FE9D33D00F0888C /* ManagedSettings.framework */; };
+		BC8AB0DD304914E90001384D /* PawlShieldAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC8AB0D4304914E80001384D /* PawlShieldAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BC8B55BD2FF438C500BACE0C /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC8B55BC2FF438C500BACE0C /* StoreKit.framework */; };
+		BC8B55BF2FF4393100BACE0C /* Configuration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = BC8B55BE2FF4393100BACE0C /* Configuration.storekit */; };
+		BC8B55C02FF4393100BACE0C /* Configuration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = BC8B55BE2FF4393100BACE0C /* Configuration.storekit */; };
+		BC8B55C12FF4393100BACE0C /* Configuration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = BC8B55BE2FF4393100BACE0C /* Configuration.storekit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BC8410E72FE9D26100F0888C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BC8410922FE9B3D600F0888C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BC8410DD2FE9D26000F0888C;
+			remoteInfo = PawlMonitor;
+		};
+		BC8410FE2FE9D33D00F0888C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BC8410922FE9B3D600F0888C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BC8410F32FE9D33D00F0888C;
+			remoteInfo = PawlShield;
+		};
+		BC8AB0DB304914E90001384D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BC8410922FE9B3D600F0888C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BC8AB0D3304914E80001384D;
+			remoteInfo = PawlShieldAction;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BC8410EE2FE9D26100F0888C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BC8AB0DD304914E90001384D /* PawlShieldAction.appex in Embed Foundation Extensions */,
+				BC8410E92FE9D26100F0888C /* PawlMonitor.appex in Embed Foundation Extensions */,
+				BC8411002FE9D33D00F0888C /* PawlShield.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		BC84109A2FE9B3D600F0888C /* Pawl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pawl.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC8410DE2FE9D26000F0888C /* PawlMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PawlMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC8410E02FE9D26000F0888C /* DeviceActivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceActivity.framework; path = System/Library/Frameworks/DeviceActivity.framework; sourceTree = SDKROOT; };
+		BC8410F42FE9D33D00F0888C /* PawlShield.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PawlShield.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC8410F52FE9D33D00F0888C /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
+		BC8410F72FE9D33D00F0888C /* ManagedSettingsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettingsUI.framework; path = System/Library/Frameworks/ManagedSettingsUI.framework; sourceTree = SDKROOT; };
+		BC8AB0D4304914E80001384D /* PawlShieldAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PawlShieldAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC8B55BC2FF438C500BACE0C /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		BC8B55BE2FF4393100BACE0C /* Configuration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Configuration.storekit; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BC8410EA2FE9D26100F0888C /* Exceptions for "PawlMonitor" folder in "PawlMonitor" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BC8410DD2FE9D26000F0888C /* PawlMonitor */;
+		};
+		BC8411012FE9D33D00F0888C /* Exceptions for "PawlShield" folder in "PawlShield" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BC8410F32FE9D33D00F0888C /* PawlShield */;
+		};
+		BC8411072FE9D8A800F0888C /* Exceptions for "Pawl" folder in "PawlMonitor" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Shared/PawlShared.swift,
+			);
+			target = BC8410DD2FE9D26000F0888C /* PawlMonitor */;
+		};
+		BC8AB0F1304914E90001384D /* Exceptions for "Pawl" folder in "PawlShieldAction" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Shared/PawlShared.swift,
+			);
+			target = BC8AB0D3304914E80001384D /* PawlShieldAction */;
+		};
+		BC8411192FE9ED4B00F0888C /* Exceptions for "Pawl" folder in "Pawl" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BC8410992FE9B3D600F0888C /* Pawl */;
+		};
+		BC8AB0E1304914E90001384D /* Exceptions for "PawlShieldAction" folder in "PawlShieldAction" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BC8AB0D3304914E80001384D /* PawlShieldAction */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		BC84109C2FE9B3D600F0888C /* Pawl */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BC8411192FE9ED4B00F0888C /* Exceptions for "Pawl" folder in "Pawl" target */,
+				BC8411072FE9D8A800F0888C /* Exceptions for "Pawl" folder in "PawlMonitor" target */,
+				BC8AB0F1304914E90001384D /* Exceptions for "Pawl" folder in "PawlShieldAction" target */,
+			);
+			path = Pawl;
+			sourceTree = "<group>";
+		};
+		BC8410E22FE9D26100F0888C /* PawlMonitor */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BC8410EA2FE9D26100F0888C /* Exceptions for "PawlMonitor" folder in "PawlMonitor" target */,
+			);
+			path = PawlMonitor;
+			sourceTree = "<group>";
+		};
+		BC8410F92FE9D33D00F0888C /* PawlShield */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BC8411012FE9D33D00F0888C /* Exceptions for "PawlShield" folder in "PawlShield" target */,
+			);
+			path = PawlShield;
+			sourceTree = "<group>";
+		};
+		BC8AB0D6304914E90001384D /* PawlShieldAction */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BC8AB0E1304914E90001384D /* Exceptions for "PawlShieldAction" folder in "PawlShieldAction" target */,
+			);
+			path = PawlShieldAction;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BC8410972FE9B3D600F0888C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC8411212FE9F34000F0888C /* Supabase in Frameworks */,
+				BC8B55BD2FF438C500BACE0C /* StoreKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC8410DB2FE9D26000F0888C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC8410E12FE9D26000F0888C /* DeviceActivity.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC8410F12FE9D33D00F0888C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC8410F62FE9D33D00F0888C /* ManagedSettings.framework in Frameworks */,
+				BC8410F82FE9D33D00F0888C /* ManagedSettingsUI.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC8AB0D1304914E80001384D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC8AB0D5304914E90001384D /* ManagedSettings.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BC8410912FE9B3D600F0888C = {
+			isa = PBXGroup;
+			children = (
+				BC8B55BE2FF4393100BACE0C /* Configuration.storekit */,
+				BC84109C2FE9B3D600F0888C /* Pawl */,
+				BC8410E22FE9D26100F0888C /* PawlMonitor */,
+				BC8410F92FE9D33D00F0888C /* PawlShield */,
+				BC8AB0D6304914E90001384D /* PawlShieldAction */,
+				BC8410DF2FE9D26000F0888C /* Frameworks */,
+				BC84109B2FE9B3D600F0888C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BC84109B2FE9B3D600F0888C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BC84109A2FE9B3D600F0888C /* Pawl.app */,
+				BC8410DE2FE9D26000F0888C /* PawlMonitor.appex */,
+				BC8410F42FE9D33D00F0888C /* PawlShield.appex */,
+				BC8AB0D4304914E80001384D /* PawlShieldAction.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BC8410DF2FE9D26000F0888C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BC8B55BC2FF438C500BACE0C /* StoreKit.framework */,
+				BC8410E02FE9D26000F0888C /* DeviceActivity.framework */,
+				BC8410F52FE9D33D00F0888C /* ManagedSettings.framework */,
+				BC8410F72FE9D33D00F0888C /* ManagedSettingsUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BC8410992FE9B3D600F0888C /* Pawl */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BC8410A52FE9B3D700F0888C /* Build configuration list for PBXNativeTarget "Pawl" */;
+			buildPhases = (
+				BC8410962FE9B3D600F0888C /* Sources */,
+				BC8410972FE9B3D600F0888C /* Frameworks */,
+				BC8410982FE9B3D600F0888C /* Resources */,
+				BC8410EE2FE9D26100F0888C /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BC8410E82FE9D26100F0888C /* PBXTargetDependency */,
+				BC8410FF2FE9D33D00F0888C /* PBXTargetDependency */,
+				BC8AB0DC304914E90001384D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				BC84109C2FE9B3D600F0888C /* Pawl */,
+			);
+			name = Pawl;
+			packageProductDependencies = (
+				BC8411202FE9F34000F0888C /* Supabase */,
+			);
+			productName = Pawl;
+			productReference = BC84109A2FE9B3D600F0888C /* Pawl.app */;
+			productType = "com.apple.product-type.application";
+		};
+		BC8410DD2FE9D26000F0888C /* PawlMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BC8410EB2FE9D26100F0888C /* Build configuration list for PBXNativeTarget "PawlMonitor" */;
+			buildPhases = (
+				BC8410DA2FE9D26000F0888C /* Sources */,
+				BC8410DB2FE9D26000F0888C /* Frameworks */,
+				BC8410DC2FE9D26000F0888C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				BC8410E22FE9D26100F0888C /* PawlMonitor */,
+			);
+			name = PawlMonitor;
+			packageProductDependencies = (
+			);
+			productName = PawlMonitor;
+			productReference = BC8410DE2FE9D26000F0888C /* PawlMonitor.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		BC8410F32FE9D33D00F0888C /* PawlShield */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BC8411022FE9D33D00F0888C /* Build configuration list for PBXNativeTarget "PawlShield" */;
+			buildPhases = (
+				BC8410F02FE9D33D00F0888C /* Sources */,
+				BC8410F12FE9D33D00F0888C /* Frameworks */,
+				BC8410F22FE9D33D00F0888C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				BC8410F92FE9D33D00F0888C /* PawlShield */,
+			);
+			name = PawlShield;
+			packageProductDependencies = (
+			);
+			productName = PawlShield;
+			productReference = BC8410F42FE9D33D00F0888C /* PawlShield.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		BC8AB0D3304914E80001384D /* PawlShieldAction */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BC8AB0E0304914E90001384D /* Build configuration list for PBXNativeTarget "PawlShieldAction" */;
+			buildPhases = (
+				BC8AB0D0304914E80001384D /* Sources */,
+				BC8AB0D1304914E80001384D /* Frameworks */,
+				BC8AB0D2304914E80001384D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				BC8AB0D6304914E90001384D /* PawlShieldAction */,
+			);
+			name = PawlShieldAction;
+			packageProductDependencies = (
+			);
+			productName = PawlShieldAction;
+			productReference = BC8AB0D4304914E80001384D /* PawlShieldAction.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BC8410922FE9B3D600F0888C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					BC8410992FE9B3D600F0888C = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					BC8410DD2FE9D26000F0888C = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					BC8410F32FE9D33D00F0888C = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					BC8AB0D3304914E80001384D = {
+						CreatedOnToolsVersion = 26.6;
+					};
+				};
+			};
+			buildConfigurationList = BC8410952FE9B3D600F0888C /* Build configuration list for PBXProject "Pawl" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = BC8410912FE9B3D600F0888C;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BC8411172FE9ED1800F0888C /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = BC84109B2FE9B3D600F0888C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BC8410992FE9B3D600F0888C /* Pawl */,
+				BC8410DD2FE9D26000F0888C /* PawlMonitor */,
+				BC8410F32FE9D33D00F0888C /* PawlShield */,
+				BC8AB0D3304914E80001384D /* PawlShieldAction */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BC8410982FE9B3D600F0888C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC8B55BF2FF4393100BACE0C /* Configuration.storekit in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC8410DC2FE9D26000F0888C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC8B55C02FF4393100BACE0C /* Configuration.storekit in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC8410F22FE9D33D00F0888C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC8B55C12FF4393100BACE0C /* Configuration.storekit in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC8AB0D2304914E80001384D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BC8410962FE9B3D600F0888C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC8410DA2FE9D26000F0888C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC8410F02FE9D33D00F0888C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC8AB0D0304914E80001384D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BC8410E82FE9D26100F0888C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BC8410DD2FE9D26000F0888C /* PawlMonitor */;
+			targetProxy = BC8410E72FE9D26100F0888C /* PBXContainerItemProxy */;
+		};
+		BC8410FF2FE9D33D00F0888C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BC8410F32FE9D33D00F0888C /* PawlShield */;
+			targetProxy = BC8410FE2FE9D33D00F0888C /* PBXContainerItemProxy */;
+		};
+		BC8AB0DC304914E90001384D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BC8AB0D3304914E80001384D /* PawlShieldAction */;
+			targetProxy = BC8AB0DB304914E90001384D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		BC8410A32FE9B3D700F0888C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 8C4BM6A82T;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		BC8410A42FE9B3D700F0888C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 8C4BM6A82T;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BC8410A62FE9B3D700F0888C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Pawl/Pawl.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
+				DEVELOPMENT_TEAM = 8C4BM6A82T;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Pawl/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.jasonepage.Pawl;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BC8410A72FE9B3D700F0888C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Pawl/Pawl.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
+				DEVELOPMENT_TEAM = 8C4BM6A82T;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Pawl/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.jasonepage.Pawl;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BC8410EC2FE9D26100F0888C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PawlMonitor/PawlMonitor.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
+				DEVELOPMENT_TEAM = 8C4BM6A82T;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PawlMonitor/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PawlMonitor;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.jasonepage.Pawl.PawlMonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BC8410ED2FE9D26100F0888C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PawlMonitor/PawlMonitor.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
+				DEVELOPMENT_TEAM = 8C4BM6A82T;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PawlMonitor/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PawlMonitor;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.jasonepage.Pawl.PawlMonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BC8411032FE9D33D00F0888C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PawlShield/PawlShield.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
+				DEVELOPMENT_TEAM = 8C4BM6A82T;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PawlShield/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PawlShield;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.jasonepage.Pawl.PawlShield;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BC8411042FE9D33D00F0888C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PawlShield/PawlShield.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
+				DEVELOPMENT_TEAM = 8C4BM6A82T;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PawlShield/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PawlShield;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.jasonepage.Pawl.PawlShield;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BC8AB0DE304914E90001384D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PawlShieldAction/PawlShieldAction.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
+				DEVELOPMENT_TEAM = 8C4BM6A82T;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PawlShieldAction/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PawlShieldAction;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.jasonepage.Pawl.PawlShieldAction;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BC8AB0DF304914E90001384D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PawlShieldAction/PawlShieldAction.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
+				DEVELOPMENT_TEAM = 8C4BM6A82T;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PawlShieldAction/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PawlShieldAction;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.jasonepage.Pawl.PawlShieldAction;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BC8410952FE9B3D600F0888C /* Build configuration list for PBXProject "Pawl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC8410A32FE9B3D700F0888C /* Debug */,
+				BC8410A42FE9B3D700F0888C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BC8410A52FE9B3D700F0888C /* Build configuration list for PBXNativeTarget "Pawl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC8410A62FE9B3D700F0888C /* Debug */,
+				BC8410A72FE9B3D700F0888C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BC8410EB2FE9D26100F0888C /* Build configuration list for PBXNativeTarget "PawlMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC8410EC2FE9D26100F0888C /* Debug */,
+				BC8410ED2FE9D26100F0888C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BC8411022FE9D33D00F0888C /* Build configuration list for PBXNativeTarget "PawlShield" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC8411032FE9D33D00F0888C /* Debug */,
+				BC8411042FE9D33D00F0888C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BC8AB0E0304914E90001384D /* Build configuration list for PBXNativeTarget "PawlShieldAction" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC8AB0DE304914E90001384D /* Debug */,
+				BC8AB0DF304914E90001384D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BC8411172FE9ED1800F0888C /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase-community/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BC8411202FE9F34000F0888C /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BC8411172FE9ED1800F0888C /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = BC8410922FE9B3D600F0888C /* Project object */;
+}

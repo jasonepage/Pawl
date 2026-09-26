@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — Pawl</title>
+<meta name="description" content="How Pawl handles your data: most of it never leaves your device, we never see which apps or sites you block, we don't track or sell anything, and you can delete your account and all its data from inside the app at any time.">
+<style>
+  :root{ --green:#356310; --green-dark:#21400a; --amber:#EFA02A; --ink:#1c2417; --muted:#5a6450; --paper:#faf8f1; --card:#ffffff; --line:#e4e0d2; }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{ background:var(--paper); color:var(--ink);
+        font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+        line-height:1.6; -webkit-font-smoothing:antialiased; }
+  a{color:var(--green)}
+  header.brand{ background:linear-gradient(135deg,var(--green),var(--green-dark)); color:#F2EEE2; padding:28px 24px; }
+  header.brand .wrap{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:14px}
+  header.brand svg{width:40px;height:40px;flex:none}
+  header.brand a{color:#F2EEE2;text-decoration:none;font-weight:600;font-size:22px;letter-spacing:.2px}
+  main{max-width:760px;margin:0 auto;padding:32px 24px 64px}
+  h1{font-size:30px;line-height:1.2;margin:8px 0 4px}
+  .updated{color:var(--muted);font-size:14px;margin:0 0 28px}
+  h2{font-size:20px;margin:36px 0 8px;color:var(--green-dark)}
+  h3{font-size:16px;margin:22px 0 6px}
+  p,li{font-size:16px}
+  ul{padding-left:22px}
+  li{margin:6px 0}
+  .callout{ background:var(--card); border:1px solid var(--line); border-left:4px solid var(--amber);
+            border-radius:10px; padding:16px 18px; margin:20px 0; }
+  .callout strong{color:var(--green-dark)}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:15px}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#f0eddf}
+  code{background:#eef0e6;padding:1px 6px;border-radius:5px;font-size:14px}
+  footer{border-top:1px solid var(--line);margin-top:40px;padding-top:18px;color:var(--muted);font-size:14px}
+  footer a{margin-right:16px}
+</style>
+</head>
+<body>
+<header class="brand">
+  <div class="wrap">
+    <svg viewBox="0 0 1024 1024" aria-hidden="true">
+      <polyline points="300,582 512,338 724,582" fill="none" stroke="#F2EEE2" stroke-width="112" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="312" y="648" width="400" height="100" rx="50" fill="#EFA02A"/>
+    </svg>
+    <a href="/">Pawl</a>
+  </div>
+</header>
+
+<main>
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: June 28, 2026</p>
+
+  <p>Pawl is a self-control tool that helps you stop something you're struggling with — gambling, adult
+  content, or any distracting app — by blocking it with Apple's Screen Time and making it deliberately
+  hard to unblock. This policy explains what Pawl does and doesn't collect, how the small amount of data
+  we do handle is used, and how you can delete it.</p>
+
+  <div class="callout">
+    <p style="margin:0"><strong>The short version.</strong> Pawl works without an account, and most of
+    your data never leaves your iPhone. We never see which specific apps or websites you block. We don't
+    use advertising, we don't track you across other apps, and we never sell your data. If you create an
+    account, you can delete it and everything tied to it from right inside the app — Settings → Account →
+    Delete account.</p>
+  </div>
+
+  <h2>1. Who this applies to</h2>
+  <p>This policy covers the Pawl iOS app and the website <code>getpawl.com</code>. Pawl is intended for
+  adults (17+). It is not directed to children.</p>
+
+  <h2>2. What Pawl never sees</h2>
+  <p>Pawl blocks apps and sites using Apple's <strong>Screen Time / Family Controls</strong> framework.
+  Apple hands the app only <em>opaque tokens</em> that stand in for your selections — Pawl cannot read,
+  and never receives, the identities of the specific apps or websites you choose to block. Your blocking
+  choices are not transmitted to us.</p>
+
+  <h2>3. Data that stays on your device</h2>
+  <p>When you use Pawl without signing in, the following stays on your iPhone (and, where you've enabled
+  it, your own private iCloud) and is <strong>not</strong> sent to us:</p>
+  <ul>
+    <li>Your clean-day streak and history.</li>
+    <li>Your relapse log and urge/“tough moment” entries.</li>
+    <li>Your blocking selections (as opaque Screen Time tokens), friction settings, and the optional
+        “someone you trust” phone number.</li>
+  </ul>
+  <p>You can remove this by deleting the app (see <a href="#ondevice">Section 9</a>).</p>
+
+  <h2>4. Data we collect only if you create an account</h2>
+  <p>Signing in is <strong>optional</strong> and only needed for the sponsor / accountability feature.
+  Account sign-in uses <strong>Sign in with Apple</strong>. If you sign in, we store the following in our
+  backend (hosted on Supabase) to provide the feature:</p>
+  <table>
+    <tr><th>Data</th><th>Why</th></tr>
+    <tr><td>Apple user identifier</td><td>Identifies your account so your data and sponsor link persist across launches.</td></tr>
+    <tr><td>Email address (from Apple; may be Apple's private relay)</td><td>Account identity and contact. You can use Apple's “Hide My Email.”</td></tr>
+    <tr><td>Display name (optional, you type it)</td><td>So your sponsor sees it's you rather than “Someone you sponsor.”</td></tr>
+    <tr><td>Sponsor link + unlock requests</td><td>Lets a trusted person approve your unlock requests.</td></tr>
+    <tr><td>Heartbeat + device push token, device identifier</td><td>Detects if your protection is removed and alerts your sponsor; delivers notifications.</td></tr>
+    <tr><td>Commitment status &amp; friction settings</td><td>Keeps your setup in sync; lets the sponsor feature work.</td></tr>
+  </table>
+
+  <div class="callout">
+    <p style="margin:0"><strong>Sensitive by nature.</strong> The fact that you use Pawl can imply you're
+    working on a gambling, adult-content, or focus problem. We treat your information as sensitive. Your
+    <strong>relapse and urge entries are private to you</strong> — they are never shared with your sponsor.
+    A sponsor only ever sees your display name, your unlock requests, and alerts that your protection was
+    removed.</p>
+  </div>
+
+  <h2>5. How we use data</h2>
+  <ul>
+    <li>To provide the optional sponsor/accountability feature and send the related notifications.</li>
+    <li>To keep your account and setup working across devices and reinstalls.</li>
+    <li>To keep the service secure and operational.</li>
+  </ul>
+  <p>We do <strong>not</strong> use your data for advertising, we do <strong>not</strong> track you across
+  other companies' apps or websites, and we do <strong>not</strong> sell or rent your personal data.</p>
+
+  <h2>6. Who we share data with</h2>
+  <ul>
+    <li><strong>Your chosen sponsor</strong> — only your display name, unlock requests, and protection
+        alerts, and only while the link is active. Never your relapse/urge log.</li>
+    <li><strong>Service providers</strong> that run the backend on our behalf: <strong>Supabase</strong>
+        (database and authentication) and <strong>Apple</strong> (Sign in with Apple and push
+        notifications). They process data only to provide their service to us.</li>
+    <li><strong>No advertisers or data brokers.</strong></li>
+  </ul>
+
+  <h2>7. Where data is stored and how it's protected</h2>
+  <p>Account data is stored in our Supabase Postgres database, protected by row-level security so each
+  person can reach only their own rows (and a sponsor only the limited fields above). Data is encrypted in
+  transit. Push tokens and the Apple sign-in token are accessible only to our secure server functions.</p>
+
+  <h2>8. Retention</h2>
+  <p>We keep account data for as long as your account exists. When you delete your account, the associated
+  data is deleted (see below). On-device data is kept until you remove it.</p>
+
+  <h2 id="delete">9. Your choices and rights — including deleting your account</h2>
+  <p>You can request access to, correction of, or deletion of your personal data. You also have a built-in,
+  one-tap way to delete everything:</p>
+
+  <div class="callout">
+    <p style="margin:0 0 8px"><strong>Delete your account from inside the app:</strong></p>
+    <p style="margin:0">Open Pawl → <strong>Settings</strong> tab → <strong>Account</strong> →
+    <strong>Delete account</strong> → confirm. This permanently and immediately deletes your Pawl account
+    and all data tied to it — profile, sponsor link, unlock history, devices, heartbeats, and alerts — and
+    revokes Sign in with Apple. It cannot be undone. (Your on-device protection and streak remain on your
+    iPhone; remove those by deleting the app — Section&nbsp;9 below.)</p>
+  </div>
+
+  <p>If you can no longer access the app and want your account deleted, email us at the address below from
+  the email associated with your account and we'll delete it.</p>
+
+  <h3 id="ondevice">Removing on-device data</h3>
+  <p>To remove the data Pawl keeps on your iPhone: open <strong>Settings → Screen Time</strong>, turn off
+  Screen Time (or remove Pawl under “Apps with Screen Time Access”), then delete Pawl from your Home Screen.</p>
+
+  <h2>10. Children</h2>
+  <p>Pawl is not directed to children and is rated 17+. We do not knowingly collect data from children under
+  13. If you believe a child has provided us data, contact us and we'll delete it.</p>
+
+  <h2>11. Changes to this policy</h2>
+  <p>If we make material changes we'll update the date at the top and, where appropriate, notify you in the
+  app. Continued use after an update means you accept the revised policy.</p>
+
+  <h2>12. Contact</h2>
+  <p>Questions, requests, or account-deletion help: <a href="mailto:privacy@getpawl.com">privacy@getpawl.com</a>.</p>
+
+  <footer>
+    <a href="/">Home</a><a href="/support">Support</a><a href="/privacy">Privacy</a>
+  </footer>
+</main>
+</body>
+</html>

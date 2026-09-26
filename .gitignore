@@ -1,0 +1,14 @@
+.DS_Store
+xcuserdata/
+DerivedData/
+*.xcuserstate
+.wrangler/
+supabase/.temp/
+supabase/.branches/
+.env
+.env.*
+*.p8
+*.p12
+*.mobileprovision
+Claude outputs/
+_to_delete/
