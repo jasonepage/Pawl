@@ -49,6 +49,7 @@ struct OnboardingView: View {
         .frame(maxWidth: .infinity)        // …with the background still filling the screen
         .background(PawlColor.groupedBg)
         .tint(PawlColor.brand)
+        .task { await model.noteSetupStarted() }
     }
 
     // MARK: Role picker (first screen)
@@ -232,7 +233,7 @@ struct OnboardingView: View {
                     infoRow("lock.shield", "Your blocks turn on now",
                             "Pawl starts protecting you right away. Until a key is paired you can't unblock from inside Pawl, so pair it as soon as it arrives.")
                     infoRow("arrow.clockwise", "Pair it anytime",
-                            "Open the Unlock tab and tap \u{201C}Pair security key\u{201D} once you have it in hand. The first pairing is free.")
+                            "Open the Unlock tab and tap \u{201C}Pair security key\u{201D} once you have it in hand. The key becomes active after your cooling-off wait.")
                 }
                 .padding(.top, 2)
             } else {
@@ -306,7 +307,7 @@ struct OnboardingView: View {
             primary(working ? "Activating…" : "Lock it in") {
                 Task {
                     working = true
-                    model.setWebCategories(gambling: blockGambling, adult: blockAdult)
+                    model.setOnboardingWebCategories(gambling: blockGambling, adult: blockAdult)
                     await model.activate(selection: selection, vertical: vertical)   // flips didOnboard → main app
                 }
             }
@@ -386,15 +387,30 @@ struct OnboardingView: View {
         working = true
         defer { working = false }
         do {
-            guard keyStore.state() != .unavailable else {
+            switch keyStore.state() {
+            case .unavailable:
                 message = "Pawl can't read its saved key right now. Unlock your phone and try again."
                 return
+            case .paired:
+                // 2.1: onboarding never replaces a paired key. Changing keys is the gated
+                // re-pair in Unlock, so running setup again can't swap in a key within reach.
+                keyPaired = true
+                message = "Your key is already paired, so it stays your key. You can change it later from Unlock, after the wait."
+                return
+            case .unpaired:
+                // 2.1: a phone that was already protecting (for example a new phone where the
+                // key didn't transfer) gets no free pairing here. It goes through Unlock and waits.
+                if model.setupWasAlreadyProtecting {
+                    message = "Pawl was already protecting you, so a new key goes through the Unlock tab and becomes active after your cooling-off wait. Tap \u{201C}I don't have a key yet\u{201D} to finish setup."
+                    return
+                }
             }
             let newKey = try await security.pairNewKey(displayName: "Pawl key")
             guard keyStore.save(newKey) else {
                 message = "Couldn't save the key. Try again."
                 return
             }
+            keyStore.clearPending()
             keyPaired = true
         } catch {
             message = error.localizedDescription

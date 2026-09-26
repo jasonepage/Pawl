@@ -27,8 +27,10 @@ public enum PawlDefaults {
     /// the ~15-min DeviceActivity window minimum so the durable auto-relock fires reliably.
     /// Shorter is "stricter"; the user may lengthen it only via the gated path.
     public static let graceDefault: TimeInterval = 30 * 60           // 30 minutes
-    /// Floor on the grace window so it can't be set to effectively nothing by accident.
-    public static let graceFloor: TimeInterval = 60                  // 1 minute
+    /// Floor on the grace window. 2.1: raised from 1 minute to 15, because iOS refuses a
+    /// DeviceActivity window shorter than 15 minutes. Below that, the OS-owned auto-relock was
+    /// never scheduled and the shield only came back when Pawl was opened again.
+    public static let graceFloor: TimeInterval = 15 * 60             // 15 minutes
     /// Ceiling on the grace window (Decision D6). Generous enough for a real distraction-app
     /// session (e.g. a longer TikTok window), bounded so it can never be "open all evening."
     /// Default stays short (graceDefault); lengthening toward this cap is a gated loosening.

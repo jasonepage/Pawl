@@ -54,8 +54,10 @@ final class AppModel {
     private(set) var activeCommitment: Commitment?
 
     /// Sponsor mode is on exactly while an active sponsor link exists (FR-P2-LINK-005).
+    /// 2.1: also true while this phone remembers a sponsor it can't currently confirm (signed
+    /// out, offline, or a different account). Signing out must not skip the sponsor.
     var isSponsorModeActive: Bool {
-        sponsor.asProtected.contains { $0.status == "active" }
+        sponsor.asProtected.contains { $0.status == "active" } || sponsor.rememberedSponsor
     }
 
     /// True when this user approves someone else's unlocks (so the Approvals tab is relevant).
@@ -122,6 +124,7 @@ final class AppModel {
         // left deletable.
         if didOnboard && role == .blocker {
             shield.setDeletionBlock(true)
+            shield.setClockLock(true)       // 2.1: FR-CLOCK-001, same lifecycle as the deletion block
         }
     }
 
@@ -159,18 +162,38 @@ final class AppModel {
         guard auth.isApproved else { return }
         SharedState.ensureWebDefaults(domains: GamblingBlocklist.seedDomains)
         shield.apply(selectionStore.load())
-        if role == .blocker { shield.setDeletionBlock(true) }
+        if role == .blocker {
+            shield.setDeletionBlock(true)
+            shield.setClockLock(true)       // 2.1: FR-CLOCK-001
+        }
     }
 
     /// Finish onboarding: persist the selection, apply the shield, create the commitment
     /// (FR-ONBOARD-003, FR-SHIELD-005). Streak starts now.
     func activate(selection: FamilyActivitySelection, vertical: Vertical = .gambling) async {
+        // 2.1: if this phone was already protecting (setup shown again, e.g. after the iCloud
+        // "onboarded" flag went missing), setup may only ADD protection: keep every block that
+        // was on, keep the existing commitment and its durations and streak (HC-4).
+        let existing: Commitment?
+        if let active = activeCommitment {
+            existing = active
+        } else {
+            existing = (try? await repo.loadActiveCommitment())?.commitment
+        }
+        let previous = SharedState.loadSelection()
+        var selection = selection
+        if setupWasAlreadyProtecting || existing != nil {
+            selection.applicationTokens = selection.applicationTokens.union(previous.applicationTokens)
+            selection.categoryTokens    = selection.categoryTokens.union(previous.categoryTokens)
+            selection.webDomainTokens   = selection.webDomainTokens.union(previous.webDomainTokens)
+        }
         selectionStore.save(selection)
         shield.apply(selection)
         shield.setDeletionBlock(true)   // Pawl can't be uninstalled while protecting (FR-P3-HARD-002)
+        shield.setClockLock(true)       // 2.1: the clock can't be moved forward to skip the wait (FR-CLOCK-001)
 
         let now = Date()
-        let commitment = Commitment(startedAt: now, updatedAt: now)
+        let commitment = existing ?? Commitment(startedAt: now, updatedAt: now)
         let blockSet = BlockSet(
             commitmentID: commitment.id,
             selectionTokenData: try? JSONEncoder().encode(selection),
@@ -184,6 +207,31 @@ final class AppModel {
         self.vertical = vertical
         OnboardingFlag.setComplete()
         didOnboard = true
+    }
+
+    /// Set once when setup appears, BEFORE a key can be paired in it: was this phone or account
+    /// already protecting someone (a paired key, an active commitment, or a saved block list)?
+    /// Then setup may only tighten (2.1).
+    private(set) var setupWasAlreadyProtecting = false
+
+    func noteSetupStarted() async {
+        let previous = SharedState.loadSelection()
+        let hadSelection = !previous.applicationTokens.isEmpty || !previous.categoryTokens.isEmpty
+            || !previous.webDomainTokens.isEmpty
+        var existing = activeCommitment
+        if existing == nil { existing = (try? await repo.loadActiveCommitment())?.commitment }
+        setupWasAlreadyProtecting = existing != nil || keyStore.state() != .unpaired || hadSelection
+    }
+
+    /// Website categories chosen during setup. On a first setup they apply as picked. If setup
+    /// runs again on a phone that was already protecting, a category that was on stays on;
+    /// turning it off is the gated path in Settings.
+    func setOnboardingWebCategories(gambling: Bool, adult: Bool) {
+        if setupWasAlreadyProtecting {
+            setWebCategories(gambling: gambling || gamblingOn, adult: adult || adultOn)
+        } else {
+            setWebCategories(gambling: gambling, adult: adult)
+        }
     }
 
     /// Finish onboarding as an approver-only user: no Screen Time, no shield, no key, no
@@ -235,6 +283,11 @@ final class AppModel {
         }
 
         // In sponsor mode, the sponsor must approve before the cooling-off can even start.
+        // 2.1: with a sponsor but no loaded commitment, fail closed instead of skipping approval.
+        if isSponsorModeActive && activeCommitment == nil {
+            blockChangeMessage = "Couldn't reach your sponsor — change cancelled."
+            return false
+        }
         if isSponsorModeActive, let commitmentID = activeCommitment?.id {
             blockChangeMessage = "Sent to your sponsor for approval…"
             do {

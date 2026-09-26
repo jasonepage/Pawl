@@ -15,6 +15,7 @@
 //
 
 import Foundation
+import Security
 import Supabase
 
 @MainActor
@@ -47,6 +48,12 @@ public final class SponsorService {
 
     public init() {}
 
+    /// 2.1: a device-local record that this phone's user has an active sponsor. Set whenever
+    /// the server confirms an active link, and cleared only when the server confirms, for the
+    /// SAME account, that none is left. Signing out, going offline, or signing into another
+    /// account doesn't clear it, so none of those skips sponsor approval.
+    public var rememberedSponsor: Bool { SponsorLatch.userID() != nil }
+
     /// RLS returns both my-as-user and my-as-sponsor rows; split them client-side.
     public func refresh() async {
         guard let myID else { asProtected = []; asSponsor = []; didLoad = true; return }
@@ -61,11 +68,28 @@ public final class SponsorService {
             // case-insensitively or every row gets filtered out.
             asProtected = all.filter { Self.sameID($0.user_id, myID) }
             asSponsor = all.filter { Self.sameID($0.sponsor_id, myID) }
+            if asProtected.contains(where: { $0.status == "active" }) {
+                SponsorLatch.set(userID: myID)
+            } else if let latched = SponsorLatch.userID() {
+                if Self.sameID(latched, myID) {
+                    SponsorLatch.clear()     // the server says this account has no sponsor now
+                } else if let still = try? await Self.hasActiveSponsor(latched), !still {
+                    // The latched account (another sign-in, or deleted elsewhere) has no
+                    // sponsor anymore, so stop waiting for one.
+                    SponsorLatch.clear()
+                }
+            }
             await loadNames()
             didLoad = true
         } catch {
             message = error.localizedDescription
         }
+    }
+
+    /// Server check (migration 12): does this account still have an active sponsor?
+    /// False for an account that no longer exists.
+    private static func hasActiveSponsor(_ userID: String) async throws -> Bool {
+        try await Supa.client.rpc("has_active_sponsor", params: ["target": userID]).execute().value
     }
 
     /// Best-effort display names for the people I sponsor (and my sponsor), so the UI can name them.
@@ -160,6 +184,15 @@ public final class SponsorService {
 
     /// Revoke a link from the protected-person side, downgrading to solo mode (FR-P2-LINK-004).
     public func revoke(_ link: Link) async {
+        // 2.1: removing an active sponsor from this side is turned off, in the app and on the
+        // server (migration 12), so it can't be done alone in a hard moment and without the
+        // sponsor knowing. The sponsor can step down from their own app at any time.
+        message = "To remove your sponsor, ask them to tap \"Stop sponsoring\" in their Pawl app. If you can't reach them or don't feel safe asking, email support@getpawl.com."
+        return
+    }
+
+    /// The 2.0 protected-side removal, kept only for reference. Migration 12 blocks it.
+    private func legacyRevoke(_ link: Link) async {
         guard let myID, Self.sameID(link.user_id, myID) else {
             message = "Only the person being sponsored can remove the link here for now."
             return
@@ -203,4 +236,40 @@ public final class SponsorService {
         let charset = Array("ABCDEFGHJKLMNPQRSTUVWXYZ23456789")
         return String((0..<length).map { _ in charset[Int.random(in: 0..<charset.count)] })
     }
+}
+
+/// Device-local Keychain record of "this account has an active sponsor" (2.1).
+/// ThisDeviceOnly, and it survives deleting and reinstalling the app.
+enum SponsorLatch {
+    private static let service = "io.github.jasonepage.Pawl.sponsorLatch"
+    private static let account = "pawl.sponsor.latchedUserID"
+
+    private static var query: [String: Any] {
+        [kSecClass as String: kSecClassGenericPassword,
+         kSecAttrService as String: service,
+         kSecAttrAccount as String: account]
+    }
+
+    static func userID() -> String? {
+        var q = query
+        q[kSecReturnData as String] = true
+        q[kSecMatchLimit as String] = kSecMatchLimitOne
+        var result: AnyObject?
+        guard SecItemCopyMatching(q as CFDictionary, &result) == errSecSuccess,
+              let data = result as? Data else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    static func set(userID: String) {
+        let data = Data(userID.utf8)
+        let attrs: [String: Any] = [kSecValueData as String: data,
+                                    kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly]
+        if SecItemUpdate(query as CFDictionary, attrs as CFDictionary) == errSecItemNotFound {
+            var add = query
+            add.merge(attrs) { _, new in new }
+            _ = SecItemAdd(add as CFDictionary, nil)
+        }
+    }
+
+    static func clear() { _ = SecItemDelete(query as CFDictionary) }
 }

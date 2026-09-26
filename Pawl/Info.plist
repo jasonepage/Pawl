@@ -7,6 +7,8 @@
 		<string>io.github.jasonepage.Pawl.heartbeat</string>
 	</array>
 	<key>UIBackgroundModes</key>
-	<array/>
+	<array>
+		<string>fetch</string>
+	</array>
 </dict>
 </plist>

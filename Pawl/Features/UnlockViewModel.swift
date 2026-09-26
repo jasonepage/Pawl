@@ -84,6 +84,10 @@ public final class UnlockViewModel {
             // Decide free-first-pair vs gated re-pair from a FRESH read, never the cached
             // value: a Keychain that can't be read must not look unpaired (HC-4).
             let pairing = keyStore.state()
+            // Use the commitment's real cooling-off, not whatever this screen started with.
+            if let c = commitmentProvider() {
+                machine = UnlockMachine(commitment: c, requiresSponsorApproval: sponsorModeProvider())
+            }
             guard pairing != .unavailable else {
                 message = "Pawl can't read its saved key right now. Unlock your phone and try again."
                 return
@@ -91,7 +95,9 @@ public final class UnlockViewModel {
             let newKey = try await security.pairNewKey(displayName: "Pawl key")
             let encoded = newKey.credentialID.base64EncodedString()
 
-            if pairing == .unpaired {
+            // A first pairing is free only when nothing is being protected yet. With an active
+            // commitment and no key (new phone, the key did not transfer), it waits like a re-pair.
+            if pairing == .unpaired && commitmentProvider() == nil {
                 guard keyStore.save(newKey) else {
                     message = "Couldn't save the key. Nothing changed. Try again."
                     return
@@ -119,7 +125,7 @@ public final class UnlockViewModel {
         keyTimerTask?.cancel(); keyTimerTask = nil
         keyStore.clearPending()
         pendingKeyEndsAt = nil
-        message = "Cancelled — your current key is unchanged."
+        message = pairedCredential == nil ? "Cancelled. No key was added." : "Cancelled. Your current key is unchanged."
     }
 
     /// DEV ONLY: skip the re-pair wait.
@@ -255,10 +261,24 @@ public final class UnlockViewModel {
             // ...AND schedules the OS-owned window that lifts/re-applies the shield even
             // if the app is force-quit (HC-6, FR-UNLOCK-006/009). The PawlMonitor extension
             // handles both ends. The two paths are idempotent if the app stays open.
-            try? UnlockScheduler.scheduleUnlock(coolingOff: machine.coolingOff, grace: machine.grace)
+            // 2.1: if iOS refuses the window, the relock would depend on the app staying open.
+            // Stay locked instead (HC-4, HC-6).
+            do {
+                try UnlockScheduler.scheduleUnlock(coolingOff: machine.coolingOff, grace: machine.grace)
+            } catch {
+                timerTask?.cancel(); timerTask = nil
+                send(.cancel)
+                message = "iOS couldn't schedule the relock, so Pawl stayed locked. Try again."
+            }
         case .liftShield:                     shield.lift(); Feedback.shieldLifted()   // understated — not a reward
         case .scheduleGrace(let endsAt):      scheduleFire(at: endsAt, event: .graceEnded)
-        case .reapplyShield:                  shield.apply(selection); Feedback.relock()   // the pawl catches — protection re-engaged
+        case .reapplyShield:
+            // 2.1: relock with the live shared selection (it includes apps added since this
+            // screen opened), falling back to the one this screen started with.
+            let live = SharedState.loadSelection()
+            let liveIsEmpty = live.applicationTokens.isEmpty && live.categoryTokens.isEmpty && live.webDomainTokens.isEmpty
+            shield.apply(liveIsEmpty ? selection : live)
+            Feedback.relock()
         }
     }
 

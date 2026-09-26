@@ -2,8 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- PawlMonitor (DeviceActivityMonitor extension). Collects no data and does no tracking; it
-	     only reads/writes the shared App Group state in UserDefaults to lift/relock the shield. -->
+	<!-- PawlShieldAction (ShieldAction extension). Collects no data and does no tracking; it
+	     only records caught attempts and the urge note in the shared App Group UserDefaults. -->
 	<key>NSPrivacyTracking</key>
 	<false/>
 	<key>NSPrivacyTrackingDomains</key>

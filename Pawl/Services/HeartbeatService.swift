@@ -99,11 +99,13 @@ public final class HeartbeatService {
             // The launch handler runs off the main actor and BGTask isn't Sendable, so opt
             // out of the isolation check for this single hop onto the main actor.
             nonisolated(unsafe) let task = task
-            Task { @MainActor in
+            let work = Task { @MainActor in
                 HeartbeatService.shared.scheduleBackgroundBeat()   // chain the next beat
                 await HeartbeatService.shared.beat()
-                task.setTaskCompleted(success: true)
+                task.setTaskCompleted(success: !Task.isCancelled)   // the only completion call
             }
+            // If iOS runs out of time, cancel the beat; the task above still completes once.
+            task.expirationHandler = { work.cancel() }
         }
     }
 

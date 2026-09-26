@@ -98,11 +98,13 @@ struct ShieldSetupView: View {
             .disabled(selectionIsEmpty)
             // Exposed here ONLY for the dev slice. In the real product, lifting is
             // gated by NFC tap + cooling-off and is never a free button (FR-SHIELD-008).
+            #if DEBUG
             Button("Lift shield (dev only)", role: .destructive) {
                 shield.lift()
                 shieldActive = false
                 lastShieldAction = "Shield lifted."
             }
+            #endif
             if let lastShieldAction {
                 Text(lastShieldAction).font(.footnote).foregroundStyle(.secondary)
             }

@@ -123,6 +123,9 @@ public final class AuthService {
             // The server-side user is gone, so clear the local session. A network sign-out would
             // 401 against the deleted session; sign out locally instead.
             try? await client.auth.signOut()
+            // The server revoked every sponsor link and told the sponsor, so this phone stops
+            // waiting for a sponsor that no longer exists (2.1).
+            SponsorLatch.clear()
             isSignedIn = false
             email = nil
             userID = nil

@@ -15,6 +15,24 @@ A hardening release. The screens, the cooling off wait and the sponsor flow are 
 - 28 new unit tests for the key check.
 - Unlocking now asks the key for the exact credential you paired. Re-pairing the same
   physical key no longer risks the key answering with its old credential.
+- While Pawl is protecting you, it now asks Screen Time to require automatic date and
+  time, so the clock can't be moved forward to skip the wait. Still being confirmed on
+  a device.
+- Fixes from our own review of the code and the sponsor server (no one had reported them):
+  - The shortest grace window is now 15 minutes. iOS won't schedule a relock window shorter
+    than that, so a shorter grace could leave apps unblocked until Pawl was opened again.
+    If the relock can't be scheduled, Pawl now stays locked.
+  - Signing out, going offline, or switching accounts no longer skips your sponsor.
+  - Running setup again on a phone that was already protecting can only add protection. It
+    keeps your paired key, your blocks, your durations and your streak.
+  - Pairing a key on a new phone while a commitment is active now waits like a re-pair.
+  - The automatic relock uses your current block list, including apps you added since.
+  - Removing an active sponsor from your own side is turned off. Your sponsor can step down
+    from their app, or you can email support@getpawl.com.
+  - Server: people can no longer approve their own unlock requests, sponsor themselves, link a
+    stranger as a sponsor, edit away alerts, fake a future heartbeat, or dismiss an alert
+    while they have a sponsor (supabase/migrations/12_owner_write_lockdown.sql).
+  - Background heartbeats now actually run, and every extension has a privacy manifest.
 - The buttons on the block screen now work on iOS 18 through 26.4. The block screen
   extension was set to require iOS 26.5 by mistake.
 

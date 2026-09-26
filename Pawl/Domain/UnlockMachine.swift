@@ -84,7 +84,7 @@ public struct UnlockMachine: Sendable {
 
     public init(commitment: Commitment, requiresSponsorApproval: Bool = false) {
         self.init(coolingOff: commitment.coolingOffSeconds,
-                  grace: commitment.graceSeconds,
+                  grace: PawlDefaults.clampGrace(commitment.graceSeconds),
                   requiresSponsorApproval: requiresSponsorApproval)
     }
 

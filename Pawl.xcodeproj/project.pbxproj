@@ -95,13 +95,6 @@
 			);
 			target = BC8410DD2FE9D26000F0888C /* PawlMonitor */;
 		};
-		BC8AB0F1304914E90001384D /* Exceptions for "Pawl" folder in "PawlShieldAction" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Shared/PawlShared.swift,
-			);
-			target = BC8AB0D3304914E80001384D /* PawlShieldAction */;
-		};
 		BC8411192FE9ED4B00F0888C /* Exceptions for "Pawl" folder in "Pawl" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -113,6 +106,13 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+			);
+			target = BC8AB0D3304914E80001384D /* PawlShieldAction */;
+		};
+		BC8AB0F1304914E90001384D /* Exceptions for "Pawl" folder in "PawlShieldAction" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Shared/PawlShared.swift,
 			);
 			target = BC8AB0D3304914E80001384D /* PawlShieldAction */;
 		};

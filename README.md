@@ -77,10 +77,12 @@ Read this before you trust it with anything.
   paired on 2.0 has no saved public key, so its signature is not checked until
   you pair it again. All of this runs on your phone, so on a jailbroken phone
   none of it holds. See `Pawl/Domain/WebAuthnVerifier.swift`.
-- **The clock is not locked yet.** Code to require automatic date and time
-  exists (`ShieldService.setClockLock`) but nothing calls it yet. Until it is
-  switched on, moving the phone's clock forward may shorten the cooling off
-  wait. This has not been tested either way.
+- **The clock lock is new and not yet proven.** In 2.0 nothing called it, so
+  moving the phone's clock forward may shorten the cooling off wait. 2.1 (not
+  on the App Store yet) turns on Screen Time's "require automatic date and
+  time" while Pawl is protecting you (`ShieldService.setClockLock`). Whether
+  iOS enforces that for an app using individual Screen Time permission has not
+  been confirmed on a device yet.
 - **Debug builds have developer buttons.** "Skip the wait", "simulate
   sponsor approve" and "allow deletion" exist for testing. They sit inside
   `#if DEBUG`, which is only switched on in the Debug build setting, so they
@@ -91,6 +93,11 @@ Read this before you trust it with anything.
 - **A determined person can get around any blocker on a phone they own**
   (another phone, a laptop, a friend's device). Pawl makes the 1am version
   slow. It does not make it impossible.
+- **Sponsor alerts trust the phone.** The "Pawl went quiet" alert depends on
+  heartbeats the phone sends. Someone who pulls their own sign-in token out of
+  the app could keep sending heartbeats from a script after deleting Pawl.
+  Since 2.1 the server refuses every other direct edit that could hide an
+  alert (see `supabase/migrations/12_owner_write_lockdown.sql`).
 - **Most of the code has no automated tests.** The unlock loop and the key
   check do. The rest was tested by hand on real phones.
 - **No reproducible builds.** You cannot prove the App Store binary was built

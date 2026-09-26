@@ -119,6 +119,7 @@ struct SettingsView: View {
                     }
                     Button {
                         model.shield.setDeletionBlock(false)
+                        model.shield.setClockLock(false)
                     } label: {
                         iconLabel("trash.slash.fill", .red, "Allow deletion (escape)")
                     }
@@ -153,7 +154,7 @@ struct SettingsView: View {
             }
             .onAppear {
                 cooldownMin = max(15, Int(model.cooldownSeconds / 60))
-                graceMin = max(1, Int(model.graceSeconds / 60))
+                graceMin = max(15, Int(model.graceSeconds / 60))
                 model.auth.refresh()
                 syncPro()
             }
@@ -308,7 +309,7 @@ struct SettingsView: View {
             Stepper(value: $cooldownMin, in: 15...120, step: 5) {
                 iconLabel("hourglass", .teal, "Cooling-off: \(cooldownMin) min")
             }
-            Stepper(value: $graceMin, in: 1...180, step: 1) {
+            Stepper(value: $graceMin, in: 15...180, step: 5) {
                 iconLabel("clock.arrow.circlepath", .teal, "Grace: \(graceMin) min")
             }
             Button {
