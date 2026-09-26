@@ -42,10 +42,10 @@ usually passed. That is the whole idea.
 
 | | |
 |---|---|
-| Stage | Live on the [App Store](https://apps.apple.com/app/id6783119309), iPhone only. |
+| Stage | Live on the [App Store](https://apps.apple.com/app/id6783119309), iPhone and iPad. |
 | Audit | **None.** Nobody independent has reviewed the code. |
 | Team | One developer. No company, no funding, no investors. |
-| Platform | iPhone, iOS 18 and later. No Android, no Mac. |
+| Platform | iPhone and iPad, iOS 18 and later. No Android, no Mac. |
 | Backend | Supabase, used only for the optional sponsor features. The solo blocker works with no account. |
 | Tracking | No analytics, no ads, no crash reporter. |
 | Price | The blocker, the key, the urge tools and the sponsor (approver) side are free. Pawl Pro, a subscription, adds linking your own sponsor and tamper alerts. The Pro code is in this repo too. |
