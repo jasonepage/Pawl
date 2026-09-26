@@ -45,7 +45,21 @@ You need three things to line up. They must all use the **same domain** (the doc
 4. **Insert / tap your security key to unlock** → starts the 15-minute cooling-off → shield lifts → auto-relock. Use **"Dev: skip the wait"** to test fast.
 
 ## Honest note on the model (HC-7)
-We don't run a server in Phase 1, so we don't cryptographically verify the key's signature. We store the registered credential ID and require an assertion returning the **same** credential ID — proof the same physical key is present. That's a sound *possession* gate for this product; the real lock is still that you physically put the key out of reach (HC-4). Full signature verification can come with the Phase-2 backend.
+**2.0** stored only the registered credential ID and required an assertion returning the same credential ID. It did not verify the signature.
+
+**2.1** verifies on the phone, with no server (`Pawl/Domain/WebAuthnVerifier.swift`, tested in `PawlTests/WebAuthnVerifierTests.swift`):
+
+1. `clientDataJSON`: `type` is `webauthn.create` or `webauthn.get` as expected, and `challenge` is byte-equal to the fresh 32-byte challenge issued for that request (replay binding).
+2. `authenticatorData`: `rpIdHash` equals SHA-256 of `PawlConfig.relyingPartyID`, the User Present flag is set, and the signature counter is strictly greater than the last one stored (skipped only when both are 0).
+3. The ES256 signature over `authenticatorData || SHA-256(clientDataJSON)`, using CryptoKit P256 and the public key taken from the attestation object's authenticator data at pairing. The public key comes from `ASAuthorizationSecurityKeyPublicKeyCredentialRegistration.rawAttestationObject` (CBOR; its `authData` holds the COSE key). That property is optional in the SDK; if iOS returns no attestation object, pairing fails with an error instead of saving a key without a public key.
+
+The paired key (credential ID, public key, counter) is stored in the Keychain with `AfterFirstUnlockThisDeviceOnly`. 2.0 values in UserDefaults (`pawl.key.uid`, `pawl.key.pending.*`) are migrated on first launch and then deleted.
+
+**Residual gaps in 2.1:**
+- No attestation check. The signature proves it is the same key that was paired, not that the key is genuine hardware from a particular maker.
+- Keys paired on 2.0 have no stored public key, and a public key can't be recovered from an assertion. For them, check 3 is skipped until the key is re-paired (re-pairing is still gated by the cooling-off). Checks 1 and 2 still apply.
+- Everything runs on the phone. On a jailbroken phone the owner controls the code and the Keychain, so no on-device check holds.
+- The key is still only a possession gate. The real lock is that you physically put the key out of reach (HC-4), and iOS still lets the phone's owner turn Screen Time off.
 
 ## Heads-up on economics (for later, not now)
 A FIDO2 key is ~$30–55 vs a ~$0.30 NFC tag. That changes the hardware story for the eventual product/business model (Phase 3 + pricing decision D4). It doesn't affect building Phase 1 — just flagging so it's on the record.

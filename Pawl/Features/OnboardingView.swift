@@ -386,8 +386,15 @@ struct OnboardingView: View {
         working = true
         defer { working = false }
         do {
-            let credentialID = try await security.register(displayName: "Pawl key")
-            keyStore.save(credentialID.base64EncodedString())
+            guard keyStore.state() != .unavailable else {
+                message = "Pawl can't read its saved key right now. Unlock your phone and try again."
+                return
+            }
+            let newKey = try await security.pairNewKey(displayName: "Pawl key")
+            guard keyStore.save(newKey) else {
+                message = "Couldn't save the key. Try again."
+                return
+            }
             keyPaired = true
         } catch {
             message = error.localizedDescription

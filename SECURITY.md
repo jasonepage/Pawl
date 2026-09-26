@@ -36,8 +36,12 @@ are the ones that hurt that person at a bad moment:
 These are written down in the README. A way to make one of them worse than
 described is still a finding.
 
-- The security key check compares credential IDs. It does not verify the
-  assertion signature. See `Pawl/Services/SecurityKeyService.swift`.
+- In 2.0 (the App Store version today) the security key check compares
+  credential IDs and does not verify the signature. 2.1, in this repo, verifies
+  the challenge, relying party hash, user presence flag, signature counter and
+  ES256 signature. It does not check attestation, and keys paired on 2.0 skip
+  the signature check until re-paired. See `Pawl/Domain/WebAuthnVerifier.swift`.
+  A way to pass the 2.1 check without the paired key is a finding.
 - iOS lets the owner of a phone turn Screen Time off. Pawl cannot prevent
   that. It can only notice and tell a sponsor.
 - Nobody independent has audited Pawl.
@@ -48,7 +52,8 @@ described is still a finding.
 |---|---|
 | `Pawl/Domain/UnlockMachine.swift` | The whole unlock loop, as a pure function |
 | `PawlTests/UnlockMachineTests.swift` | Its tests |
-| `Pawl/Services/SecurityKeyService.swift` | The physical key check |
+| `Pawl/Domain/WebAuthnVerifier.swift` | The physical key check (2.1) |
+| `Pawl/Services/SecurityKeyService.swift` | Talking to the key through AuthenticationServices |
 | `Pawl/Services/ShieldService.swift` | Applying and lifting the shield |
 | `supabase/schema.sql` and `supabase/migrations/` | Tables, row level security, server functions |
 | `supabase/functions/` | The five server functions |

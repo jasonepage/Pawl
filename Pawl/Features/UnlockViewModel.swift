@@ -63,7 +63,7 @@ public final class UnlockViewModel {
         self.approval = approval
         let c = commitmentProvider() ?? Commitment(startedAt: Date(), updatedAt: Date())
         self.machine = UnlockMachine(commitment: c, requiresSponsorApproval: sponsorModeProvider())
-        self.pairedCredential = keyStore.load()
+        self.pairedCredential = keyStore.load()?.credentialID.base64EncodedString()
         restorePendingKeyChange()   // resume/commit a gated re-pair across launches (FR-NFC-004)
     }
 
@@ -81,16 +81,29 @@ public final class UnlockViewModel {
         isBusy = true
         defer { isBusy = false }
         do {
-            let credentialID = try await security.register(displayName: "Pawl key")
-            let encoded = credentialID.base64EncodedString()
+            // Decide free-first-pair vs gated re-pair from a FRESH read, never the cached
+            // value: a Keychain that can't be read must not look unpaired (HC-4).
+            let pairing = keyStore.state()
+            guard pairing != .unavailable else {
+                message = "Pawl can't read its saved key right now. Unlock your phone and try again."
+                return
+            }
+            let newKey = try await security.pairNewKey(displayName: "Pawl key")
+            let encoded = newKey.credentialID.base64EncodedString()
 
-            if pairedCredential == nil {
-                keyStore.save(encoded)
+            if pairing == .unpaired {
+                guard keyStore.save(newKey) else {
+                    message = "Couldn't save the key. Nothing changed. Try again."
+                    return
+                }
                 pairedCredential = encoded
                 message = "Paired ✓ Now lock the key away — give it to a sponsor or a timebox, out of reach."
             } else {
                 let endsAt = Date().addingTimeInterval(machine.coolingOff)
-                keyStore.savePending(encoded, endsAt: endsAt)
+                guard keyStore.savePending(newKey, endsAt: endsAt) else {
+                    message = "Couldn't save the new key. Your current key is unchanged."
+                    return
+                }
                 pendingKeyEndsAt = endsAt
                 scheduleKeyCommit(at: endsAt)
                 let mins = Int(machine.coolingOff / 60)
@@ -126,7 +139,7 @@ public final class UnlockViewModel {
 
     /// Begin an unlock: prove the key is present, then (if it's the same key) start cooling-off.
     public func beginUnlock() async {
-        guard let pairedCredential else { message = "Pair a key first."; return }
+        guard pairedCredential != nil, let pairedKey = keyStore.load() else { message = "Pair a key first."; return }
         message = nil
         // Pick up the latest sponsor mode + commitment so linking a sponsor takes effect
         // without rebuilding the view (FR-P2-LINK-005, FR-P2-SPON-002).
@@ -140,8 +153,22 @@ public final class UnlockViewModel {
         isBusy = true
         defer { isBusy = false }
         do {
-            let credentialID = try await security.assert()
-            let matches = credentialID.base64EncodedString() == pairedCredential   // FR-UNLOCK-002
+            // FR-UNLOCK-002: same key AND a valid response (challenge, relying party,
+            // presence, counter, signature). See WebAuthnVerifier.swift.
+            let matches: Bool
+            switch try await security.verifyPresence(of: pairedKey) {
+            case .verified(let updated):
+                // Advance the signature counter, unless a re-pair committed during the tap.
+                if keyStore.load()?.credentialID == updated.credentialID { keyStore.save(updated) }
+                matches = true
+            case .rejected(let reason):
+                matches = false
+                #if DEBUG
+                print("Pawl key check rejected: \(reason)")
+                #else
+                _ = reason
+                #endif
+            }
             if matches { Feedback.keyRecognized() }
             else { Feedback.warning(); message = "That's not your paired key." }
             send(.tap(uidMatches: matches))
@@ -317,8 +344,8 @@ public final class UnlockViewModel {
     /// Promote the pending key to active once its cooling-off has elapsed.
     private func commitPendingKey() {
         guard let pending = keyStore.loadPending() else { return }
-        keyStore.save(pending.uid)
-        pairedCredential = pending.uid
+        guard keyStore.save(pending.key) else { return }   // keep the pending key; retry next launch
+        pairedCredential = pending.key.credentialID.base64EncodedString()
         keyStore.clearPending()
         pendingKeyEndsAt = nil
         keyTimerTask?.cancel(); keyTimerTask = nil

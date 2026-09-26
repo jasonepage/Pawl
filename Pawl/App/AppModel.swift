@@ -223,11 +223,12 @@ final class AppModel {
             return false
         }
         do {
-            let credentialID = try await security.assert()
-            guard credentialID.base64EncodedString() == paired else {
+            guard case .verified(let updated) = try await security.verifyPresence(of: paired) else {
                 blockChangeMessage = "That wasn't your paired key — nothing changed."
                 return false
             }
+            // Advance the signature counter, unless the paired key changed during the tap.
+            if keyStore.load()?.credentialID == updated.credentialID { keyStore.save(updated) }
         } catch {
             blockChangeMessage = "Key check cancelled — nothing changed."
             return false

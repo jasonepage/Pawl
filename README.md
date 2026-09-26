@@ -66,12 +66,17 @@ Read this before you trust it with anything.
   that. Pawl can only notice it the next time it runs and, if you have a
   sponsor, push them an alert. For a real lock, a sponsor sets the Screen Time passcode in person
   and keeps it (the "hard lock" flow). iOS enforces that passcode, not Pawl.
-- **The key check is simple.** Pawl asks iOS for a security key assertion and
+- **The key check.** In 2.0 (the version on the App Store today) Pawl only
   checks that the credential ID matches the key you registered. It does
-  **not** verify the assertion's signature. On a normal, non-jailbroken
-  iPhone, iOS itself talks to the key, so this proves the key was physically
-  there. It is not a cryptographic proof, and it is the first place a reviewer
-  should look. See `Pawl/Services/SecurityKeyService.swift`.
+  **not** verify the signature. Version 2.1, in this repo and not on the App
+  Store yet, checks the whole response on the phone: the challenge it just
+  issued, the hash of `getpawl.com`, the "user present" flag, a signature
+  counter that must go up, and the ES256 signature against the public key
+  saved when you paired. What 2.1 still cannot do: it does not check that the
+  key is genuine hardware from a known maker (no attestation check), and a key
+  paired on 2.0 has no saved public key, so its signature is not checked until
+  you pair it again. All of this runs on your phone, so on a jailbroken phone
+  none of it holds. See `Pawl/Domain/WebAuthnVerifier.swift`.
 - **The clock is not locked yet.** Code to require automatic date and time
   exists (`ShieldService.setClockLock`) but nothing calls it yet. Until it is
   switched on, moving the phone's clock forward may shorten the cooling off
@@ -86,8 +91,8 @@ Read this before you trust it with anything.
 - **A determined person can get around any blocker on a phone they own**
   (another phone, a laptop, a friend's device). Pawl makes the 1am version
   slow. It does not make it impossible.
-- **Most of the code has no automated tests.** The unlock loop does. The rest
-  was tested by hand on real phones.
+- **Most of the code has no automated tests.** The unlock loop and the key
+  check do. The rest was tested by hand on real phones.
 - **No reproducible builds.** You cannot prove the App Store binary was built
   from this exact source.
 
@@ -147,7 +152,9 @@ The best thing a stranger can do today is read. Start here:
 |---|---|
 | `Pawl/Domain/UnlockMachine.swift` | The whole unlock loop, as a pure function with no iOS code |
 | `PawlTests/UnlockMachineTests.swift` | 19 tests for that loop |
-| `Pawl/Services/SecurityKeyService.swift` | The key check, and its known weakness |
+| `Pawl/Domain/WebAuthnVerifier.swift` | The key check (2.1), and what it still cannot prove |
+| `PawlTests/WebAuthnVerifierTests.swift` | 28 tests for the key check, with synthetic key data |
+| `Pawl/Services/SecurityKeyService.swift` | Talking to the key through Apple's AuthenticationServices |
 | `Pawl/Services/ShieldService.swift` | Applying and lifting the shield, the app deletion block |
 | `Pawl/Services/DurationSettings.swift` | Why making the wait shorter is itself delayed |
 | `supabase/schema.sql` | Tables, row level security, server functions |
