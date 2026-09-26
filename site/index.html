@@ -80,7 +80,10 @@
   .keysec .grid{display:grid;grid-template-columns:1fr;gap:var(--s-5);margin-top:var(--s-6)}
   @media(min-width:760px){.keysec .grid{grid-template-columns:1fr 1fr 1fr}}
   .keysec .grid p{margin-top:var(--s-2);font-size:var(--fs-0);color:var(--ink)}
-  .note{margin-top:var(--s-6);background:var(--green-100);border-radius:var(--r-2);padding:var(--s-4) var(--s-5);font-size:var(--fs-0);color:var(--green-700)}
+  .buy{display:grid;grid-template-columns:1fr;gap:var(--s-4);align-items:center;margin-top:var(--s-6)}
+  @media(min-width:760px){.buy{grid-template-columns:280px 1fr;gap:var(--s-5)}}
+  .buy img{width:100%;max-width:280px;height:auto;justify-self:center}
+  .note{margin-top:0;background:var(--green-100);border-radius:var(--r-2);padding:var(--s-4) var(--s-5);font-size:var(--fs-0);color:var(--green-700)}
 
   /* trust */
   .trust .two{align-items:start}
@@ -229,7 +232,7 @@
       <div><h3>Leave it somewhere else</h3><p>Give it to a friend, put it in your car, or lock it in a drawer at work. The further away it is, the longer the urge has to fade.</p></div>
       <div><h3>The 1am version of you has to go get it</h3><p>Even when you do get the key, tapping it starts a 15 minute wait. Then the block lifts for a short window (30 minutes by default) and comes back on by itself.</p></div>
     </div>
-    <p class="note"><strong>Which key to buy:</strong> any FIDO2 security key with a USB-C plug. Several makers sell them, and they need no app or account. Pawl does not sell keys and does not take a cut.</p>
+    <div class="buy"><img src="/img/security-key.svg" alt="A drawing of a small green security key with a USB-C plug and a keyring loop" width="320" height="130"><p class="note"><strong>Which key to buy:</strong> any FIDO2 security key with a USB-C plug. Several makers sell them, and they need no app or account. Pawl does not sell keys and does not take a cut.</p></div>
   </div>
 </section>
 <section id="open" class="alt trust">

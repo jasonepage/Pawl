@@ -97,7 +97,11 @@ Read this before you trust it with anything.
    picker. Pawl never learns the names of the apps you pick. Apple hands it an
    opaque token.
 2. **Register a security key.** Tap it to your phone once. Then put it
-   somewhere that takes real effort to reach.
+   somewhere that takes real effort to reach. Any FIDO2 key with a USB-C
+   plug works.
+
+   <img src="site/img/security-key.svg" width="320" alt="A drawing of a small green security key with a USB-C plug and a keyring loop">
+
 3. **The shield goes on.** While a commitment is active, Pawl also turns on
    Screen Time's "block app deletion", so you cannot delete Pawl to get out.
 4. **When you want out,** you tap the key, then wait out a 15 minute cooling
