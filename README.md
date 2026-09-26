@@ -164,6 +164,11 @@ here.
 
 ## Building
 
+```
+git clone https://github.com/jasonepage/Pawl.git
+open Pawl/Pawl.xcodeproj
+```
+
 You need Xcode 26, an iPhone on iOS 18 or later (Screen Time does not work in
 the simulator), and a paid Apple Developer account. Apple must also approve
 the Family Controls entitlement for your team before the blocker will run
