@@ -1,76 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" role="img" aria-labelledby="t d">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 240" role="img" aria-labelledby="t d">
   <title id="t">A USB-C security key</title>
-  <desc id="d">A small green security key with a metal USB-C plug on the left, a round touch button in the middle, and a keyring on the right, drawn on a pale green panel.</desc>
-  <defs>
-    <linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#5a9024"/>
-      <stop offset=".55" stop-color="#3c6a14"/>
-      <stop offset="1" stop-color="#27480c"/>
-    </linearGradient>
-    <linearGradient id="metalG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#f4f6f0"/>
-      <stop offset=".45" stop-color="#cfd8c6"/>
-      <stop offset=".55" stop-color="#b3c0a6"/>
-      <stop offset="1" stop-color="#8fa07f"/>
-    </linearGradient>
-    <linearGradient id="ringG" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#9aa68f"/>
-      <stop offset=".5" stop-color="#5f6b56"/>
-      <stop offset="1" stop-color="#8b977f"/>
-    </linearGradient>
-    <linearGradient id="collarG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2f5a10"/>
-      <stop offset="1" stop-color="#16300a"/>
-    </linearGradient>
-    <filter id="soft" x="-20%" y="-50%" width="140%" height="220%">
-      <feGaussianBlur stdDeviation="9"/>
-    </filter>
-  </defs>
-
-  <!-- panel -->
-  <rect width="720" height="320" rx="28" fill="#e6efdc"/>
-
-  <!-- shadow -->
-  <ellipse cx="380" cy="238" rx="260" ry="16" fill="#16300a" opacity=".18" filter="url(#soft)"/>
-
-  <!-- keyring (behind the key) -->
-  <circle cx="606" cy="160" r="58" fill="none" stroke="url(#ringG)" stroke-width="14"/>
-  <circle cx="606" cy="160" r="58" fill="none" stroke="#ffffff" stroke-width="3" opacity=".45" stroke-dasharray="70 300" stroke-dashoffset="-30" stroke-linecap="round"/>
-
-  <!-- USB-C plug: shell -->
-  <rect x="66" y="126" width="126" height="68" rx="34" fill="url(#metalG)" stroke="#6f7f62" stroke-width="2"/>
-  <!-- shell seam line -->
-  <path d="M100 129 H180" stroke="#ffffff" stroke-width="2" opacity=".6" stroke-linecap="round"/>
-  <!-- cavity -->
-  <rect x="80" y="140" width="98" height="40" rx="20" fill="#2b3526"/>
-  <!-- tongue and contacts -->
-  <rect x="90" y="155" width="80" height="10" rx="5" fill="#b8c9a4"/>
-  <g fill="#e6a23c" opacity=".9">
-    <rect x="98" y="157" width="6" height="6" rx="1"/><rect x="110" y="157" width="6" height="6" rx="1"/><rect x="122" y="157" width="6" height="6" rx="1"/>
-    <rect x="134" y="157" width="6" height="6" rx="1"/><rect x="146" y="157" width="6" height="6" rx="1"/><rect x="158" y="157" width="6" height="6" rx="1"/>
-  </g>
-
-  <!-- collar / strain relief -->
-  <rect x="186" y="112" width="30" height="96" rx="9" fill="url(#collarG)"/>
-  <path d="M193 122 V198 M201 122 V198 M209 122 V198" stroke="#ffffff" stroke-width="1.5" opacity=".18"/>
-
+  <desc id="d">A simple flat drawing of a green security key: a USB-C plug on the left, a round touch button in the middle, and a small hole for a keyring on the right.</desc>
+  <rect width="640" height="240" rx="24" fill="#e6efdc"/>
+  <!-- plug -->
+  <rect x="86" y="96" width="92" height="48" rx="24" fill="#c9ddb4"/>
+  <rect x="104" y="112" width="56" height="16" rx="8" fill="#2c550d"/>
   <!-- body -->
-  <rect x="210" y="102" width="340" height="116" rx="44" fill="url(#bodyG)"/>
-  <rect x="210" y="102" width="340" height="116" rx="44" fill="none" stroke="#16300a" stroke-width="2" opacity=".45"/>
-  <!-- top highlight -->
-  <rect x="228" y="112" width="304" height="26" rx="13" fill="#ffffff" opacity=".16"/>
-  <!-- bottom edge shade -->
-  <rect x="228" y="196" width="304" height="12" rx="6" fill="#000000" opacity=".12"/>
-
+  <rect x="170" y="78" width="376" height="84" rx="36" fill="#3c6a14"/>
   <!-- touch button -->
-  <circle cx="378" cy="160" r="38" fill="#1f3d0a" opacity=".55"/>
-  <circle cx="378" cy="160" r="34" fill="#3b6914" stroke="#d9e6c8" stroke-width="4"/>
-  <circle cx="378" cy="160" r="20" fill="none" stroke="#e6efdc" stroke-width="3" opacity=".8"/>
-  <circle cx="378" cy="160" r="8" fill="#e6efdc"/>
-
+  <circle cx="336" cy="120" r="24" fill="#e6efdc"/>
+  <circle cx="336" cy="120" r="9" fill="#3c6a14"/>
   <!-- keyring hole -->
-  <circle cx="512" cy="160" r="16" fill="#e6efdc"/>
-  <circle cx="512" cy="160" r="16" fill="none" stroke="#16300a" stroke-width="2" opacity=".5"/>
-  <!-- ring passing through the hole, in front -->
-  <path d="M548 160 a58 58 0 0 1 18 -42" fill="none" stroke="url(#ringG)" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="496" cy="120" r="12" fill="#e6efdc"/>
 </svg>
