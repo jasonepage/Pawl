@@ -22,6 +22,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		7A11E57A00000001000000AA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BC8410922FE9B3D600F0888C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BC8410992FE9B3D600F0888C;
+			remoteInfo = Pawl;
+		};
 		BC8410E72FE9D26100F0888C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BC8410922FE9B3D600F0888C /* Project object */;
@@ -62,6 +69,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7A11E57A00000001000000A2 /* PawlTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PawlTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC84109A2FE9B3D600F0888C /* Pawl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pawl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC8410DE2FE9D26000F0888C /* PawlMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PawlMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC8410E02FE9D26000F0888C /* DeviceActivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceActivity.framework; path = System/Library/Frameworks/DeviceActivity.framework; sourceTree = SDKROOT; };
@@ -119,6 +127,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		7A11E57A00000001000000A3 /* PawlTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PawlTests;
+			sourceTree = "<group>";
+		};
 		BC84109C2FE9B3D600F0888C /* Pawl */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -156,6 +169,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		7A11E57A00000001000000A5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BC8410972FE9B3D600F0888C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -201,6 +221,7 @@
 				BC8410E22FE9D26100F0888C /* PawlMonitor */,
 				BC8410F92FE9D33D00F0888C /* PawlShield */,
 				BC8AB0D6304914E90001384D /* PawlShieldAction */,
+				7A11E57A00000001000000A3 /* PawlTests */,
 				BC8410DF2FE9D26000F0888C /* Frameworks */,
 				BC84109B2FE9B3D600F0888C /* Products */,
 			);
@@ -213,6 +234,7 @@
 				BC8410DE2FE9D26000F0888C /* PawlMonitor.appex */,
 				BC8410F42FE9D33D00F0888C /* PawlShield.appex */,
 				BC8AB0D4304914E80001384D /* PawlShieldAction.appex */,
+				7A11E57A00000001000000A2 /* PawlTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -231,6 +253,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		7A11E57A00000001000000A1 /* PawlTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7A11E57A00000001000000A7 /* Build configuration list for PBXNativeTarget "PawlTests" */;
+			buildPhases = (
+				7A11E57A00000001000000A4 /* Sources */,
+				7A11E57A00000001000000A5 /* Frameworks */,
+				7A11E57A00000001000000A6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7A11E57A00000001000000AB /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7A11E57A00000001000000A3 /* PawlTests */,
+			);
+			name = PawlTests;
+			packageProductDependencies = (
+			);
+			productName = PawlTests;
+			productReference = 7A11E57A00000001000000A2 /* PawlTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		BC8410992FE9B3D600F0888C /* Pawl */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BC8410A52FE9B3D700F0888C /* Build configuration list for PBXNativeTarget "Pawl" */;
@@ -334,6 +379,10 @@
 				LastSwiftUpdateCheck = 2660;
 				LastUpgradeCheck = 2660;
 				TargetAttributes = {
+					7A11E57A00000001000000A1 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = BC8410992FE9B3D600F0888C;
+					};
 					BC8410992FE9B3D600F0888C = {
 						CreatedOnToolsVersion = 26.5;
 					};
@@ -369,11 +418,19 @@
 				BC8410DD2FE9D26000F0888C /* PawlMonitor */,
 				BC8410F32FE9D33D00F0888C /* PawlShield */,
 				BC8AB0D3304914E80001384D /* PawlShieldAction */,
+				7A11E57A00000001000000A1 /* PawlTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		7A11E57A00000001000000A6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BC8410982FE9B3D600F0888C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -408,6 +465,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		7A11E57A00000001000000A4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BC8410962FE9B3D600F0888C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -439,6 +503,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		7A11E57A00000001000000AB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BC8410992FE9B3D600F0888C /* Pawl */;
+			targetProxy = 7A11E57A00000001000000AA /* PBXContainerItemProxy */;
+		};
 		BC8410E82FE9D26100F0888C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BC8410DD2FE9D26000F0888C /* PawlMonitor */;
@@ -457,6 +526,52 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		7A11E57A00000001000000A8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8C4BM6A82T;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.jasonepage.PawlTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Pawl.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Pawl";
+			};
+			name = Debug;
+		};
+		7A11E57A00000001000000A9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8C4BM6A82T;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.jasonepage.PawlTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Pawl.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Pawl";
+			};
+			name = Release;
+		};
 		BC8410A32FE9B3D700F0888C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -829,6 +944,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		7A11E57A00000001000000A7 /* Build configuration list for PBXNativeTarget "PawlTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A11E57A00000001000000A8 /* Debug */,
+				7A11E57A00000001000000A9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		BC8410952FE9B3D600F0888C /* Build configuration list for PBXProject "Pawl" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

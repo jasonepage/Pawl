@@ -12,6 +12,7 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct SponsorView: View {
     let sponsor: SponsorService
@@ -20,6 +21,7 @@ struct SponsorView: View {
     var hasAccountability: Bool = true
     var onUnlock: () -> Void = {}
     @State private var codeEntry = ""
+    @Environment(\.requestReview) private var requestReview
 
     private var activeProtected: SponsorService.Link? {
         sponsor.asProtected.first { $0.status == "active" }
@@ -32,6 +34,12 @@ struct SponsorView: View {
         Section("Your sponsor") {
             if let link = activeProtected {
                 LabeledContent("Status", value: "Linked ✓")
+                    // Someone agreed to stand with them. Earned moment; once per link.
+                    .task(id: link.id) {
+                        guard ReviewPrompter.shouldAsk(.sponsorLinked, tag: link.id) else { return }
+                        try? await Task.sleep(for: ReviewPrompter.askDelay)
+                        requestReview()
+                    }
                 lapsedRenewRow   // no-op unless Pro has lapsed (docs/12 §8)
                 Button("Remove sponsor", role: .destructive) {
                     Task { await sponsor.revoke(link) }

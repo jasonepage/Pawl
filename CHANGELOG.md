@@ -13,6 +13,10 @@ A hardening release. The screens, the cooling off wait and the sponsor flow are 
 - The paired key now lives in the Keychain (this device only) instead of UserDefaults.
   2.0 values are moved over on first launch.
 - 28 new unit tests for the key check.
+- Pawl now asks for an App Store rating at earned moments only: a streak milestone, a
+  third or later resisted urge, and the first time a sponsor links. Never after an unlock.
+  Nothing in the first three days, and at least sixty days between asks. Settings has a
+  "Rate Pawl on the App Store" row that always works.
 - Unlocking now asks the key for the exact credential you paired. Re-pairing the same
   physical key no longer risks the key answering with its old credential.
 - While Pawl is protecting you, it now asks Screen Time to require automatic date and

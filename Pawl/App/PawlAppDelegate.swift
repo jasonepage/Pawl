@@ -20,6 +20,7 @@ final class PawlAppDelegate: NSObject, UIApplicationDelegate {
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         // Register the heartbeat BG task identifier (matches Info.plist + SupabaseConfig).
         HeartbeatService.shared.registerBackgroundTask()
+        Task { @MainActor in ReviewPrompter.noteLaunch() }   // install clock for rating asks
         UNUserNotificationCenter.current().delegate = self
         registerNotificationCategories()
         requestPush(application)

@@ -87,6 +87,11 @@ struct SettingsView: View {
                     }
                     Text("Feedback for key taps, the relock click, and the breathing guide.")
                         .font(.footnote).foregroundStyle(.secondary)
+                    Link(destination: ReviewPrompter.writeReviewURL) {
+                        iconLabel("star.fill", .yellow, "Rate Pawl on the App Store")
+                    }
+                    Text("A review helps someone else find a lock they can't talk themselves out of.")
+                        .font(.footnote).foregroundStyle(.secondary)
                 }
 
                 Section("Privacy & legal") {

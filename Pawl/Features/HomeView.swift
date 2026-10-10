@@ -12,6 +12,7 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct HomeView: View {
     /// True when no security key is paired yet — shows a nudge to pair (unlocking needs a key).
@@ -29,6 +30,7 @@ struct HomeView: View {
 
     @State private var vm = HomeViewModel()
     @State private var showRelapseSheet = false
+    @Environment(\.requestReview) private var requestReview
     @ScaledMetric(relativeTo: .largeTitle) private var heroNumberSize: CGFloat = 76
 
     var body: some View {
@@ -50,6 +52,12 @@ struct HomeView: View {
             .toolbar(.hidden, for: .navigationBar)
             .task { await vm.load() }
             .refreshable { await vm.refresh() }
+            // A streak milestone is an earned moment: ask for a rating once per milestone.
+            .onChange(of: vm.cleanDays, initial: true) { _, days in
+                guard milestones.contains(days),
+                      ReviewPrompter.shouldAsk(.streakMilestone, tag: "\(days)") else { return }
+                askForReview()
+            }
             .sheet(isPresented: $showRelapseSheet) {
                 RelapseSheet { note, amount in
                     Task { await vm.logRelapse(note: note, amount: amount) }
@@ -62,11 +70,27 @@ struct HomeView: View {
             // Popping back sets the binding false again, since navigationDestination is two way.
             .navigationDestination(isPresented: showUrge) {
                 UrgeView(streakDays: vm.cleanDays) { intensity, trigger, note in
-                    Task { await vm.logUrge(intensity: intensity, trigger: trigger, note: note) }
+                    Task {
+                        await vm.logUrge(intensity: intensity, trigger: trigger, note: note)
+                        // Riding out a few urges with the shield up is the win Pawl exists for.
+                        if vm.urges.count >= ReviewPrompter.minUrgesBeforeAsk,
+                           ReviewPrompter.shouldAsk(.urgeLogged) {
+                            askForReview()
+                        }
+                    }
                 }
             }
         }
         .tint(PawlColor.brand)
+    }
+
+    /// Shows the system rating sheet after a short pause so it never lands mid-transition.
+    /// iOS decides whether to actually show it (at most three times a year).
+    private func askForReview() {
+        Task {
+            try? await Task.sleep(for: ReviewPrompter.askDelay)
+            requestReview()
+        }
     }
 
 
