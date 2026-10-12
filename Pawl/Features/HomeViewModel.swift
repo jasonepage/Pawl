@@ -18,6 +18,8 @@ public final class HomeViewModel {
     public private(set) var cleanDays = 0
     public private(set) var relapses: [RelapseEvent] = []
     public private(set) var urges: [UrgeEvent] = []
+    /// 2.2: the last seven days as plain counts (WeekCard). nil until the first refresh.
+    public private(set) var week: WeeklyReport?
     public private(set) var commitment: Commitment?
 
     private let repo: CommitmentRepository
@@ -50,6 +52,16 @@ public final class HomeViewModel {
         guard let c = commitment else { return }
         relapses = (try? await repo.relapses(for: c.id)) ?? []
         urges = (try? await repo.urges(for: c.id)) ?? []
+        let unlocks = (try? await repo.unlocks(for: c.id)) ?? []
+        week = WeeklyReport.make(
+            commitmentStart: c.startedAt,
+            relapses: relapses.map(\.occurredAt),
+            urges: urges.map(\.occurredAt),
+            attempts: SharedState.blockAttemptStamps(),
+            completedUnlocks: unlocks.filter { $0.outcome == .completed || $0.outcome == .expired }
+                                     .compactMap { $0.coolingOffEndsAt ?? $0.completedAt },
+            now: Date()
+        )
         cleanDays = Streak.cleanDays(
             commitmentStart: c.startedAt,
             lastRelapse: relapses.first?.occurredAt,   // sorted newest-first

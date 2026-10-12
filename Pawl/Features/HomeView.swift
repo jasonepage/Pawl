@@ -42,7 +42,7 @@ struct HomeView: View {
                     if needsKey { keyNudge }
                     urgeButton
                     statusCard
-                    CaughtCard()
+                    if let week = vm.week { WeekCard(report: week) }
                     relapseButton
                     if !vm.relapses.isEmpty { historyCard }
                 }

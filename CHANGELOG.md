@@ -2,6 +2,9 @@
 
 ## 2.2 (in progress)
 
+- Home has a "This week" card: seven day dots and plain counts of days Pawl was on, attempts
+  it blocked, urges you logged, unlocks with your key, and relapses logged. Counts of zero are
+  left out. No score, no grade, no comparison to anyone. It replaces the "Caught this week" card.
 - You can now type in specific websites to block (Settings, Websites, Specific websites). One per
   line or pasted as a list. They are blocked right away, in Safari and inside apps, and the list
   comes back after a reinstall through iCloud. Removing a site works like removing an app: key,
