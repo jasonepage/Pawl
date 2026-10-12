@@ -264,12 +264,25 @@ enum SponsorLatch {
         let data = Data(userID.utf8)
         let attrs: [String: Any] = [kSecValueData as String: data,
                                     kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly]
-        if SecItemUpdate(query as CFDictionary, attrs as CFDictionary) == errSecItemNotFound {
-            var add = query
-            add.merge(attrs) { _, new in new }
-            _ = SecItemAdd(add as CFDictionary, nil)
+        let updateStatus = SecItemUpdate(query as CFDictionary, attrs as CFDictionary)
+        guard updateStatus == errSecItemNotFound else {
+            report("update", updateStatus)
+            return
         }
+        var add = query
+        add.merge(attrs) { _, new in new }
+        report("add", SecItemAdd(add as CFDictionary, nil))
     }
 
-    static func clear() { _ = SecItemDelete(query as CFDictionary) }
+    static func clear() { report("delete", SecItemDelete(query as CFDictionary)) }
+
+    /// 2.2: a failed latch write used to vanish silently. The latch is what keeps sponsor
+    /// approval in place across sign-out and reinstall, so a failure is worth seeing in a
+    /// debug build. Release builds stay quiet. errSecItemNotFound on delete is normal.
+    private static func report(_ op: String, _ status: OSStatus) {
+        #if DEBUG
+        guard status != errSecSuccess, !(op == "delete" && status == errSecItemNotFound) else { return }
+        print("[SponsorLatch] \(op) failed: OSStatus \(status)")
+        #endif
+    }
 }
