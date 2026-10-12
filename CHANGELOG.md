@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.2 (in progress)
+
+- You can now type in specific websites to block (Settings, Websites, Specific websites). One per
+  line or pasted as a list. They are blocked right away, in Safari and inside apps, and the list
+  comes back after a reinstall through iCloud. Removing a site works like removing an app: key,
+  sponsor if you have one, then the cooling-off wait, and the site stays blocked until then.
+- In Debug builds, a failed write of the sponsor record now prints to the console instead of
+  vanishing. Release builds are unchanged.
+
 ## 2.1 (not on the App Store yet)
 
 A hardening release. The screens, the cooling off wait and the sponsor flow are unchanged.

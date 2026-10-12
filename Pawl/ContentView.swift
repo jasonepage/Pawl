@@ -41,6 +41,7 @@ struct ContentView: View {
             model.restorePendingDurations()                  // resume/commit a gated loosening
             model.restorePendingSelectionChange()            // resume/commit a gated block removal
             model.restorePendingCategoryChange()             // resume/commit a gated category turn-off
+            model.restorePendingDomainRemoval()              // 2.2: iCloud mirror + gated typed-site removal
             await model.sponsor.refresh()                    // so sponsor mode engages app-wide (FR-P2-LINK-005)
             model.applyGrandfatherIfNeeded()                 // 2.0 P1: legacy sponsor users → Pro-free for life
             await model.refreshBlocklist()                   // Tier-1: grow the gambling web list from Supabase

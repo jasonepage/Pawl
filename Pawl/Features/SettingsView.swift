@@ -373,7 +373,16 @@ struct SettingsView: View {
                 }
                 Button("Cancel", role: .cancel) { model.cancelCategoryChange() }
             }
-            Text("Gambling sites use our maintained list; adult sites use Apple's built-in filter. Turning a category on is instant; turning one off needs your key + a cooling-off.")
+            NavigationLink {
+                CustomDomainsView(model: model)
+            } label: {
+                HStack {
+                    iconLabel("globe", .blue, "Specific websites")
+                    Spacer()
+                    Text("\(model.customDomains.count)").foregroundStyle(.secondary)
+                }
+            }
+            Text("Gambling sites use our maintained list; adult sites use Apple's built-in filter; specific websites are ones you type in yourself. Adding is instant. Turning a category off or removing a site needs your key + a cooling-off.")
                 .font(.footnote).foregroundStyle(.secondary)
         }
     }

@@ -92,6 +92,9 @@ public enum SharedState {
     private nonisolated static let webEnabledKey = "pawl.web.enabled"
     private nonisolated static let webAdultKey = "pawl.web.adult"
     private nonisolated static let webDomainsKey = "pawl.web.domains"
+    /// 2.2: sites the user typed in themselves (FR-SHIELD-003/004). Independent of the gambling
+    /// category flag: these are always blocked while the shield is on.
+    private nonisolated static let webCustomDomainsKey = "pawl.web.customDomains"
 
     public nonisolated static func setWebBlock(enabled: Bool, adult: Bool, domains: [String]) {
         AppGroup.defaults.set(enabled, forKey: webEnabledKey)
@@ -119,6 +122,10 @@ public enum SharedState {
     public nonisolated static func webBlockEnabled() -> Bool { AppGroup.defaults.bool(forKey: webEnabledKey) }
     public nonisolated static func webAdultFilter() -> Bool { AppGroup.defaults.bool(forKey: webAdultKey) }
     public nonisolated static func webBlockDomains() -> [String] { AppGroup.defaults.stringArray(forKey: webDomainsKey) ?? [] }
+    public nonisolated static func customWebDomains() -> [String] { AppGroup.defaults.stringArray(forKey: webCustomDomainsKey) ?? [] }
+    public nonisolated static func setCustomWebDomains(_ domains: [String]) {
+        AppGroup.defaults.set(domains.sorted(), forKey: webCustomDomainsKey)
+    }
 }
 
 /// Apply / lift the shield on the SHARED named store. Used by the app and by the
@@ -164,17 +171,16 @@ public enum SharedShield {
         //   adult    = turn on Apple's built-in "Limit Adult Websites" filter (.auto)
         let gambling = SharedState.webBlockEnabled()
         let adult = SharedState.webAdultFilter()
+        // 2.2: the user's own typed sites are always in, whatever the category flags say.
+        let custom = Set(SharedState.customWebDomains().map { WebDomain(domain: $0) })
         let webDomains = gambling
-            ? Set(SharedState.webBlockDomains().map { WebDomain(domain: $0) })
-            : Set<WebDomain>()
+            ? custom.union(SharedState.webBlockDomains().map { WebDomain(domain: $0) })
+            : custom
 
-        switch (adult, gambling) {
-        case (false, false):
-            store.webContent.blockedByFilter = nil
-        case (true, _):
-            // Apple's adult filter, plus any gambling domains we also block.
+        if adult {
+            // Apple's adult filter, plus every domain we block ourselves.
             store.webContent.blockedByFilter = .auto(webDomains, except: [])
-        case (false, true):
+        } else {
             store.webContent.blockedByFilter = webDomains.isEmpty ? nil : .specific(webDomains)
         }
     }

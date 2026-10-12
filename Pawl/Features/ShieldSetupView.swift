@@ -78,7 +78,7 @@ struct ShieldSetupView: View {
         } header: {
             Text("2 · Choose what to block")
         } footer: {
-            Text("Apple's picker lets you add specific websites under its Web section, but it's limited — you can't freely type a domain. Reliable blocking of all betting/crypto sites needs a content filter, planned as a focused next step (FR-SHIELD-003/004).")
+            Text("Pick apps and categories here. Specific websites you type in yourself live in Settings under Websites, and gambling sites are covered by Pawl's own list.")
         }
     }
 
