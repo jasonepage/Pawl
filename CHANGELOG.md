@@ -2,6 +2,10 @@
 
 ## 2.2 (in progress)
 
+- Settings is now a short index that fits on one screen. What's blocked, the cooling-off and
+  grace timers, and the hard lock each open on their own page, the long explanations moved into
+  "How protection works", Screen Time only shows up when it is off, and "Someone to call" has its
+  own row under Help instead of hiding inside the explainer.
 - Setup starts by asking what you want to block: social media, games, shopping, news, adult
   content, gambling, or something else. Nothing is picked for you. Gambling and adult content
   preset the website filter; everything else starts with the app picker, since Apple does not

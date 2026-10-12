@@ -91,7 +91,7 @@ struct SponsorView: View {
                 }
                 .disabled(sponsor.isBusy)
             }
-            Text("You can sponsor more than one person — enter another code above to add them. Approve unlock requests in the Approvals tab; stopping returns someone to solo mode.")
+            Text("You can sponsor more than one person. Enter another code above to add them. Approve unlock requests in the Approvals tab; stopping returns someone to solo mode.")
                 .font(.caption).foregroundStyle(.secondary)
         }
 
@@ -111,7 +111,7 @@ struct SponsorView: View {
     private var lapsedRenewRow: some View {
         if !hasAccountability {
             Button("Renew Pawl Pro") { onUnlock() }
-            Text("Your Pro subscription has lapsed. Your sponsor link stays — nothing is severed — but you'll need Pro to link a new sponsor.")
+            Text("Your Pro subscription has lapsed. Your sponsor link stays and nothing is severed, but you'll need Pro to link a new sponsor.")
                 .font(.caption).foregroundStyle(.secondary)
         }
     }
