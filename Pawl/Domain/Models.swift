@@ -241,8 +241,13 @@ public struct UrgeEvent: Identifiable, Codable, Sendable, Equatable {
 /// and a custom "specific apps" focus broaden Pawl to consumers beyond gamblers. Pure data, no iOS
 /// imports, so it stays in the testable domain core (HC-1 boundary).
 public enum Vertical: String, Codable, Sendable, CaseIterable {
-    case gambling
+    // 2.2: Pawl is a general blocker. Order here is the order on the first screen.
+    case social
+    case games
+    case shopping
+    case news
     case adultContent
+    case gambling
     case custom
 
     /// Website categories switched on by default for this focus at onboarding. `gambling` blocks
@@ -255,26 +260,38 @@ public enum Vertical: String, Codable, Sendable, CaseIterable {
     /// Short label for the focus card and Settings.
     public var title: String {
         switch self {
-        case .gambling:     return "Quit gambling"
-        case .adultContent: return "Filter Adult Content"
-        case .custom:       return "Block distracting apps"
+        case .social:       return "Social media"
+        case .games:        return "Games"
+        case .shopping:     return "Shopping"
+        case .news:         return "News and doomscrolling"
+        case .adultContent: return "Adult content"
+        case .gambling:     return "Gambling"
+        case .custom:       return "Something else"
         }
     }
 
     /// One-line subtitle shown on the focus card.
     public var cardSubtitle: String {
         switch self {
+        case .social:       return "Instagram, TikTok, X, Reddit, whatever keeps pulling you back."
+        case .games:        return "The games you open without deciding to."
+        case .shopping:     return "Shopping apps and sites you keep browsing."
+        case .news:         return "News and feed apps you check too often."
+        case .adultContent: return "Apple's adult-site filter, plus any apps you pick."
         case .gambling:     return "Sportsbook, casino, and crypto apps and sites."
-        case .adultContent: return "Turn on Apple's adult-site filter, and lock the apps."
-        case .custom:       return "Social, games, anything you keep reaching for."
+        case .custom:       return "Any mix of apps and sites you choose."
         }
     }
 
     /// SF Symbol for the focus card.
     public var icon: String {
         switch self {
-        case .gambling:     return "dice"
+        case .social:       return "bubble.left.and.bubble.right"
+        case .games:        return "gamecontroller"
+        case .shopping:     return "cart"
+        case .news:         return "newspaper"
         case .adultContent: return "eye.slash"
+        case .gambling:     return "dice"
         case .custom:       return "apps.iphone"
         }
     }
@@ -283,10 +300,14 @@ public enum Vertical: String, Codable, Sendable, CaseIterable {
     public var welcomeBody: String {
         let what: String
         switch self {
+        case .social:       what = "the social apps and sites you choose"
+        case .games:        what = "the games you choose"
+        case .shopping:     what = "the shopping apps and sites you choose"
+        case .news:         what = "the news and feed apps you choose"
         case .gambling:     what = "gambling apps and sites"
         case .adultContent: what = "adult sites and the apps you choose"
-        case .custom:       what = "the apps you choose"
+        case .custom:       what = "the apps and sites you choose"
         }
-        return "Pawl blocks \(what), and makes unblocking deliberately hard — it takes your physical security key plus a 15-minute wait. No shortcuts in the moment."
+        return "Pawl blocks \(what), and makes unblocking deliberately hard. It takes your physical security key plus a 15-minute wait. No shortcuts in the moment."
     }
 }

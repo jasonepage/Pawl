@@ -18,7 +18,9 @@ struct OnboardingView: View {
     let model: AppModel
 
     @State private var role: AppRole?          // nil → show the role/focus picker first
-    @State private var vertical: Vertical = .gambling   // what the user is here to quit
+    @State private var vertical: Vertical = .custom     // set when the person picks a focus
+    @State private var pickedFocus: Vertical?            // 2.2: nothing selected until they choose
+    @State private var hoursPerDay: Double = 2           // welcome-screen estimate, never stored
     @State private var codeEntry = ""
     @State private var step = 0
     @State private var selection = FamilyActivitySelection()
@@ -57,28 +59,36 @@ struct OnboardingView: View {
     private var rolePicker: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                heading("Welcome to Pawl", "What brings you here?")
-                body("Choose what you want to quit — Pawl blocks it and makes unblocking deliberately hard. Or set up as an approver to support someone else.")
+                heading("Welcome to Pawl", "What do you want to block?")
+                body("Pick one to start. Pawl blocks it and makes unblocking deliberately hard. You can add more later.")
                 VStack(spacing: 12) {
                     ForEach(Vertical.allCases, id: \.self) { v in
-                        Button { chooseFocus(v) } label: {
-                            roleCard(v.icon, v.title, v.cardSubtitle)
+                        Button { pickedFocus = v } label: {
+                            roleCard(v.icon, v.title, v.cardSubtitle, selected: pickedFocus == v)
                         }
-                    }
-                    Button { role = .approver } label: {
-                        roleCard("checkmark.shield",
-                                 "I'm supporting someone",
-                                 "You won't block anything. You'll approve their unlocks and get alerts.")
                     }
                 }
                 .buttonStyle(.plain)
+
+                primary("Continue") { if let v = pickedFocus { chooseFocus(v) } }
+                    .disabled(pickedFocus == nil)
+                    .opacity(pickedFocus == nil ? 0.5 : 1)
+
+                Button { role = .approver } label: {
+                    Text("I'm here to support someone else")
+                        .font(.footnote)
+                        .foregroundStyle(PawlColor.brand)
+                        .frame(maxWidth: .infinity)
+                }
+                .padding(.top, 4)
             }
             .padding(20)
         }
     }
 
-    /// Pick a focus → become a blocker and preset the default website categories for that focus.
-    /// The user can still adjust the toggles (multi-select) on the categories step.
+    /// Become a blocker and preset the website categories for the chosen focus. Only gambling
+    /// and adult content have a website preset; the app picker cannot be pre-filled (Apple
+    /// hands Pawl opaque tokens), so every other focus starts with the picker on the next step.
     private func chooseFocus(_ v: Vertical) {
         vertical = v
         blockGambling = v.defaultBlockGambling
@@ -100,7 +110,7 @@ struct OnboardingView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func roleCard(_ icon: String, _ title: String, _ sub: String) -> some View {
+    private func roleCard(_ icon: String, _ title: String, _ sub: String, selected: Bool = false) -> some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
                 .font(.title).foregroundStyle(PawlColor.brand).frame(width: 38)
@@ -109,11 +119,17 @@ struct OnboardingView: View {
                 Text(sub).font(.callout).foregroundStyle(.secondary)
             }
             Spacer(minLength: 0)
+            if selected {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.title3).foregroundStyle(PawlColor.brand)
+            }
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(selected ? PawlColor.cleanBg : Color(.secondarySystemGroupedBackground))
+        .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(selected ? PawlColor.brand : .clear, lineWidth: 2))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
     // MARK: Approver flow (sign in + invite code, no blocking)
@@ -122,7 +138,7 @@ struct OnboardingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 heading("Approver setup", model.account.isSignedIn ? "Almost done." : "Sign in to approve.")
-                body("You won't block anything on your own phone. You'll approve unlock requests from the person you're supporting — and get alerted if their protection drops.")
+                body("You won't block anything on your own phone. You'll approve unlock requests from the person you're supporting, and get alerted if their protection drops.")
 
                 if !model.account.isSignedIn {
                     SignInWithAppleButton(.signIn) { request in
@@ -202,9 +218,26 @@ struct OnboardingView: View {
         case 0:
             heading("Welcome to Pawl", "The catch that won't let you slip back.")
             body(vertical.welcomeBody)
+            VStack(alignment: .leading, spacing: 8) {
+                Text("About how many hours a day go to this?")
+                    .font(.headline)
+                HStack {
+                    Slider(value: $hoursPerDay, in: 0...8, step: 0.5)
+                    Text(hoursPerDay == hoursPerDay.rounded() ? "\(Int(hoursPerDay)) h" : String(format: "%.1f h", hoursPerDay))
+                        .font(.body.monospacedDigit())
+                        .frame(width: 44, alignment: .trailing)
+                }
+                if let line = TimeCost.sentence(hoursPerDay: hoursPerDay) {
+                    Text(line).font(.callout).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Text("Just for you to see. Pawl doesn't save this.")
+                    .font(.caption).foregroundStyle(.tertiary)
+            }
+            .padding(.top, 4)
         case 1:
             heading("Allow Screen Time", "This is how Pawl blocks apps.")
-            body("Pawl uses Apple's Screen Time to shield apps and sites. We only ever see anonymous tokens — never which specific apps you chose.")
+            body("Pawl uses Apple's Screen Time to shield apps and sites. We only ever see anonymous tokens, never which specific apps you chose.")
             LabeledContent("Status", value: model.auth.isApproved ? "Approved" : "Not yet")
                 .font(.headline)
             if let err = model.auth.lastErrorMessage {
@@ -218,18 +251,18 @@ struct OnboardingView: View {
             categoryToggle(title: "Adult sites",
                            subtitle: "Turns on Apple's built-in adult-website filter.",
                            isOn: $blockAdult)
-            body("Website categories apply automatically. To also lock specific apps — the ones you keep opening — add them below. That part's optional.")
+            body("Website categories apply automatically. To also lock specific apps, the ones you keep opening, add them below. You can type in specific websites later in Settings.")
             LabeledContent("Apps added", value: "\(selection.applicationTokens.count)")
                 .font(.headline)
         case 3:
             heading("Pair your key", keyHeadlineSub)
             if keyPaired {
-                body("Now put the key out of reach — give it to a sponsor or lock it in a timebox. That distance is the whole point.")
+                body("Now put the key out of reach. Give it to a sponsor or lock it in a timebox. That distance is the whole point.")
             } else if pairLater {
-                body("No problem — set up Pawl now and pair your key when it arrives.")
+                body("No problem. Set up Pawl now and pair your key when it arrives.")
                 VStack(alignment: .leading, spacing: 14) {
                     infoRow("cart.fill", "Get a USB-C security key",
-                            "Any FIDO2 USB-C key works. Search \u{201C}FIDO2 USB-C security key,\u{201D} or look at the YubiKey 5C or Google Titan — about $30.")
+                            "Any FIDO2 USB-C key works. Search \u{201C}FIDO2 USB-C security key,\u{201D} or look at the YubiKey 5C or Google Titan, about $30.")
                     infoRow("lock.shield", "Your blocks turn on now",
                             "Pawl starts protecting you right away. Until a key is paired you can't unblock from inside Pawl, so pair it as soon as it arrives.")
                     infoRow("arrow.clockwise", "Pair it anytime",
@@ -237,21 +270,21 @@ struct OnboardingView: View {
                 }
                 .padding(.top, 2)
             } else {
-                body("A security key is a small physical device — about the size of a USB stick — that proves it's really you. It's the same kind of key banks and Google use for their strongest account protection.")
+                body("A security key is a small physical device, about the size of a USB stick, that proves it's really you. It's the same kind of key banks and Google use for their strongest account protection.")
                 VStack(alignment: .leading, spacing: 14) {
                     infoRow("key.fill", "It's your only unlock",
-                            "Pawl lifts the shield only when this exact key is connected. No key in hand, no unblock — that's the whole idea.")
+                            "Pawl lifts the shield only when this exact key is connected. No key in hand, no unblock. That's the whole idea.")
                     infoRow("cable.connector", "It plugs into your iPhone",
-                            "Use a USB-C security key (the FIDO2 kind). You can buy one for about $30 — YubiKey and Google Titan are common ones.")
+                            "Use a USB-C security key (the FIDO2 kind). You can buy one for about $30. YubiKey and Google Titan are common ones.")
                     infoRow("shippingbox.fill", "Where you keep it is the trick",
-                            "Because unblocking needs the physical key, you give it to someone you trust or lock it away — so it's never in your pocket at 1am.")
+                            "Because unblocking needs the physical key, you give it to someone you trust or lock it away, so it's never in your pocket at 1am.")
                 }
                 .padding(.top, 2)
                 body("Have your key handy and plug it in, then tap Pair below.")
             }
         default:
             heading("Lock it in", "You're about to activate Pawl.")
-            body("We'll turn on your protection now — the website categories you chose, plus any apps you added. From here, lifting the shield needs your key + a 15-minute cooling-off. Turning off Screen Time can still remove protection (and alerts your sponsor) — the only fully hard lock is a sponsor-set Screen Time passcode (a later step).")
+            body("We'll turn on your protection now: the website categories you chose, plus any apps you added. From here, lifting the shield needs your key + a 15-minute cooling-off. Turning off Screen Time can still remove protection (and alerts your sponsor). The only fully hard lock is a sponsor-set Screen Time passcode (a later step).")
         }
     }
 
@@ -352,13 +385,20 @@ struct OnboardingView: View {
 
     /// Categories-step copy, tailored to the chosen focus.
     private var categoryStepTitle: String {
-        vertical == .custom ? "Choose what to block" : "What are you here to block?"
+        switch vertical {
+        case .gambling, .adultContent: return "What are you here to block?"
+        default:                       return "Choose what to block"
+        }
     }
     private var categoryStepSubtitle: String {
         switch vertical {
-        case .custom:       return "Add the apps you keep reaching for — websites are optional."
-        case .adultContent: return "Adult sites are on. Add apps, or gambling sites, too if you want."
-        case .gambling:     return "Pick one or both — Pawl handles the websites."
+        case .social:       return "Add the social apps you keep opening. Website categories are optional."
+        case .games:        return "Add the games you keep opening. Website categories are optional."
+        case .shopping:     return "Add the shopping apps you keep opening. Website categories are optional."
+        case .news:         return "Add the news and feed apps you keep opening. Website categories are optional."
+        case .custom:       return "Add the apps you keep reaching for. Website categories are optional."
+        case .adultContent: return "Adult sites are on. Add apps, or gambling sites too, if you want."
+        case .gambling:     return "Pick one or both. Pawl handles the websites."
         }
     }
 

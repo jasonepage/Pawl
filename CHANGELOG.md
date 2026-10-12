@@ -2,6 +2,11 @@
 
 ## 2.2 (in progress)
 
+- Setup starts by asking what you want to block: social media, games, shopping, news, adult
+  content, gambling, or something else. Nothing is picked for you. Gambling and adult content
+  preset the website filter; everything else starts with the app picker, since Apple does not
+  let an app pre-fill it. The welcome screen also shows what your daily hours add up to in a
+  year. That number is for you to see and is not saved.
 - Home has a "This week" card: seven day dots and plain counts of days Pawl was on, attempts
   it blocked, urges you logged, unlocks with your key, and relapses logged. Counts of zero are
   left out. No score, no grade, no comparison to anyone. It replaces the "Caught this week" card.
