@@ -74,7 +74,9 @@ public final class SupabaseCommitmentRepository: CommitmentRepository {
     // MARK: - Logs (delegate to the cache for now)
 
     public func append(relapse: RelapseEvent) async throws { try await inner.append(relapse: relapse) }
+    public func remove(relapseID: UUID) async throws { try await inner.remove(relapseID: relapseID) }
     public func append(urge: UrgeEvent) async throws { try await inner.append(urge: urge) }
+    public func remove(urgeID: UUID) async throws { try await inner.remove(urgeID: urgeID) }
     public func append(unlock: UnlockRequest) async throws { try await inner.append(unlock: unlock) }
     public func update(unlock: UnlockRequest) async throws { try await inner.update(unlock: unlock) }
     public func relapses(for id: UUID) async throws -> [RelapseEvent] { try await inner.relapses(for: id) }

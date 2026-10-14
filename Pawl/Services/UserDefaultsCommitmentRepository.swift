@@ -71,9 +71,21 @@ public final class UserDefaultsCommitmentRepository: CommitmentRepository {
         write(all, key: Key.relapses)
     }
 
+    public func remove(relapseID: UUID) async throws {
+        var all = readArray(Key.relapses, as: RelapseEvent.self)
+        all.removeAll { $0.id == relapseID }
+        write(all, key: Key.relapses)
+    }
+
     public func append(urge: UrgeEvent) async throws {
         var all = readArray(Key.urges, as: UrgeEvent.self)
         all.append(urge)
+        write(all, key: Key.urges)
+    }
+
+    public func remove(urgeID: UUID) async throws {
+        var all = readArray(Key.urges, as: UrgeEvent.self)
+        all.removeAll { $0.id == urgeID }
         write(all, key: Key.urges)
     }
 

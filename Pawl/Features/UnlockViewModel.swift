@@ -175,8 +175,7 @@ public final class UnlockViewModel {
                 _ = reason
                 #endif
             }
-            if matches { Feedback.keyRecognized() }
-            else { Feedback.warning(); message = "That's not your paired key." }
+            if !matches { message = "That's not your paired key." }
             send(.tap(uidMatches: matches))
         } catch {
             send(.cancel)
@@ -270,7 +269,7 @@ public final class UnlockViewModel {
                 send(.cancel)
                 message = "iOS couldn't schedule the relock, so Pawl stayed locked. Try again."
             }
-        case .liftShield:                     shield.lift(); Feedback.shieldLifted()   // understated — not a reward
+        case .liftShield:                     shield.lift()
         case .scheduleGrace(let endsAt):      scheduleFire(at: endsAt, event: .graceEnded)
         case .reapplyShield:
             // 2.1: relock with the live shared selection (it includes apps added since this
@@ -278,7 +277,6 @@ public final class UnlockViewModel {
             let live = SharedState.loadSelection()
             let liveIsEmpty = live.applicationTokens.isEmpty && live.categoryTokens.isEmpty && live.webDomainTokens.isEmpty
             shield.apply(liveIsEmpty ? selection : live)
-            Feedback.relock()
         }
     }
 

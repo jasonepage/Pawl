@@ -17,8 +17,9 @@ import SwiftUI
 
 struct SettingsView: View {
     let model: AppModel
+    /// Flipped by Home to land straight on What's blocked.
+    var openBlockedItems: Binding<Bool> = .constant(false)
 
-    @AppStorage(Feedback.enabledKey) private var feedbackEnabled = true
     @State private var showPaywall = false
     // Mirror of Pro entitlement in local @State so the row re-renders reliably on lifecycle events
     // (purchase, sheet close, appear) without relying on cross-object Observation timing.
@@ -69,6 +70,9 @@ struct SettingsView: View {
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Settings")
+            .navigationDestination(isPresented: openBlockedItems) {
+                BlockedItemsView(model: model)
+            }
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showPaywall,
                    onDismiss: { Task { await model.pro.refreshEntitlements(); syncPro() } }) {
@@ -188,19 +192,7 @@ struct SettingsView: View {
         }
     }
 
-    /// One short value for the index row, for example "Gambling · 3 apps · 2 sites".
-    private var blockedSummaryText: String {
-        var parts: [String] = []
-        if model.gamblingOn { parts.append("Gambling") }
-        if model.adultOn { parts.append("Adult") }
-        let s = model.blockedSummary
-        if s.apps > 0 { parts.append(s.apps == 1 ? "1 app" : "\(s.apps) apps") }
-        let sites = s.sites + model.customDomains.count
-        if sites > 0 { parts.append(sites == 1 ? "1 site" : "\(sites) sites") }
-        let sets = model.scheduledSets.count
-        if sets > 0 { parts.append(sets == 1 ? "1 set" : "\(sets) sets") }
-        return parts.isEmpty ? "Nothing yet" : parts.joined(separator: " · ")
-    }
+    private var blockedSummaryText: String { model.blockedSummaryLine }
 
     private var approverSection: some View {
         Section {
@@ -241,9 +233,6 @@ struct SettingsView: View {
 
     private var appSection: some View {
         Section("App") {
-            Toggle(isOn: $feedbackEnabled) {
-                SettingsRows.label("speaker.wave.2.fill", .purple, "Sound & haptics")
-            }
             Link(destination: URL(string: "https://getpawl.com/privacy")!) {
                 SettingsRows.label("hand.raised.fill", .blue, "Privacy Policy")
             }

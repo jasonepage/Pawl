@@ -574,7 +574,39 @@ final class AppModel {
         }
     }
 
+    // MARK: - Time kept (2.2)
+
+    private static let hoursPerDayKey = "pawl.hoursPerDay"
+
+    /// The setup answer to "about how many hours a day go to this?". On the phone only, used
+    /// for the hours-kept lines on Home and the tough-moment screen. 0 means not answered.
+    var hoursPerDay: Double {
+        get { UserDefaults.standard.double(forKey: Self.hoursPerDayKey) }
+        set { UserDefaults.standard.set(max(0, newValue), forKey: Self.hoursPerDayKey) }
+    }
+
     // MARK: - Scheduled block sets (2.2)
+
+    /// One short line for Home and Settings, for example "Gambling · 3 apps · 2 sites · 1 set".
+    var blockedSummaryLine: String {
+        var parts: [String] = []
+        if gamblingOn { parts.append("Gambling") }
+        if adultOn { parts.append("Adult") }
+        let s = blockedSummary
+        if s.apps > 0 { parts.append(s.apps == 1 ? "1 app" : "\(s.apps) apps") }
+        let sites = s.sites + customDomains.count
+        if sites > 0 { parts.append(sites == 1 ? "1 site" : "\(sites) sites") }
+        let sets = scheduledSets.count
+        if sets > 0 { parts.append(sets == 1 ? "1 set" : "\(sets) sets") }
+        return parts.isEmpty ? "Nothing yet" : parts.joined(separator: " · ")
+    }
+
+    /// Name of a scheduled set whose window is open right now, if any.
+    var activeScheduledSetName: String? {
+        let now = Date()
+        return scheduledSets.first { $0.isActive(at: now) }?.name
+    }
+
 
     /// Save a new or edited set. Tightening applies now; loosening keeps the old set in place,
     /// then needs the key, the sponsor if linked, and the cooldown before the new one lands.

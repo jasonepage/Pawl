@@ -23,6 +23,14 @@ public enum TimeCost {
         Int((max(0, hoursPerDay) * 365 / 24).rounded())
     }
 
+    /// "About 21 hours" style text for hours kept. nil when there is nothing to say.
+    public static func keptText(hoursPerDay: Double, days: Int) -> String? {
+        guard hoursPerDay > 0, days > 0 else { return nil }
+        let hours = Int((hoursPerDay * Double(days)).rounded())
+        guard hours >= 1 else { return nil }
+        return hours == 1 ? "about 1 hour" : "about \(hours) hours"
+    }
+
     /// The sentence the welcome screen shows. nil below half an hour, where it would be noise.
     public static func sentence(hoursPerDay: Double) -> String? {
         guard hoursPerDay >= 0.5 else { return nil }

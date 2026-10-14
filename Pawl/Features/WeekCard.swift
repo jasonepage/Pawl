@@ -16,6 +16,8 @@ import SwiftUI
 
 struct WeekCard: View {
     let report: WeeklyReport
+    /// Setup answer, hours a day that went to the habit. 0 when unknown.
+    var hoursPerDay: Double = 0
 
     var body: some View {
         PawlCard {
@@ -24,6 +26,12 @@ struct WeekCard: View {
                 dayRow
                 VStack(alignment: .leading, spacing: 6) {
                     line(report.daysProtected == 1 ? "Pawl was on for 1 day" : "Pawl was on for \(report.daysProtected) days")
+                    if let kept = TimeCost.keptText(hoursPerDay: hoursPerDay,
+                                                    days: report.days.filter { $0.kind == .protected }.count) {
+                        Text("\(kept.prefix(1).uppercased() + kept.dropFirst()) kept this week")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(PawlColor.cleanText)
+                    }
                     if report.attemptsCaught > 0 {
                         line(report.attemptsCaught == 1
                              ? "Blocked 1 attempt to open a blocked app or site"

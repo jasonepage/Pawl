@@ -71,13 +71,57 @@ public final class HomeViewModel {
 
     /// FR-STREAK-002/003: logging a relapse resets the streak. Never weakens the
     /// shield (FR-STREAK-006) — there is no shield interaction here at all.
-    public func logRelapse(note: String?, amount: Decimal?) async {
+    public func logRelapse(note: String?, amount: Decimal?, occurredAt: Date = Date()) async {
         guard let c = commitment else { return }
+        // Never in the future, never before the commitment started.
+        let when = min(max(occurredAt, c.startedAt), Date())
         try? await repo.append(relapse: RelapseEvent(
-            commitmentID: c.id, occurredAt: Date(),
+            commitmentID: c.id, occurredAt: when,
             note: note?.isEmpty == true ? nil : note, amount: amount
         ))
         await refresh()
+    }
+
+    /// 2.2: the log is an honor system. Removing an entry recounts the streak from whatever
+    /// relapse is newest after it, or from the start if none remain.
+    public func removeRelapse(_ event: RelapseEvent) async {
+        try? await repo.remove(relapseID: event.id)
+        await refresh()
+    }
+
+    public func removeUrge(_ event: UrgeEvent) async {
+        try? await repo.remove(urgeID: event.id)
+        await refresh()
+    }
+
+    /// One entry in the merged History: a relapse, or an urge that was ridden out.
+    public enum HistoryEntry: Identifiable {
+        case relapse(RelapseEvent)
+        case urge(UrgeEvent)
+        public var id: UUID {
+            switch self {
+            case .relapse(let e): return e.id
+            case .urge(let e):    return e.id
+            }
+        }
+        public var occurredAt: Date {
+            switch self {
+            case .relapse(let e): return e.occurredAt
+            case .urge(let e):    return e.occurredAt
+            }
+        }
+        public var note: String? {
+            switch self {
+            case .relapse(let e): return e.note
+            case .urge(let e):    return e.note
+            }
+        }
+    }
+
+    /// Relapses and urges together, newest first.
+    public var history: [HistoryEntry] {
+        (relapses.map(HistoryEntry.relapse) + urges.map(HistoryEntry.urge))
+            .sorted { $0.occurredAt > $1.occurredAt }
     }
 
     /// FR-URGE-002/004: log an urge. Never offers an unblock (FR-URGE-003).

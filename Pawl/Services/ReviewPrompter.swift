@@ -9,7 +9,7 @@
 //  Decides WHEN to ask for a rating. iOS shows the rating sheet at most three times per
 //  year per app and silently drops any extra request, so each ask is spent on a moment the
 //  person earned: a streak milestone, a few resisted urges, a sponsor who just linked.
-//  Never on an unlock. Lifting the shield must not feel rewarding (same rule as Feedback).
+//  Never on an unlock. Lifting the shield must not feel rewarding.
 //
 //  The views call `shouldAsk` and, on true, SwiftUI's `requestReview` environment action.
 //  Settings also has an always-available "Rate Pawl" row that opens the App Store directly,

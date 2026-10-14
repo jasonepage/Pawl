@@ -19,6 +19,8 @@ enum AppTab: Hashable { case home, unlock, approvals, settings }
 struct ContentView: View {
     @State private var model = AppModel()
     @State private var tab: AppTab = .home
+    /// Set by Home's "What's blocked" card; Settings pushes that page and clears it.
+    @State private var openBlockedItems = false
     @Environment(\.scenePhase) private var scenePhase
     /// Set when someone pressed "I need a minute" on the block screen (FR-SHACT-004).
     /// Owned here rather than in HomeView: sibling tabs stay alive in a TabView, so a
@@ -80,8 +82,12 @@ struct ContentView: View {
                 HomeView(
                     needsKey: !model.isKeyPaired,
                     screenTimeOff: !model.auth.isApproved,
+                    blockedSummary: model.blockedSummaryLine,
+                    activeSetName: model.activeScheduledSetName,
+                    hoursPerDay: model.hoursPerDay,
                     onPairKey: { tab = .unlock },
                     onEnableScreenTime: { Task { await model.reenableScreenTime() } },
+                    onShowBlocked: { tab = .settings; openBlockedItems = true },
                     showUrge: $pendingUrge
                 )
                     .tabItem { Label("Home", systemImage: "shield.lefthalf.filled") }
@@ -106,7 +112,7 @@ struct ContentView: View {
                     .tag(AppTab.approvals)
             }
 
-            SettingsView(model: model)
+            SettingsView(model: model, openBlockedItems: $openBlockedItems)
                 .tabItem { Label("Settings", systemImage: "gearshape") }
                 .tag(AppTab.settings)
         }
