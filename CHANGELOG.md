@@ -30,7 +30,7 @@
 - In Debug builds, a failed write of the sponsor record now prints to the console instead of
   vanishing. Release builds are unchanged.
 
-## 2.1 (not on the App Store yet)
+## 2.1
 
 A hardening release. The screens, the cooling off wait and the sponsor flow are unchanged.
 
