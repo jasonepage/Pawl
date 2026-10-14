@@ -42,6 +42,7 @@ struct ContentView: View {
             model.restorePendingSelectionChange()            // resume/commit a gated block removal
             model.restorePendingCategoryChange()             // resume/commit a gated category turn-off
             model.restorePendingDomainRemoval()              // 2.2: iCloud mirror + gated typed-site removal
+            model.restorePendingSetsChange()                 // 2.2: scheduled sets, their activities, gated edits
             await model.sponsor.refresh()                    // so sponsor mode engages app-wide (FR-P2-LINK-005)
             model.applyGrandfatherIfNeeded()                 // 2.0 P1: legacy sponsor users → Pro-free for life
             await model.refreshBlocklist()                   // Tier-1: grow the gambling web list from Supabase
@@ -89,6 +90,7 @@ struct ContentView: View {
                 UnlockView(
                     shield: model.shield,
                     selection: model.selectionStore.load(),
+                    screenTimeOff: !model.auth.isApproved,
                     commitmentProvider: { model.activeCommitment },
                     sponsorModeProvider: { model.isSponsorModeActive },
                     approval: model.approval

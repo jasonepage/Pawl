@@ -17,12 +17,17 @@ import FamilyControls
 
 struct UnlockView: View {
     @State private var vm: UnlockViewModel
+    /// Screen Time access is off, so nothing is actually blocked no matter what the lock
+    /// state says. The hero must say that instead of "Apps are blocked".
+    var screenTimeOff: Bool = false
 
     init(shield: ShieldService,
          selection: FamilyActivitySelection,
+         screenTimeOff: Bool = false,
          commitmentProvider: @escaping () -> Commitment? = { nil },
          sponsorModeProvider: @escaping () -> Bool = { false },
          approval: UnlockApprovalService? = nil) {
+        self.screenTimeOff = screenTimeOff
         _vm = State(wrappedValue: UnlockViewModel(
             shield: shield,
             selection: selection,
@@ -82,6 +87,11 @@ struct UnlockView: View {
                         .font(.title3)
                         .foregroundStyle(heroFg)
                 }
+            } else if showScreenTimeOff {
+                Text("Pawl can't block anything until it's turned back on in Settings.")
+                    .font(.body)
+                    .foregroundStyle(heroFg)
+                    .multilineTextAlignment(.center)
             }
         }
         .frame(maxWidth: .infinity)
@@ -207,7 +217,11 @@ struct UnlockView: View {
         return false
     }
 
+    /// Only the locked state claims apps are blocked, so that is the only state to correct.
+    private var showScreenTimeOff: Bool { screenTimeOff && isLocked }
+
     private var heroBg: Color {
+        if showScreenTimeOff { return PawlColor.dangerText.opacity(0.15) }
         switch vm.state {
         case .locked: return vm.isPaired ? PawlColor.cleanBg : PawlColor.cardBg
         case .reading: return PawlColor.cardBg
@@ -216,6 +230,7 @@ struct UnlockView: View {
     }
 
     private var heroFg: Color {
+        if showScreenTimeOff { return PawlColor.dangerText }
         switch vm.state {
         case .locked: return vm.isPaired ? PawlColor.cleanText : .primary
         case .reading: return .primary
@@ -224,6 +239,7 @@ struct UnlockView: View {
     }
 
     private var heroIcon: String {
+        if showScreenTimeOff { return "exclamationmark.triangle.fill" }
         switch vm.state {
         case .locked: return vm.isPaired ? "lock.fill" : "key"
         case .reading: return "key.fill"
@@ -234,6 +250,7 @@ struct UnlockView: View {
     }
 
     private var heroTitle: String {
+        if showScreenTimeOff { return "Screen Time is off" }
         switch vm.state {
         case .locked: return vm.isPaired ? "Apps are blocked" : "Set up your key"
         case .reading: return "Checking your key"

@@ -25,6 +25,7 @@ struct BlockedItemsView: View {
     var body: some View {
         List {
             appsSection
+            ScheduledSetsSection(model: model)
             websitesSection
             if let m = model.blockChangeMessage {
                 Section {
@@ -50,7 +51,7 @@ struct BlockedItemsView: View {
                 editSelection = model.currentSelection
                 showBlockPicker = true
             } label: {
-                SettingsRows.label("pencil", .blue, "Edit blocked apps")
+                SettingsRows.label("pencil", .blue, "Edit always-on apps")
             }
             if let endsAt = model.pendingSelectionChange {
                 TimelineView(.periodic(from: .now, by: 1)) { _ in
@@ -59,9 +60,9 @@ struct BlockedItemsView: View {
                 Button("Cancel removal", role: .cancel) { model.cancelSelectionChange() }
             }
         } header: {
-            Text("Apps")
+            Text("Always on")
         } footer: {
-            Text("Adding apps applies right away. Removing one needs your key + a cooling-off, and it stays blocked until the wait ends.")
+            Text("These are blocked around the clock and open only with your key. Adding apps applies right away. Removing one needs your key + a cooling-off, and it stays blocked until the wait ends.")
         }
     }
 

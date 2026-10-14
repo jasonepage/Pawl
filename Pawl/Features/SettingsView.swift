@@ -197,6 +197,8 @@ struct SettingsView: View {
         if s.apps > 0 { parts.append(s.apps == 1 ? "1 app" : "\(s.apps) apps") }
         let sites = s.sites + model.customDomains.count
         if sites > 0 { parts.append(sites == 1 ? "1 site" : "\(sites) sites") }
+        let sets = model.scheduledSets.count
+        if sets > 0 { parts.append(sets == 1 ? "1 set" : "\(sets) sets") }
         return parts.isEmpty ? "Nothing yet" : parts.joined(separator: " · ")
     }
 
@@ -241,9 +243,6 @@ struct SettingsView: View {
         Section("App") {
             Toggle(isOn: $feedbackEnabled) {
                 SettingsRows.label("speaker.wave.2.fill", .purple, "Sound & haptics")
-            }
-            Link(destination: ReviewPrompter.writeReviewURL) {
-                SettingsRows.label("star.fill", .yellow, "Rate Pawl on the App Store")
             }
             Link(destination: URL(string: "https://getpawl.com/privacy")!) {
                 SettingsRows.label("hand.raised.fill", .blue, "Privacy Policy")

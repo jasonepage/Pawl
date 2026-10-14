@@ -219,7 +219,7 @@ struct HomeView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("Apps & sites").font(.title2)
-                    Text("Locked by your key")
+                    Text(screenTimeOff ? "Screen Time is off, so nothing is blocked" : "Locked by your key")
                         .font(.body)
                         .foregroundStyle(.secondary)
                 }

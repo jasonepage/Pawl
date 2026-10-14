@@ -117,6 +117,7 @@ final class AppModel {
         hardLockAttested = HardLock.isAttested()
         hardLockDate = HardLock.attestedDate()
         customDomains = customDomainStore.load()
+        scheduledSets = scheduledSetStore.load()
         // Default web blocking on (gambling sites, no adult filter) before the launch shield
         // re-apply runs, so existing users get it too.
         SharedState.ensureWebDefaults(domains: GamblingBlocklist.seedDomains)
@@ -399,6 +400,14 @@ final class AppModel {
     /// Mirrors the stored list so SwiftUI sees changes (a computed read of UserDefaults would not).
     private(set) var customDomains: [String] = []
 
+    // 2.2: scheduled block sets. The pre-2.2 selection is the "Always on" set and keeps its own
+    // gating above. Adding a set or tightening one applies now; loosening (fewer apps, fewer
+    // hours, off, deleted) is gated like every other removal (FR-SHIELD-010).
+    private let scheduledSetStore = ScheduledSetStore()
+    private var setsTimer: Task<Void, Never>?
+    private(set) var pendingSets: ScheduledSetStore.PendingSets?
+    private(set) var scheduledSets: [ScheduledSet] = []
+
     /// Change which website categories are blocked. Turning one ON applies immediately
     /// (tightening is free); turning one OFF is removing protection — paired key + cooling-off —
     /// and it stays ON until the wait ends (FR-SHIELD-010, HC-4).
@@ -562,6 +571,93 @@ final class AppModel {
             if delay > 0 { try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000)) }
             if Task.isCancelled { return }
             self?.commitDomainRemoval()
+        }
+    }
+
+    // MARK: - Scheduled block sets (2.2)
+
+    /// Save a new or edited set. Tightening applies now; loosening keeps the old set in place,
+    /// then needs the key, the sponsor if linked, and the cooldown before the new one lands.
+    func saveScheduledSet(_ set: ScheduledSet) async {
+        var target = scheduledSets
+        if let i = target.firstIndex(where: { $0.id == set.id }) {
+            let old = target[i]
+            target[i] = set
+            if ScheduledSet.isLoosening(old: old, new: set) {
+                await gateSetsChange(target, what: "That change blocks less, so it waits.")
+                return
+            }
+        } else {
+            guard target.count < ScheduledSet.maxSets else {
+                blockChangeMessage = "You can have up to \(ScheduledSet.maxSets) sets."
+                return
+            }
+            target.append(set)
+        }
+        applySets(target)
+        blockChangeMessage = "Saved. It's in effect whenever its schedule is on."
+    }
+
+    /// Deleting always blocks less, so it is always gated.
+    func requestDeleteScheduledSet(_ set: ScheduledSet) async {
+        let target = scheduledSets.filter { $0.id != set.id }
+        guard target.count != scheduledSets.count else { return }
+        await gateSetsChange(target, what: "Deleting a set blocks less, so it waits.")
+    }
+
+    func cancelSetsChange() {
+        let had = pendingSets != nil
+        clearPendingSets()
+        if had { blockChangeMessage = "Cancelled. Your sets are unchanged." }
+    }
+
+    /// On launch: pull the iCloud mirror back after a reinstall, re-register the schedules, then
+    /// resume or finish a wait.
+    func restorePendingSetsChange() {
+        scheduledSetStore.restoreFromCloudIfNeeded()
+        scheduledSets = scheduledSetStore.load()
+        guard let p = scheduledSetStore.loadPending() else { return }
+        if Date() >= p.endsAt { commitSetsChange() }
+        else { pendingSets = p; scheduleSetsCommit(at: p.endsAt) }
+    }
+
+    private func gateSetsChange(_ target: [ScheduledSet], what: String) async {
+        clearPendingSets()
+        guard await approveLoosening(kind: "remove_app") else { return }
+        let endsAt = Date().addingTimeInterval(cooldownSeconds)
+        let p = ScheduledSetStore.PendingSets(target: target, endsAt: endsAt)
+        scheduledSetStore.savePending(p)
+        pendingSets = p
+        scheduleSetsCommit(at: endsAt)
+        blockChangeMessage = "\(what) It applies in \(Int(cooldownSeconds / 60)) min."
+    }
+
+    private func applySets(_ sets: [ScheduledSet]) {
+        scheduledSetStore.save(sets)
+        scheduledSets = sets
+        if SharedState.phase() == "locked" { shield.apply(selectionStore.load()) }
+    }
+
+    private func commitSetsChange() {
+        guard let p = scheduledSetStore.loadPending() else { return }
+        applySets(p.target)
+        clearPendingSets()
+        blockChangeMessage = "Your sets are updated."
+    }
+
+    private func clearPendingSets() {
+        setsTimer?.cancel(); setsTimer = nil
+        scheduledSetStore.clearPending()
+        pendingSets = nil
+    }
+
+    private func scheduleSetsCommit(at endsAt: Date) {
+        setsTimer?.cancel()
+        setsTimer = Task { [weak self] in
+            let delay = endsAt.timeIntervalSinceNow
+            if delay > 0 { try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000)) }
+            if Task.isCancelled { return }
+            self?.commitSetsChange()
         }
     }
 
