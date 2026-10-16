@@ -46,10 +46,10 @@ struct HardLockView: View {
         switch step {
         case 0:
             heading("The hard lock", "The only truly unfakeable tier.")
-            body("Pawl's shield is strong, but a determined person can still delete the app or turn off Screen Time. The one thing that closes those last doors is a Screen Time passcode they don't know — set by you, their sponsor, in person.")
+            body("Pawl's shield is strong, but a determined person can still delete the app or turn off Screen Time. The one thing that closes those last doors is a Screen Time passcode they don't know, set by you, their sponsor, in person.")
             body("Pawl can't see, set, or recover this passcode. iOS enforces it; you hold it. If it's ever forgotten, only Apple's device-reset process can clear it.")
         case 1:
-            heading("1 · Set the passcode", "In the Settings app — not here.")
+            heading("1 · Set the passcode", "In the Settings app, not here.")
             steps([
                 "Open Settings → Screen Time.",
                 "Tap \u{201C}Use Screen Time Passcode.\u{201D}",
@@ -60,11 +60,11 @@ struct HardLockView: View {
         case 2:
             heading("2 · Test it", "Prove the lock actually holds.")
             body("Still in Settings → Screen Time, try to turn off Pawl's access (or change a restriction). If the passcode is set right, iOS will demand the passcode and block the change.")
-            body("It must demand the secret Screen Time passcode. If Face ID, a fingerprint, or your device passcode lets the change through, the lock is NOT set right — fix that before you attest, or it's a false sense of security.")
+            body("It must demand the secret Screen Time passcode. If Face ID, a fingerprint, or your device passcode lets the change through, the lock is NOT set right. Fix that before you attest, or it's a false sense of security.")
             body("Do this now, together. Only attest if the Screen Time passcode prompt is the only way through.")
         default:
             heading("3 · Confirm", "You set it and saw it work.")
-            body("You're attesting that you set the Screen Time passcode and verified it blocks changes. Pawl records this as your attestation — not something Pawl can check itself. If protection is ever removed anyway, you'll get a tamper alert.")
+            body("You're attesting that you set the Screen Time passcode and verified it blocks changes. Pawl records this as your attestation, not something Pawl can check itself. If protection is ever removed anyway, you'll get a tamper alert.")
         }
     }
 

@@ -4,7 +4,7 @@
 
 <h1 align="center">Pawl</h1>
 
-<p align="center"><b>A gambling blocker you unlock with a physical key.</b></p>
+<p align="center"><b>An app and website blocker you unlock with a physical key.</b></p>
 
 <p align="center">
   <a href="LICENSE"><img alt="MPL 2.0" src="https://img.shields.io/badge/license-MPL_2.0-4A5A3C"></a>
@@ -34,17 +34,20 @@ Most blockers can be undone by the same person who set them up, in about
 thirty seconds, at exactly the moment they most want to. That is the moment
 Pawl is built for.
 
-Pawl blocks sportsbook, casino and other apps and websites you pick, using
-Apple's Screen Time. There is no unlock button anywhere in the app. To lift the
-block you need a physical FIDO2 security key (a YubiKey, for example) that you
+Pawl blocks any apps and websites you pick, using Apple's Screen Time. There
+is no way to lift the block from the phone alone. To lift it you need a physical FIDO2 security key (a YubiKey, for example) that you
 plugged in once and then put somewhere hard to reach: a friend's house, your
 car, a drawer at work. Even with the key, you wait fifteen minutes before
 anything opens, and the block comes back on by itself.
 
-A real example: it is 1am, the game is on, and you open DraftKings. You see
-Pawl's block screen. The key is at your sister's place across town. By the
-time you could get it, and then wait out the fifteen minutes, the urge has
-usually passed. That is the whole idea.
+A real example: it is 1am and you open the app you told yourself you were
+done with. You see Pawl's block screen. The key is at your sister's place
+across town. By the time you could get it, and then wait out the fifteen
+minutes, the urge has usually passed. That is the whole idea.
+
+You choose what Pawl blocks. Some people block betting apps, some block adult
+sites, some block the three apps that eat their evenings. Pawl does not care
+which, and never learns the names of the apps you pick.
 
 ## Status, plainly
 
@@ -66,30 +69,29 @@ Read this before you trust it with anything.
   that. Pawl can only notice it the next time it runs and, if you have a
   sponsor, push them an alert. For a real lock, a sponsor sets the Screen Time passcode in person
   and keeps it (the "hard lock" flow). iOS enforces that passcode, not Pawl.
-- **The key check.** In 2.0 (the version on the App Store today) Pawl only
-  checks that the credential ID matches the key you registered. It does
-  **not** verify the signature. Version 2.1, in this repo and not on the App
-  Store yet, checks the whole response on the phone: the challenge it just
+- **The key check.** Since 2.1 (the version on the App Store today) Pawl
+  checks the key's whole response on the phone: the challenge it just
   issued, the hash of `getpawl.com`, the "user present" flag, a signature
   counter that must go up, and the ES256 signature against the public key
-  saved when you paired. What 2.1 still cannot do: it does not check that the
+  saved when you paired. What it still cannot do: it does not check that the
   key is genuine hardware from a known maker (no attestation check), and a key
   paired on 2.0 has no saved public key, so its signature is not checked until
-  you pair it again. All of this runs on your phone, so on a jailbroken phone
+  you pair it again. Before 2.1, Pawl only checked that the credential ID
+  matched. All of this runs on your phone, so on a jailbroken phone
   none of it holds. See `Pawl/Domain/WebAuthnVerifier.swift`.
-- **The clock lock is new and not yet proven.** In 2.0 nothing called it, so
-  moving the phone's clock forward may shorten the cooling off wait. 2.1 (not
-  on the App Store yet) turns on Screen Time's "require automatic date and
-  time" while Pawl is protecting you (`ShieldService.setClockLock`). Whether
-  iOS enforces that for an app using individual Screen Time permission has not
-  been confirmed on a device yet.
+- **The clock lock is not yet proven.** Since 2.1 Pawl turns on Screen
+  Time's "require automatic date and time" while it is protecting you
+  (`ShieldService.setClockLock`), so moving the clock forward should not
+  shorten the cooling off wait. Whether iOS enforces that for an app using
+  individual Screen Time permission has not been confirmed on a device yet.
 - **Debug builds have developer buttons.** "Skip the wait", "simulate
   sponsor approve" and "allow deletion" exist for testing. They sit inside
   `#if DEBUG`, which is only switched on in the Debug build setting, so they
   are not in the App Store build. If you build Pawl yourself in Debug, you
   get them. That is on purpose: it is your own phone.
-- **No blocklist is complete.** Pawl ships about 4,000 gambling domains. New
-  sites appear every week.
+- **No blocklist is complete.** The optional gambling list ships about 4,000
+  domains and the adult filter is Apple's. New sites appear every week. Sites
+  you type in yourself are blocked exactly as typed.
 - **A determined person can get around any blocker on a phone they own**
   (another phone, a laptop, a friend's device). Pawl makes the 1am version
   slow. It does not make it impossible.
@@ -129,7 +131,7 @@ Read this before you trust it with anything.
 6. **Your clean day streak survives deleting the app.** It lives in your
    iCloud, not on the phone.
 
-Relapse is treated as part of recovery. The relapse log is private to you, and
+Slipping up is treated as normal. The relapse log is private to you, and
 nothing in the app scolds you for using it.
 
 ## Where your data goes

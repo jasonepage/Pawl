@@ -116,6 +116,8 @@ final class AppModel {
         vertical = OnboardingFlag.vertical()
         hardLockAttested = HardLock.isAttested()
         hardLockDate = HardLock.attestedDate()
+        customDomains = customDomainStore.load()
+        scheduledSets = scheduledSetStore.load()
         // Default web blocking on (gambling sites, no adult filter) before the launch shield
         // re-apply runs, so existing users get it too.
         SharedState.ensureWebDefaults(domains: GamblingBlocklist.seedDomains)
@@ -390,6 +392,22 @@ final class AppModel {
     private var categoryTimer: Task<Void, Never>?
     private(set) var pendingCategoryChange: Date?
 
+    // 2.2: the user's own typed website list (FR-SHIELD-003/004). Adding is instant;
+    // removing is gated exactly like removing an app or a category (FR-SHIELD-010).
+    private let customDomainStore = CustomDomainStore()
+    private var domainTimer: Task<Void, Never>?
+    private(set) var pendingDomainRemoval: CustomDomainStore.PendingRemoval?
+    /// Mirrors the stored list so SwiftUI sees changes (a computed read of UserDefaults would not).
+    private(set) var customDomains: [String] = []
+
+    // 2.2: scheduled block sets. The pre-2.2 selection is the "Always on" set and keeps its own
+    // gating above. Adding a set or tightening one applies now; loosening (fewer apps, fewer
+    // hours, off, deleted) is gated like every other removal (FR-SHIELD-010).
+    private let scheduledSetStore = ScheduledSetStore()
+    private var setsTimer: Task<Void, Never>?
+    private(set) var pendingSets: ScheduledSetStore.PendingSets?
+    private(set) var scheduledSets: [ScheduledSet] = []
+
     /// Change which website categories are blocked. Turning one ON applies immediately
     /// (tightening is free); turning one OFF is removing protection — paired key + cooling-off —
     /// and it stays ON until the wait ends (FR-SHIELD-010, HC-4).
@@ -459,6 +477,219 @@ final class AppModel {
             if delay > 0 { try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000)) }
             if Task.isCancelled { return }
             self?.commitCategoryChange()
+        }
+    }
+
+    // MARK: - Typed website list (2.2, FR-SHIELD-003/004)
+
+    /// Add one or more sites from free text: one per line, or separated by commas or spaces.
+    /// Returns how many new sites were added. Adding only ever tightens, so it applies now.
+    @discardableResult
+    func addCustomDomains(_ text: String) -> Int {
+        let parts = text.split(whereSeparator: { $0 == "\n" || $0 == "," || $0 == " " }).map(String.init)
+        let cleaned = Set(parts.compactMap(BlocklistService.cleanHostname))
+        guard !cleaned.isEmpty else {
+            blockChangeMessage = "That doesn't look like a website address. Try something like example.com."
+            return 0
+        }
+        let before = Set(customDomains)
+        let added = cleaned.subtracting(before)
+        guard !added.isEmpty else {
+            blockChangeMessage = "Already on your list."
+            return 0
+        }
+        if before.count + added.count > CustomDomainStore.maxDomains {
+            blockChangeMessage = "Your list is full (\(CustomDomainStore.maxDomains) sites)."
+            return 0
+        }
+        customDomainStore.save(Array(before.union(added)))
+        customDomains = customDomainStore.load()
+        if SharedState.phase() == "locked" { shield.apply(selectionStore.load()) }
+        blockChangeMessage = added.count == 1
+            ? "Added. It's blocked right away."
+            : "Added \(added.count) sites. They're blocked right away."
+        return added.count
+    }
+
+    /// Ask to drop sites from the list. Needs the key, then the sponsor if linked, then the
+    /// cooldown; the sites stay blocked until the wait ends (FR-SHIELD-010, HC-4).
+    func requestRemoveCustomDomains(_ domains: [String]) async {
+        let targets = Set(domains).intersection(customDomains)
+        guard !targets.isEmpty else { return }
+        clearPendingDomainRemoval()
+
+        // "disable_category" on purpose: the server (migration 04) and the sponsor's app only
+        // know unlock / remove_app / disable_category, and to the sponsor this is "turn off a
+        // website filter". A new kind would need a migration and an approver-app update.
+        guard await approveLoosening(kind: "disable_category") else { return }
+
+        let endsAt = Date().addingTimeInterval(cooldownSeconds)
+        let pending = CustomDomainStore.PendingRemoval(domains: Array(targets).sorted(), endsAt: endsAt)
+        customDomainStore.savePending(pending)
+        pendingDomainRemoval = pending
+        scheduleDomainCommit(at: endsAt)
+        blockChangeMessage = targets.count == 1
+            ? "Removal starts in \(Int(cooldownSeconds / 60)) min. The site stays blocked until then."
+            : "Removal starts in \(Int(cooldownSeconds / 60)) min. The sites stay blocked until then."
+    }
+
+    func cancelDomainRemoval() {
+        let had = pendingDomainRemoval != nil
+        clearPendingDomainRemoval()
+        if had { blockChangeMessage = "Cancelled. Your list is unchanged." }
+    }
+
+    /// On launch: pull the iCloud mirror back after a reinstall, then resume or finish a wait.
+    func restorePendingDomainRemoval() {
+        customDomainStore.restoreFromCloudIfNeeded()
+        customDomains = customDomainStore.load()
+        guard let pending = customDomainStore.loadPending() else { return }
+        if Date() >= pending.endsAt { commitDomainRemoval() }
+        else { pendingDomainRemoval = pending; scheduleDomainCommit(at: pending.endsAt) }
+    }
+
+    private func commitDomainRemoval() {
+        guard let pending = customDomainStore.loadPending() else { return }
+        let remaining = Set(customDomains).subtracting(pending.domains)
+        customDomainStore.save(Array(remaining))
+        customDomains = customDomainStore.load()
+        clearPendingDomainRemoval()
+        if SharedState.phase() == "locked" { shield.apply(selectionStore.load()) }
+        blockChangeMessage = "Your list is updated."
+    }
+
+    private func clearPendingDomainRemoval() {
+        domainTimer?.cancel(); domainTimer = nil
+        customDomainStore.clearPending()
+        pendingDomainRemoval = nil
+    }
+
+    private func scheduleDomainCommit(at endsAt: Date) {
+        domainTimer?.cancel()
+        domainTimer = Task { [weak self] in
+            let delay = endsAt.timeIntervalSinceNow
+            if delay > 0 { try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000)) }
+            if Task.isCancelled { return }
+            self?.commitDomainRemoval()
+        }
+    }
+
+    // MARK: - Time kept (2.2)
+
+    private static let hoursPerDayKey = "pawl.hoursPerDay"
+
+    /// The setup answer to "about how many hours a day go to this?". On the phone only, used
+    /// for the hours-kept lines on Home and the tough-moment screen. 0 means not answered.
+    var hoursPerDay: Double {
+        get { UserDefaults.standard.double(forKey: Self.hoursPerDayKey) }
+        set { UserDefaults.standard.set(max(0, newValue), forKey: Self.hoursPerDayKey) }
+    }
+
+    // MARK: - Scheduled block sets (2.2)
+
+    /// One short line for Home and Settings, for example "Gambling · 3 apps · 2 sites · 1 set".
+    var blockedSummaryLine: String {
+        var parts: [String] = []
+        if gamblingOn { parts.append("Gambling") }
+        if adultOn { parts.append("Adult") }
+        let s = blockedSummary
+        if s.apps > 0 { parts.append(s.apps == 1 ? "1 app" : "\(s.apps) apps") }
+        let sites = s.sites + customDomains.count
+        if sites > 0 { parts.append(sites == 1 ? "1 site" : "\(sites) sites") }
+        let sets = scheduledSets.count
+        if sets > 0 { parts.append(sets == 1 ? "1 set" : "\(sets) sets") }
+        return parts.isEmpty ? "Nothing yet" : parts.joined(separator: " · ")
+    }
+
+    /// Name of a scheduled set whose window is open right now, if any.
+    var activeScheduledSetName: String? {
+        let now = Date()
+        return scheduledSets.first { $0.isActive(at: now) }?.name
+    }
+
+
+    /// Save a new or edited set. Tightening applies now; loosening keeps the old set in place,
+    /// then needs the key, the sponsor if linked, and the cooldown before the new one lands.
+    func saveScheduledSet(_ set: ScheduledSet) async {
+        var target = scheduledSets
+        if let i = target.firstIndex(where: { $0.id == set.id }) {
+            let old = target[i]
+            target[i] = set
+            if ScheduledSet.isLoosening(old: old, new: set) {
+                await gateSetsChange(target, what: "That change blocks less, so it waits.")
+                return
+            }
+        } else {
+            guard target.count < ScheduledSet.maxSets else {
+                blockChangeMessage = "You can have up to \(ScheduledSet.maxSets) sets."
+                return
+            }
+            target.append(set)
+        }
+        applySets(target)
+        blockChangeMessage = "Saved. It's in effect whenever its schedule is on."
+    }
+
+    /// Deleting always blocks less, so it is always gated.
+    func requestDeleteScheduledSet(_ set: ScheduledSet) async {
+        let target = scheduledSets.filter { $0.id != set.id }
+        guard target.count != scheduledSets.count else { return }
+        await gateSetsChange(target, what: "Deleting a set blocks less, so it waits.")
+    }
+
+    func cancelSetsChange() {
+        let had = pendingSets != nil
+        clearPendingSets()
+        if had { blockChangeMessage = "Cancelled. Your sets are unchanged." }
+    }
+
+    /// On launch: pull the iCloud mirror back after a reinstall, re-register the schedules, then
+    /// resume or finish a wait.
+    func restorePendingSetsChange() {
+        scheduledSetStore.restoreFromCloudIfNeeded()
+        scheduledSets = scheduledSetStore.load()
+        guard let p = scheduledSetStore.loadPending() else { return }
+        if Date() >= p.endsAt { commitSetsChange() }
+        else { pendingSets = p; scheduleSetsCommit(at: p.endsAt) }
+    }
+
+    private func gateSetsChange(_ target: [ScheduledSet], what: String) async {
+        clearPendingSets()
+        guard await approveLoosening(kind: "remove_app") else { return }
+        let endsAt = Date().addingTimeInterval(cooldownSeconds)
+        let p = ScheduledSetStore.PendingSets(target: target, endsAt: endsAt)
+        scheduledSetStore.savePending(p)
+        pendingSets = p
+        scheduleSetsCommit(at: endsAt)
+        blockChangeMessage = "\(what) It applies in \(Int(cooldownSeconds / 60)) min."
+    }
+
+    private func applySets(_ sets: [ScheduledSet]) {
+        scheduledSetStore.save(sets)
+        scheduledSets = sets
+        if SharedState.phase() == "locked" { shield.apply(selectionStore.load()) }
+    }
+
+    private func commitSetsChange() {
+        guard let p = scheduledSetStore.loadPending() else { return }
+        applySets(p.target)
+        clearPendingSets()
+        blockChangeMessage = "Your sets are updated."
+    }
+
+    private func clearPendingSets() {
+        setsTimer?.cancel(); setsTimer = nil
+        scheduledSetStore.clearPending()
+        pendingSets = nil
+    }
+
+    private func scheduleSetsCommit(at endsAt: Date) {
+        setsTimer?.cancel()
+        setsTimer = Task { [weak self] in
+            let delay = endsAt.timeIntervalSinceNow
+            if delay > 0 { try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000)) }
+            if Task.isCancelled { return }
+            self?.commitSetsChange()
         }
     }
 

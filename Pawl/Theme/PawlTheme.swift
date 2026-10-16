@@ -127,3 +127,69 @@ public struct PawlCard<Content: View>: View {
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
+
+// MARK: - Progress ring (Home hero)
+
+public struct PawlRing: View {
+    /// 0...1 of the ring that is filled.
+    var progress: Double
+    var color: Color
+    var track: Color
+    var lineWidth: CGFloat = 14
+
+    public init(progress: Double, color: Color, track: Color, lineWidth: CGFloat = 14) {
+        self.progress = progress
+        self.color = color
+        self.track = track
+        self.lineWidth = lineWidth
+    }
+
+    public var body: some View {
+        ZStack {
+            Circle().stroke(track, lineWidth: lineWidth)
+            Circle()
+                .trim(from: 0, to: max(0.02, min(1, progress)))
+                .stroke(color, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+                .animation(.easeOut(duration: 0.8), value: progress)
+        }
+    }
+}
+
+// MARK: - Step dots (onboarding)
+
+public struct PawlStepDots: View {
+    var current: Int
+    var total: Int
+    public init(current: Int, total: Int) { self.current = current; self.total = total }
+    public var body: some View {
+        HStack(spacing: 6) {
+            ForEach(0..<total, id: \.self) { i in
+                Capsule()
+                    .fill(i <= current ? PawlColor.brand : PawlColor.brand.opacity(0.2))
+                    .frame(width: i == current ? 22 : 8, height: 8)
+                    .animation(.easeOut(duration: 0.25), value: current)
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Step \(current + 1) of \(total)")
+    }
+}
+
+// MARK: - Art circle (one big symbol on a soft disc, used at the top of onboarding steps)
+
+public struct PawlArt: View {
+    var symbol: String
+    var size: CGFloat = 120
+    public init(_ symbol: String, size: CGFloat = 120) { self.symbol = symbol; self.size = size }
+    public var body: some View {
+        ZStack {
+            Circle().fill(PawlColor.cleanBg)
+            Image(systemName: symbol)
+                .font(.system(size: size * 0.42, weight: .semibold))
+                .foregroundStyle(PawlColor.brand)
+        }
+        .frame(width: size, height: size)
+        .accessibilityHidden(true)
+    }
+}

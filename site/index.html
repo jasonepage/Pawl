@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pawl: Commitment Lock. Block gambling apps behind a key you keep out of reach.</title>
-<meta name="description" content="Pawl blocks gambling apps and sites with Apple Screen Time. There is no unlock button. To unblock you need a physical security key you keep somewhere else, then a 15 minute wait. Free on iPhone and iPad.">
+<title>Pawl: App Blocker With a Key. Block any app or site behind a key you keep out of reach.</title>
+<meta name="description" content="Pawl blocks the apps and sites you choose with Apple Screen Time. Nothing on the phone can lift the block. To unblock you need a physical security key you keep somewhere else, then a 15 minute wait. Free on iPhone and iPad.">
 <link rel="canonical" href="https://getpawl.com/">
 <meta name="theme-color" content="#3c6a14">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Pawl">
 <meta property="og:url" content="https://getpawl.com/">
 <meta property="og:title" content="Pawl: Commitment Lock">
-<meta property="og:description" content="Block gambling apps and sites. Unlocking needs a physical security key you keep out of reach, then a 15 minute wait. Free on iPhone and iPad.">
+<meta property="og:description" content="Block any app or site. Unlocking needs a physical security key you keep out of reach, then a 15 minute wait. Free on iPhone and iPad.">
 <meta property="og:image" content="https://getpawl.com/img/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="The Pawl shield icon next to the words Pawl, Commitment Lock.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Pawl: Commitment Lock">
-<meta name="twitter:description" content="Block gambling apps and sites. Unlocking needs a physical security key you keep out of reach, then a 15 minute wait.">
+<meta name="twitter:description" content="Block any app or site. Unlocking needs a physical security key you keep out of reach, then a 15 minute wait.">
 <meta name="twitter:image" content="https://getpawl.com/img/og-image.png">
 <meta name="apple-itunes-app" content="app-id=6783119309">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -142,9 +142,9 @@
 <header class="hero">
   <div class="wrap">
     <div class="hero-copy">
-      <span class="kicker"><img src="/img/pawl-mark.svg" alt="" width="22" height="22">Pawl: Commitment Lock</span>
-      <h1>Block gambling apps. Keep the key out of reach.</h1>
-      <p class="sub">Pawl uses Apple Screen Time to block the apps and sites you choose. There is no unlock button. To unblock, you need a physical security key you have left somewhere else, and then a 15 minute wait.</p>
+      <span class="kicker"><img src="/img/pawl-mark.svg" alt="" width="22" height="22">Pawl: App Blocker With a Key</span>
+      <h1>Block any app. Keep the key out of reach.</h1>
+      <p class="sub">Pawl uses Apple Screen Time to block the apps and sites you choose. Nothing on the phone can lift the block. To unblock, you need a physical security key you have left somewhere else, and then a 15 minute wait.</p>
       <div class="cta-row">
         <a class="badge" href="https://apps.apple.com/app/id6783119309" aria-label="Download on the App Store">
           <svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
@@ -215,7 +215,7 @@
     <h2>How it works</h2>
     <p class="lead">Three steps turn a quick tap into a choice you have to mean.</p>
     <div class="steps">
-      <div class="step"><span class="n">1</span><h3>Pick what to block</h3><p>Choose sportsbook, casino and other gambling apps and sites, or anything else you keep reaching for. Apple Screen Time does the blocking and shows a calm locked screen with no unlock button.</p></div>
+      <div class="step"><span class="n">1</span><h3>Pick what to block</h3><p>Choose any apps and sites you keep reaching for: betting, adult sites, social feeds, games, or the one app that eats your evenings. Apple Screen Time does the blocking and shows a calm locked screen with no unlock button.</p></div>
       <div class="step"><span class="n">2</span><h3>Put the key somewhere else</h3><p>Unblocking needs a physical USB-C security key. Leave it at a friend's place, in your car, or anywhere that is not your pocket at 1am.</p></div>
       <div class="step"><span class="n">3</span><h3>Wait it out</h3><p>Even with the key in hand, unblocking starts a 15 minute wait. After a short open window (30 minutes by default), the block comes back on by itself.</p></div>
     </div>
@@ -254,9 +254,9 @@
       <p class="lead">Pawl makes the 1am version of you slow. It does not make anything impossible. The details, in plain words:</p>
       <ul class="promise">
         <li><strong>iOS lets the phone's owner turn Screen Time off.</strong> No app can stop that. Pawl notices the next time it runs and, if you have a sponsor, sends them an alert. For a real lock, a sponsor can set the Screen Time passcode in person and keep it. iOS enforces that passcode, not Pawl.</li>
-        <li><strong>The key check is simple.</strong> Pawl asks iOS for the key and checks that it is the one you registered. It does not verify the key's signature. On a normal iPhone this still proves the key was physically there, but it is not a cryptographic proof.</li>
-        <li><strong>The clock is not locked yet.</strong> Moving the phone's clock forward may shorten the wait. Code to require automatic date and time exists but is not switched on, and this has not been tested either way.</li>
-        <li><strong>No blocklist is complete.</strong> Pawl ships about 4,000 gambling domains. New sites appear every week.</li>
+        <li><strong>The key check runs on your phone.</strong> Pawl verifies the key's signature, the fresh challenge and the touch flag itself. It does not check that the key is genuine hardware from a known maker, and a key paired before 2.1 is not signature-checked until you pair it again.</li>
+        <li><strong>The clock lock is not yet proven.</strong> Pawl asks Screen Time to require automatic date and time while it is protecting you, so moving the clock forward should not shorten the wait. Whether iOS enforces that for an app like Pawl has not been confirmed on a device yet.</li>
+        <li><strong>No blocklist is complete.</strong> The optional gambling list has about 4,000 domains and the adult filter is Apple's. New sites appear every week. Sites you type in are blocked exactly as typed.</li>
         <li><strong>A determined person can get around any blocker on a phone they own,</strong> with another phone, a laptop, or a friend's device.</li>
         <li><strong>Most of the code has no automated tests.</strong> The unlock loop does. The rest was tested by hand on real phones.</li>
         <li><strong>You cannot prove the App Store build came from this exact source.</strong> There are no reproducible builds.</li>
@@ -309,7 +309,6 @@
     <a href="https://github.com/jasonepage/Pawl">GitHub</a>
     <a href="https://apps.apple.com/app/id6783119309">App Store</a>
     <span class="sp">&copy; 2026 Jason Page</span>
-    <div class="help">If gambling is hurting you or someone you know, free and confidential help is available 24 hours a day. Call or text 1-800-GAMBLER (US).</div>
   </div>
 </footer>
 

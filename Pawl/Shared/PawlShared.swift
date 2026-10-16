@@ -92,6 +92,9 @@ public enum SharedState {
     private nonisolated static let webEnabledKey = "pawl.web.enabled"
     private nonisolated static let webAdultKey = "pawl.web.adult"
     private nonisolated static let webDomainsKey = "pawl.web.domains"
+    /// 2.2: sites the user typed in themselves (FR-SHIELD-003/004). Independent of the gambling
+    /// category flag: these are always blocked while the shield is on.
+    private nonisolated static let webCustomDomainsKey = "pawl.web.customDomains"
 
     public nonisolated static func setWebBlock(enabled: Bool, adult: Bool, domains: [String]) {
         AppGroup.defaults.set(enabled, forKey: webEnabledKey)
@@ -119,16 +122,27 @@ public enum SharedState {
     public nonisolated static func webBlockEnabled() -> Bool { AppGroup.defaults.bool(forKey: webEnabledKey) }
     public nonisolated static func webAdultFilter() -> Bool { AppGroup.defaults.bool(forKey: webAdultKey) }
     public nonisolated static func webBlockDomains() -> [String] { AppGroup.defaults.stringArray(forKey: webDomainsKey) ?? [] }
+    public nonisolated static func customWebDomains() -> [String] { AppGroup.defaults.stringArray(forKey: webCustomDomainsKey) ?? [] }
+    public nonisolated static func setCustomWebDomains(_ domains: [String]) {
+        AppGroup.defaults.set(domains.sorted(), forKey: webCustomDomainsKey)
+    }
 }
 
 /// Apply / lift the shield on the SHARED named store. Used by the app and by the
 /// monitor extension so both touch the exact same shield (HC-4, FR-UNLOCK-007/008).
 public enum SharedShield {
-    public nonisolated static func apply(_ selection: FamilyActivitySelection) {
+    public nonisolated static func apply(_ selection: FamilyActivitySelection, now: Date = Date()) {
+        // 2.2: `selection` is the always-on set. Scheduled sets whose window is open right
+        // now are added on top, so callers keep passing the base selection as before.
+        let extra = SharedState.activeScheduledSelection(now: now)
+        let apps = selection.applicationTokens.union(extra.applicationTokens)
+        let cats = selection.categoryTokens.union(extra.categoryTokens)
+        let webs = selection.webDomainTokens.union(extra.webDomainTokens)
+
         let store = ManagedSettingsStore(named: .pawl)
-        store.shield.applications = selection.applicationTokens.isEmpty ? nil : selection.applicationTokens
-        store.shield.applicationCategories = selection.categoryTokens.isEmpty ? nil : .specific(selection.categoryTokens)
-        store.shield.webDomains = selection.webDomainTokens.isEmpty ? nil : selection.webDomainTokens
+        store.shield.applications = apps.isEmpty ? nil : apps
+        store.shield.applicationCategories = cats.isEmpty ? nil : .specific(cats)
+        store.shield.webDomains = webs.isEmpty ? nil : webs
         applyWebFilter(to: store)
     }
 
@@ -164,17 +178,16 @@ public enum SharedShield {
         //   adult    = turn on Apple's built-in "Limit Adult Websites" filter (.auto)
         let gambling = SharedState.webBlockEnabled()
         let adult = SharedState.webAdultFilter()
+        // 2.2: the user's own typed sites are always in, whatever the category flags say.
+        let custom = Set(SharedState.customWebDomains().map { WebDomain(domain: $0) })
         let webDomains = gambling
-            ? Set(SharedState.webBlockDomains().map { WebDomain(domain: $0) })
-            : Set<WebDomain>()
+            ? custom.union(SharedState.webBlockDomains().map { WebDomain(domain: $0) })
+            : custom
 
-        switch (adult, gambling) {
-        case (false, false):
-            store.webContent.blockedByFilter = nil
-        case (true, _):
-            // Apple's adult filter, plus any gambling domains we also block.
+        if adult {
+            // Apple's adult filter, plus every domain we block ourselves.
             store.webContent.blockedByFilter = .auto(webDomains, except: [])
-        case (false, true):
+        } else {
             store.webContent.blockedByFilter = webDomains.isEmpty ? nil : .specific(webDomains)
         }
     }
@@ -251,5 +264,132 @@ public extension SharedShield {
     /// step six of the test plan in docs/16 has actually been run.
     nonisolated static func setClockLock(_ on: Bool) {
         ManagedSettingsStore(named: .pawl).dateAndTime.requireAutomaticDateAndTime = on ? true : nil
+    }
+}
+
+// MARK: - Scheduled block sets (2.2)
+//
+// A set is a named picker selection with an optional weekly schedule. The one selection
+// Pawl had before 2.2 (SharedState.loadSelection) stays as it is and acts as the "Always on"
+// set; it never has a schedule and is the only thing the gambling list and adult filter
+// ride on. Scheduled sets ADD to it while their window is open. The shield at any moment is
+// the union of the always-on selection and every scheduled set that is on right now, and
+// SharedShield.apply computes that union itself so every existing caller stays correct.
+//
+// Loosening a set (fewer apps, fewer hours, off, deleted) is gated in AppModel like every
+// other removal (FR-SHIELD-010). Nothing here enforces that; this layer only stores and
+// evaluates.
+
+/// One scheduled set. Pure Foundation so the extensions and the tests can use it.
+public struct ScheduledSet: Codable, Equatable, Identifiable, Sendable {
+    public var id: UUID
+    public var name: String
+    /// JSON-encoded FamilyActivitySelection (opaque Screen Time tokens).
+    public var selectionData: Data?
+    /// Calendar weekdays, 1 = Sunday through 7 = Saturday. Empty means no day, so never on.
+    public var weekdays: Set<Int>
+    /// Minutes after midnight. An end at or before the start crosses midnight.
+    public var startMinute: Int
+    public var endMinute: Int
+    public var isEnabled: Bool
+
+    public init(id: UUID = UUID(), name: String, selectionData: Data? = nil,
+                weekdays: Set<Int> = [2, 3, 4, 5, 6], startMinute: Int = 9 * 60, endMinute: Int = 17 * 60,
+                isEnabled: Bool = true) {
+        self.id = id
+        self.name = name
+        self.selectionData = selectionData
+        self.weekdays = weekdays
+        self.startMinute = startMinute
+        self.endMinute = endMinute
+        self.isEnabled = isEnabled
+    }
+
+    public static let maxSets = 10
+    public static let minutesPerWeek = 7 * 24 * 60
+
+    /// Every minute of the week this set covers, 0 = Sunday 00:00. Used to compare two
+    /// versions of a set: if the new coverage is not a superset of the old, it is a loosening.
+    public var coverage: Set<Int> {
+        guard isEnabled, !weekdays.isEmpty else { return [] }
+        var out = Set<Int>()
+        let length = endMinute > startMinute ? endMinute - startMinute
+                                             : (24 * 60 - startMinute) + endMinute
+        guard length > 0 else { return [] }
+        for day in weekdays where (1...7).contains(day) {
+            let base = (day - 1) * 24 * 60 + startMinute
+            for m in 0..<length { out.insert((base + m) % Self.minutesPerWeek) }
+        }
+        return out
+    }
+
+    public nonisolated func isActive(at date: Date, calendar: Calendar = .current) -> Bool {
+        guard isEnabled else { return false }
+        let c = calendar.dateComponents([.weekday, .hour, .minute], from: date)
+        guard let wd = c.weekday, let h = c.hour, let mi = c.minute else { return false }
+        return coverage.contains((wd - 1) * 24 * 60 + h * 60 + mi)
+    }
+
+    public nonisolated func selection() -> FamilyActivitySelection {
+        guard let data = selectionData,
+              let s = try? JSONDecoder().decode(FamilyActivitySelection.self, from: data) else {
+            return FamilyActivitySelection()
+        }
+        return s
+    }
+
+    /// True when `new` blocks less than `old` at any minute or for any app, or is turned off.
+    /// A pure addition returns false and may apply right away.
+    public static func isLoosening(old: ScheduledSet, new: ScheduledSet) -> Bool {
+        if old.isEnabled && !new.isEnabled { return true }
+        if !new.coverage.isSuperset(of: old.coverage) { return true }
+        let o = old.selection(), n = new.selection()
+        if !n.applicationTokens.isSuperset(of: o.applicationTokens) { return true }
+        if !n.categoryTokens.isSuperset(of: o.categoryTokens) { return true }
+        if !n.webDomainTokens.isSuperset(of: o.webDomainTokens) { return true }
+        return false
+    }
+}
+
+public extension SharedState {
+    private nonisolated static var scheduledSetsKey: String { "pawl.sets.scheduled" }
+
+    nonisolated static func scheduledSets() -> [ScheduledSet] {
+        guard let data = AppGroup.defaults.data(forKey: scheduledSetsKey),
+              let sets = try? JSONDecoder().decode([ScheduledSet].self, from: data) else { return [] }
+        return sets
+    }
+
+    nonisolated static func saveScheduledSets(_ sets: [ScheduledSet]) {
+        if let data = try? JSONEncoder().encode(Array(sets.prefix(ScheduledSet.maxSets))) {
+            AppGroup.defaults.set(data, forKey: scheduledSetsKey)
+        }
+    }
+
+    /// Everything scheduled sets add right now, as one selection.
+    nonisolated static func activeScheduledSelection(now: Date = Date()) -> FamilyActivitySelection {
+        var out = FamilyActivitySelection()
+        for set in scheduledSets() where set.isActive(at: now) {
+            let s = set.selection()
+            out.applicationTokens.formUnion(s.applicationTokens)
+            out.categoryTokens.formUnion(s.categoryTokens)
+            out.webDomainTokens.formUnion(s.webDomainTokens)
+        }
+        return out
+    }
+}
+
+public extension DeviceActivityName {
+    /// One DeviceActivity per scheduled set, so the monitor hears its window open and close.
+    nonisolated static func scheduledSet(_ id: UUID) -> Self { Self("pawlSet-\(id.uuidString)") }
+    nonisolated static var scheduledSetPrefix: String { "pawlSet-" }
+}
+
+public extension SharedShield {
+    /// A scheduled window opened or closed. Only while locked: during an unlock's grace
+    /// window the shield is down on purpose and the relock will pick up the new union.
+    nonisolated static func reapplyIfLocked(now: Date = Date()) {
+        guard SharedState.phase() == "locked" else { return }
+        apply(SharedState.loadSelection(), now: now)
     }
 }

@@ -22,6 +22,11 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     // Window opens (cooling-off elapsed) → lift the shield.
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
+        // 2.2: a scheduled set's window opened. Recompute the union; no-op during grace.
+        if activity.rawValue.hasPrefix(DeviceActivityName.scheduledSetPrefix) {
+            SharedShield.reapplyIfLocked()
+            return
+        }
         guard activity == .pawlUnlock else { return }
         SharedShield.lift()
         SharedState.setPhase("unshielded")
@@ -30,6 +35,12 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     // Window closes (grace elapsed) → re-apply the shield automatically.
     override func intervalDidEnd(for activity: DeviceActivityName) {
         super.intervalDidEnd(for: activity)
+        // 2.2: a scheduled set's window closed. Its apps leave the union on their own; that
+        // is the feature. Shrinking the window from the app is gated like any removal.
+        if activity.rawValue.hasPrefix(DeviceActivityName.scheduledSetPrefix) {
+            SharedShield.reapplyIfLocked()
+            return
+        }
         guard activity == .pawlUnlock else { return }
         SharedShield.apply(SharedState.loadSelection())
         SharedState.setPhase("locked")

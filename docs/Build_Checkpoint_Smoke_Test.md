@@ -49,7 +49,9 @@ Open `Pawl.xcodeproj` → scheme **Pawl** → real iPhone → ⌘⇧K, ⌘B (cle
       Promote to a real always-on feature (SRS FR-P3-HARD-002). Caveat: Settings → Screen Time revoke still
       wipes it (no passcode). Replace the DEBUG spike buttons with the real wiring.
 
-**Known artifact (not a failure):** repeated Start-over leaves multiple `active` commitments → duplicate
-tamper alerts. Cleanup is on the list.
+**Formerly a known artifact (closed in 2.1):** repeated Start-over used to leave multiple `active`
+commitments and so duplicate tamper alerts. `AppModel.activate()` now reuses the existing active
+commitment, so setup can only add protection. Production checked 2026-10-12: no user has more than one
+active commitment. If it reappears, check `activate()` first.
 
 When C is green we mark the checkpoint passed (HANDOFF/SRS/SDS) and start the Tier-1 blocklist slice.

@@ -36,6 +36,9 @@ public protocol CommitmentRepository: Sendable {
     func save(_ snapshot: CommitmentSnapshot) async throws
 
     func append(relapse: RelapseEvent) async throws
+    /// 2.2: the relapse log is an honor system, so an entry can be removed again.
+    func remove(relapseID: UUID) async throws
+    func remove(urgeID: UUID) async throws
     func append(urge: UrgeEvent) async throws
 
     func append(unlock: UnlockRequest) async throws
@@ -89,7 +92,9 @@ public final class InMemoryCommitmentRepository: CommitmentRepository {
     }
 
     public func append(relapse: RelapseEvent) async throws { relapseLog.append(relapse) }
+    public func remove(relapseID: UUID) async throws { relapseLog.removeAll { $0.id == relapseID } }
     public func append(urge: UrgeEvent) async throws { urgeLog.append(urge) }
+    public func remove(urgeID: UUID) async throws { urgeLog.removeAll { $0.id == urgeID } }
 
     public func append(unlock: UnlockRequest) async throws { unlockLog.append(unlock) }
     public func update(unlock: UnlockRequest) async throws {

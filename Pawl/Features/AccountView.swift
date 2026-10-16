@@ -41,7 +41,7 @@ struct AccountView: View {
                     Button("Save name") { Task { await auth.updateDisplayName(nameDraft) } }
                 }
                 if (auth.displayName ?? "").isEmpty {
-                    Text("Add your name so your sponsor sees it's you — otherwise you appear as \u{201C}Someone you sponsor.\u{201D}")
+                    Text("Add your name so your sponsor sees it's you. Otherwise you appear as \u{201C}Someone you sponsor.\u{201D}")
                         .font(.caption).foregroundStyle(PawlColor.brand)
                 } else {
                     Text("Your sponsor sees this name on their alerts and requests.")
@@ -78,7 +78,7 @@ struct AccountView: View {
                 .signInWithAppleButtonStyle(.black)
                 .frame(height: 44)
 
-                Text("Sign in to link a sponsor and turn on accountability. The blocker works without an account — signing out never lifts your shield.")
+                Text("Sign in to link a sponsor and turn on accountability. The blocker works without an account, and signing out never lifts your shield.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
