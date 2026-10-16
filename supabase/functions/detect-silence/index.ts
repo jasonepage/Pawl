@@ -96,7 +96,7 @@ async function pushOpenAlerts(
     if (sponsorIDs.length > 0) {
       const { data: prof } = await supabase
         .from("profiles").select("display_name").eq("id", a.user_id).single();
-      const who = prof?.display_name || "Someone you sponsor";
+      const who = prof?.display_name || "Someone you're an ally for";
       const { data: devices } = await supabase
         .from("devices").select("apns_token").in("user_id", sponsorIDs)
         .not("apns_token", "is", null);

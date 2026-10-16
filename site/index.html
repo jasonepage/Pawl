@@ -10,14 +10,14 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Pawl">
 <meta property="og:url" content="https://getpawl.com/">
-<meta property="og:title" content="Pawl: Commitment Lock">
+<meta property="og:title" content="Pawl: App Blocker With a Key">
 <meta property="og:description" content="Block any app or site. Unlocking needs a physical security key you keep out of reach, then a 15 minute wait. Free on iPhone and iPad.">
 <meta property="og:image" content="https://getpawl.com/img/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="The Pawl shield icon next to the words Pawl, Commitment Lock.">
+<meta property="og:image:alt" content="The Pawl shield icon next to the words Pawl, App Blocker With a Key. Blocks the apps and websites you choose. Unlocking needs a key you keep out of reach.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Pawl: Commitment Lock">
+<meta name="twitter:title" content="Pawl: App Blocker With a Key">
 <meta name="twitter:description" content="Block any app or site. Unlocking needs a physical security key you keep out of reach, then a 15 minute wait.">
 <meta name="twitter:image" content="https://getpawl.com/img/og-image.png">
 <meta name="apple-itunes-app" content="app-id=6783119309">
@@ -66,7 +66,7 @@
   .screens h2{text-align:center}
   .screens .lead{text-align:center;margin-left:auto;margin-right:auto}
   .shots{display:grid;grid-auto-flow:column;grid-auto-columns:min(72vw,260px);gap:var(--s-4);overflow-x:auto;scroll-snap-type:x mandatory;padding:var(--s-6) var(--gutter) var(--s-4);margin:0 calc(-1*var(--gutter));-webkit-overflow-scrolling:touch;scrollbar-width:thin}
-  @media(min-width:900px){.shots{grid-auto-flow:row;grid-template-columns:repeat(4,1fr);grid-auto-columns:auto;overflow:visible;margin:0;padding:var(--s-6) 0 0}}
+  @media(min-width:900px){.shots{grid-auto-flow:row;grid-template-columns:repeat(5,1fr);grid-auto-columns:auto;overflow:visible;margin:0;padding:var(--s-6) 0 0}}
   .shot{scroll-snap-align:center;text-align:center}
   .shot .frame{aspect-ratio:1179/2556;border-radius:22px;overflow:hidden;background:var(--green-100);border:1px solid var(--line);box-shadow:var(--shadow);position:relative}
   .shot .frame img{width:100%;height:100%;object-fit:cover}
@@ -165,7 +165,7 @@
     <div class="phone-wrap">
       <div class="phone" aria-hidden="false">
         <div class="screen">
-          <picture><source srcset="/img/screens/00-shield.webp" type="image/webp"><img src="/img/screens/00-shield.png" alt="The screen a blocked app shows. Locked by Pawl. Open Pawl and use your security key, then wait out the cooling-off. Buttons: Close this app, I need a minute. There is no unlock button." width="780" height="1691" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex'"></picture>
+          <picture><source srcset="/img/screens/00-shield.webp" type="image/webp"><img src="/img/screens/00-shield.png" alt="The screen a blocked app shows. Chess is locked. Open Pawl and use your security key, then wait out the cooling-off. No shortcuts, even at 1am. You've walked away 12 times this week. Buttons: Close this app, I'm tempted. There is no unlock button." width="780" height="1691" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex'"></picture>
           <div class="ph" style="display:none">img/screens/00-shield.png</div>
         </div>
       </div>
@@ -176,7 +176,7 @@
 <section id="screens" class="screens">
   <div class="wrap">
     <h2>What it looks like</h2>
-    <p class="lead">Four screens from the app, in the same order as the App Store listing.</p>
+    <p class="lead">Five screens from the app. The first four are in the same order as the App Store listing.</p>
     <div class="shots">
       <figure class="shot">
         <div class="frame">
@@ -187,7 +187,7 @@
       </figure>
       <figure class="shot">
         <div class="frame">
-          <picture><source srcset="/img/screens/02-streaks.webp" type="image/webp"><img src="/img/screens/02-streaks.png" alt="Pawl app screen. Keep Streaks. Clean days that persist." width="780" height="1691" loading="lazy" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex'"></picture>
+          <picture><source srcset="/img/screens/02-streaks.webp" type="image/webp"><img src="/img/screens/02-streaks.png" alt="Pawl app screen. Home: 44 days on track inside a ring, 16 days to the 60-day milestone, resisted 1 time, Protected. Below it an I'm tempted button and What's blocked: 2 apps, locked by your key." width="780" height="1691" loading="lazy" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex'"></picture>
           <div class="ph" style="display:none">02-streaks.png</div>
         </div>
         <figcaption><h3>Keep Streaks</h3><p>Clean days that persist.</p></figcaption>
@@ -205,6 +205,13 @@
           <div class="ph" style="display:none">04-block.png</div>
         </div>
         <figcaption><h3>Block Harder</h3><p>Make unblocking physically harder.</p></figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="frame">
+          <picture><source srcset="/img/screens/05-choose.webp" type="image/webp"><img src="/img/screens/05-choose.png" alt="Pawl setup screen. Welcome to Pawl. What do you want to block? Pick one to start. You can add more later. Cards: Social media, Games, Shopping, News and doomscrolling, Adult content, Gambling." width="780" height="1691" loading="lazy" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex'"></picture>
+          <div class="ph" style="display:none">05-choose.png</div>
+        </div>
+        <figcaption><h3>Pick What to Block</h3><p>Social, games, shopping, news and more.</p></figcaption>
       </figure>
     </div>
   </div>

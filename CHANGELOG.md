@@ -1,6 +1,30 @@
 # Changelog
 
-## 2.2 (in progress)
+## 2.3 (in progress)
+
+- Copy pass so Pawl reads as a general app and website blocker. "Log a relapse" is now "Log a
+  slip", "Rode it out" is now "Resisted", "clean-day streak" is now "streak", "I'm in a tough
+  moment" is now "I'm tempted", and "crisis tools" is now "urge tools". The Settings header now
+  says "An app and website blocker you unlock with a physical key." Nothing about how the app
+  works changes.
+- "Sponsor" is now "ally" in every place a person reads it, including push alerts. Code names,
+  database tables and comments still say sponsor. The server push text is changed in this
+  branch but is deployed the day 2.3 is approved.
+- The problem gambling help link and note show only when gambling is your focus or the gambling
+  site list is on. The 988 crisis line always shows.
+- The block screen's "I need a minute" button is now "I'm tempted", the same words as the
+  button on Home. Its subtitle now ends "No shortcuts, even at 1am."
+- The block screen looks like Pawl now: a glowing Pawl shield mark instead of the generic blue
+  hourglass, a solid deep green background, and a readable "Close this app" button in light
+  green with dark text. The title names what is blocked, like "Instagram is locked", and once
+  you have walked away from the block screen this week it says how many times.
+- Logging a slip asks "Did it cost anything?" only when gambling or shopping is your focus, or
+  the gambling site list is on. Everyone else goes straight from the note to saving.
+- No em dashes in any text the app shows. Each one is now a comma, colon or period.
+- Small copy fixes on the urge screen, and the VoiceOver hint for "I'm tempted" now describes
+  the screen it opens.
+
+## 2.2
 
 - Scheduled block sets. In Settings, What's blocked, add a named set with its own apps and
   sites and a weekly schedule, like a Work set that blocks social apps 9 to 5 on weekdays. When

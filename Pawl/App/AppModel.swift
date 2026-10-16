@@ -138,6 +138,12 @@ final class AppModel {
     /// Which website categories are blocked (chosen at onboarding; multi-select).
     var gamblingOn: Bool { SharedState.webBlockEnabled() }
     var adultOn: Bool { SharedState.webAdultFilter() }
+    /// 2.3: the problem gambling help link and note show only when gambling is the focus
+    /// or the gambling site list is on. The 988 line always shows.
+    var showGamblingHelp: Bool { vertical == .gambling || gamblingOn }
+    /// 2.3: the slip flow asks "Did it cost anything?" only for a gambling or shopping focus,
+    /// or when the gambling site list is on. There is no shopping site category to check.
+    var asksSlipCost: Bool { vertical == .gambling || vertical == .shopping || gamblingOn }
 
     /// Whether a physical security key is paired yet. False for someone who finished onboarding via
     /// "I don't have a key yet" — used to nudge them on Home, since unlocking needs a paired key.
@@ -274,33 +280,33 @@ final class AppModel {
         }
         do {
             guard case .verified(let updated) = try await security.verifyPresence(of: paired) else {
-                blockChangeMessage = "That wasn't your paired key — nothing changed."
+                blockChangeMessage = "That wasn't your paired key. Nothing changed."
                 return false
             }
             // Advance the signature counter, unless the paired key changed during the tap.
             if keyStore.load()?.credentialID == updated.credentialID { keyStore.save(updated) }
         } catch {
-            blockChangeMessage = "Key check cancelled — nothing changed."
+            blockChangeMessage = "Key check cancelled. Nothing changed."
             return false
         }
 
         // In sponsor mode, the sponsor must approve before the cooling-off can even start.
         // 2.1: with a sponsor but no loaded commitment, fail closed instead of skipping approval.
         if isSponsorModeActive && activeCommitment == nil {
-            blockChangeMessage = "Couldn't reach your sponsor — change cancelled."
+            blockChangeMessage = "Couldn't reach your ally. Change cancelled."
             return false
         }
         if isSponsorModeActive, let commitmentID = activeCommitment?.id {
-            blockChangeMessage = "Sent to your sponsor for approval…"
+            blockChangeMessage = "Sent to your ally for approval…"
             do {
                 let requestID = try await approval.createRequest(commitmentID: commitmentID, kind: kind)
                 switch await approval.pollDecision(requestID: requestID) {
                 case .approved:        break
-                case .denied:          blockChangeMessage = "Your sponsor denied the change."; return false
-                case .expired, .failed: blockChangeMessage = "No sponsor response — change cancelled."; return false
+                case .denied:          blockChangeMessage = "Your ally denied the change."; return false
+                case .expired, .failed: blockChangeMessage = "No ally response. Change cancelled."; return false
                 }
             } catch {
-                blockChangeMessage = "Couldn't reach your sponsor — change cancelled."
+                blockChangeMessage = "Couldn't reach your ally. Change cancelled."
                 return false
             }
         }
@@ -321,7 +327,7 @@ final class AppModel {
             // Pure addition (or no change): free + instant.
             selectionStore.save(new)
             shield.apply(new)
-            blockChangeMessage = "Updated — new blocks apply right away."
+            blockChangeMessage = "Updated. New blocks apply right away."
             return
         }
 
@@ -342,13 +348,13 @@ final class AppModel {
         selectionChangeStore.save(PendingSelectionChange(selection: new, endsAt: endsAt))
         pendingSelectionChange = endsAt
         scheduleSelectionCommit(at: endsAt)
-        blockChangeMessage = "Removal starts in \(Int(cooldownSeconds / 60)) min — they stay blocked until then."
+        blockChangeMessage = "Removal starts in \(Int(cooldownSeconds / 60)) min. They stay blocked until then."
     }
 
     func cancelSelectionChange() {
         let had = pendingSelectionChange != nil
         clearPendingSelection()
-        if had { blockChangeMessage = "Cancelled — nothing was removed." }
+        if had { blockChangeMessage = "Cancelled. Nothing was removed." }
     }
 
     /// On launch: resume a pending removal, or commit it if its wait already elapsed while the
@@ -418,7 +424,7 @@ final class AppModel {
 
         guard turningOff else {
             setWebCategories(gambling: gambling, adult: adult)
-            blockChangeMessage = "Updated — added protection applies right away."
+            blockChangeMessage = "Updated. Added protection applies right away."
             return
         }
 
@@ -435,13 +441,13 @@ final class AppModel {
         d.set(endsAt.timeIntervalSince1970, forKey: "pawl.pendingCat.endsAt")
         pendingCategoryChange = endsAt
         scheduleCategoryCommit(at: endsAt)
-        blockChangeMessage = "Turning that off starts in \(Int(cooldownSeconds / 60)) min — it stays on until then."
+        blockChangeMessage = "Turning that off starts in \(Int(cooldownSeconds / 60)) min. It stays on until then."
     }
 
     func cancelCategoryChange() {
         let had = pendingCategoryChange != nil
         clearPendingCategory()
-        if had { blockChangeMessage = "Cancelled — protection unchanged." }
+        if had { blockChangeMessage = "Cancelled. Protection unchanged." }
     }
 
     func restorePendingCategoryChange() {

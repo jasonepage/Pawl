@@ -109,7 +109,7 @@ public final class SponsorService {
 
     /// Name of the person a sponsor link points at (the sponsee), or a neutral fallback.
     public func sponseeName(for link: Link) -> String {
-        names[link.user_id.lowercased()] ?? "Someone you sponsor"
+        names[link.user_id.lowercased()] ?? "Someone you're an ally for"
     }
 
     /// Create a single-use invite code for a sponsor to redeem (FR-P2-LINK-001).
@@ -161,7 +161,7 @@ public final class SponsorService {
         isBusy = true; defer { isBusy = false }
         do {
             try await client.rpc("redeem_invite", params: ["code": trimmed]).execute()
-            message = "Linked ✓ You're now their sponsor."
+            message = "Linked ✓ You're now their ally."
             await refresh()
         } catch {
             message = Self.friendlyRedeemError(error)
@@ -175,7 +175,7 @@ public final class SponsorService {
         isBusy = true; defer { isBusy = false }
         do {
             try await client.rpc("revoke_sponsorship", params: ["link_id": link.id]).execute()
-            message = "You've stopped sponsoring."
+            message = "You're no longer their ally."
             await refresh()
         } catch {
             message = error.localizedDescription
@@ -187,14 +187,14 @@ public final class SponsorService {
         // 2.1: removing an active sponsor from this side is turned off, in the app and on the
         // server (migration 12), so it can't be done alone in a hard moment and without the
         // sponsor knowing. The sponsor can step down from their own app at any time.
-        message = "To remove your sponsor, ask them to tap \"Stop sponsoring\" in their Pawl app. If you can't reach them or don't feel safe asking, email support@getpawl.com."
+        message = "To remove your ally, ask them to tap \"Stop being their ally\" in their Pawl app. If you can't reach them or don't feel safe asking, email support@getpawl.com."
         return
     }
 
     /// The 2.0 protected-side removal, kept only for reference. Migration 12 blocks it.
     private func legacyRevoke(_ link: Link) async {
         guard let myID, Self.sameID(link.user_id, myID) else {
-            message = "Only the person being sponsored can remove the link here for now."
+            message = "Only the person who linked the ally can remove the link here for now."
             return
         }
         isBusy = true; defer { isBusy = false }

@@ -25,6 +25,10 @@ struct HomeView: View {
     var activeSetName: String? = nil
     /// Setup answer, hours a day that went to the habit. 0 when unknown.
     var hoursPerDay: Double = 0
+    /// 2.3: show the problem gambling help link on the urge screen. From AppModel.
+    var showGamblingHelp: Bool = false
+    /// 2.3: ask the money question in the slip flow. From AppModel.
+    var asksSlipCost: Bool = true
     /// Jump to the Unlock tab, where the (free) first pairing lives.
     var onPairKey: () -> Void = {}
     /// Re-request Screen Time authorization (Settings has the same control).
@@ -67,7 +71,7 @@ struct HomeView: View {
                 askForReview()
             }
             .sheet(isPresented: $showRelapseSheet) {
-                RelapseSheet { note, amount, when in
+                RelapseSheet(asksCost: asksSlipCost) { note, amount, when in
                     Task { await vm.logRelapse(note: note, amount: amount, occurredAt: when) }
                 }
             }
@@ -78,7 +82,8 @@ struct HomeView: View {
             // Popping back sets the binding false again, since navigationDestination is two way.
             .navigationDestination(isPresented: showUrge) {
                 UrgeView(streakDays: vm.cleanDays, rodeOutCount: vm.urges.count,
-                         keptLine: keptSinceStart, pastNotes: pastNotes) { intensity, trigger, note in
+                         keptLine: keptSinceStart, pastNotes: pastNotes,
+                         showGamblingHelp: showGamblingHelp) { intensity, trigger, note in
                     Task {
                         await vm.logUrge(intensity: intensity, trigger: trigger, note: note)
                         // Riding out a few urges with the shield up is the win Pawl exists for.
@@ -174,7 +179,7 @@ struct HomeView: View {
             }
 
             if vm.urges.count > 0 {
-                Label(vm.urges.count == 1 ? "Rode it out 1 time" : "Rode it out \(vm.urges.count) times",
+                Label(vm.urges.count == 1 ? "Resisted 1 time" : "Resisted \(vm.urges.count) times",
                       systemImage: "checkmark.circle.fill")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(PawlColor.cleanText)
@@ -294,14 +299,15 @@ struct HomeView: View {
     private var urgeButton: some View {
         NavigationLink {
             UrgeView(streakDays: vm.cleanDays, rodeOutCount: vm.urges.count,
-                     keptLine: keptSinceStart, pastNotes: pastNotes) { intensity, trigger, note in
+                     keptLine: keptSinceStart, pastNotes: pastNotes,
+                     showGamblingHelp: showGamblingHelp) { intensity, trigger, note in
                 Task { await vm.logUrge(intensity: intensity, trigger: trigger, note: note) }
             }
         } label: {
-            Label("I'm in a tough moment", systemImage: "lifepreserver")
+            Label("I'm tempted", systemImage: "lifepreserver")
         }
         .buttonStyle(PawlBigButtonStyle(background: PawlColor.urgeBg, foreground: PawlColor.urgeText))
-        .accessibilityHint("Opens a breathing exercise. Never unlocks anything.")
+        .accessibilityHint("Opens a ten-minute wait timer, your notes from past times, and a button to call someone you trust. Never unlocks anything.")
     }
 
     // MARK: What's blocked
@@ -343,7 +349,7 @@ struct HomeView: View {
     /// Quiet on purpose: easy to find, never the loudest thing on the screen.
     private var relapseButton: some View {
         Button { showRelapseSheet = true } label: {
-            Label("Log a relapse", systemImage: "arrow.counterclockwise")
+            Label("Log a slip", systemImage: "arrow.counterclockwise")
                 .font(.body.weight(.medium))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
@@ -419,14 +425,14 @@ struct HomeView: View {
     private func historyBadge(_ entry: HomeViewModel.HistoryEntry) -> some View {
         switch entry {
         case .urge:
-            Label("Rode it out", systemImage: "checkmark")
+            Label("Resisted", systemImage: "checkmark")
                 .font(.caption.weight(.semibold))
                 .padding(.horizontal, 8).padding(.vertical, 4)
                 .background(PawlColor.cleanBg)
                 .foregroundStyle(PawlColor.cleanText)
                 .clipShape(Capsule())
         case .relapse:
-            Label("Relapse", systemImage: "arrow.counterclockwise")
+            Label("Slip", systemImage: "arrow.counterclockwise")
                 .font(.caption.weight(.semibold))
                 .padding(.horizontal, 8).padding(.vertical, 4)
                 .background(PawlColor.dangerText.opacity(0.12))
@@ -440,6 +446,8 @@ struct HomeView: View {
 /// button; the note and the amount are each their own screen and each can be skipped.
 /// Nothing here scolds. The shield never changes.
 private struct RelapseSheet: View {
+    /// 2.3: false skips the "Did it cost anything?" step entirely.
+    var asksCost: Bool = true
     var onSave: (String?, Decimal?, Date) -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var step = 0
@@ -448,8 +456,9 @@ private struct RelapseSheet: View {
     @State private var amountText = ""
     @FocusState private var focused: Bool
 
-    private let totalSteps = 4
-    private var doneStep: Int { totalSteps }
+    /// Dots shown: 4 with the money step, 3 without. The done screen is always step 4.
+    private var totalSteps: Int { asksCost ? 4 : 3 }
+    private let doneStep = 4
 
     var body: some View {
         NavigationStack {
@@ -572,10 +581,18 @@ private struct RelapseSheet: View {
                 .buttonStyle(PawlBigButtonStyle(background: PawlColor.cleanBg, foreground: PawlColor.cleanText))
         case 2:
             VStack(spacing: 10) {
-                Button("Next") { focused = false; step = 3 }
-                    .buttonStyle(PawlBigButtonStyle(background: PawlColor.cleanBg, foreground: PawlColor.cleanText))
-                Button("Skip") { focused = false; step = 3 }
-                    .font(.footnote).foregroundStyle(PawlColor.brand)
+                if asksCost {
+                    Button("Next") { focused = false; step = 3 }
+                        .buttonStyle(PawlBigButtonStyle(background: PawlColor.cleanBg, foreground: PawlColor.cleanText))
+                    Button("Skip") { focused = false; step = 3 }
+                        .font(.footnote).foregroundStyle(PawlColor.brand)
+                } else {
+                    // No money step: the note is the last question, so it saves from here.
+                    Button("Save") { save() }
+                        .buttonStyle(PawlBigButtonStyle(background: PawlColor.cleanBg, foreground: PawlColor.cleanText))
+                    Button("Skip and save") { note = ""; save() }
+                        .font(.footnote).foregroundStyle(PawlColor.brand)
+                }
             }
         case 3:
             VStack(spacing: 10) {

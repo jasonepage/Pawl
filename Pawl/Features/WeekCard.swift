@@ -44,7 +44,7 @@ struct WeekCard: View {
                         line(report.unlocksCompleted == 1 ? "1 unlock with your key" : "\(report.unlocksCompleted) unlocks with your key")
                     }
                     if report.relapsesLogged > 0 {
-                        line(report.relapsesLogged == 1 ? "1 relapse logged" : "\(report.relapsesLogged) relapses logged")
+                        line(report.relapsesLogged == 1 ? "1 slip logged" : "\(report.relapsesLogged) slips logged")
                     }
                 }
             }
@@ -88,7 +88,7 @@ struct WeekCard: View {
         let name = day.date.formatted(.dateTime.weekday(.wide))
         switch day.kind {
         case .protected:   return "\(name), Pawl was on"
-        case .relapse:     return "\(name), relapse logged"
+        case .relapse:     return "\(name), slip logged"
         case .beforeStart: return "\(name), before you started"
         }
     }

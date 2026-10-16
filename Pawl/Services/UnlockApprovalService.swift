@@ -44,7 +44,7 @@ public final class UnlockApprovalService {
         public let id: String          // user_id
         public let hardLockActive: Bool
         public let attestedAt: Date?
-        public var name: String = "Someone you sponsor"
+        public var name: String = "Someone you're an ally for"
     }
 
     /// Pending requests this user can act on as a SPONSOR.
@@ -173,7 +173,7 @@ public final class UnlockApprovalService {
 
     /// Display name for a sponsored user, or a neutral fallback.
     public func name(forUser id: String) -> String {
-        requesterNames[id.lowercased()] ?? "Someone you sponsor"
+        requesterNames[id.lowercased()] ?? "Someone you're an ally for"
     }
 
     /// Load open tamper alerts for people I sponsor (RLS returns linked users' rows).
@@ -261,6 +261,6 @@ public final class UnlockApprovalService {
 
     enum Err: LocalizedError {
         case notSignedIn
-        var errorDescription: String? { "Sign in to use sponsor mode." }
+        var errorDescription: String? { "Sign in to use ally mode." }
     }
 }

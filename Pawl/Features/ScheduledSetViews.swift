@@ -162,7 +162,7 @@ struct ScheduledSetEditor: View {
                 }
             } footer: {
                 if willWait {
-                    Text("This blocks less than before, so it needs your key, your sponsor if you have one, and the cooling-off wait. The current set stays in effect until then.")
+                    Text("This blocks less than before, so it needs your key, your ally if you have one, and the cooling-off wait. The current set stays in effect until then.")
                 }
             }
         }

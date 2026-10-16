@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
       .from("devices").select("apns_token").eq("user_id", reqRow.user_id)
       .not("apns_token", "is", null);
 
-    const title = approved ? "Sponsor approved" : "Sponsor denied";
+    const title = approved ? "Ally approved" : "Ally denied";
     const body = approved
       ? "Your 15-minute cooling-off has started."
       : "Your shield stays on.";

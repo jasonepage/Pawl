@@ -128,13 +128,13 @@ struct UnlockView: View {
             helper("Hold your security key to the phone…")
 
         case .awaitingApproval:
-            helper("Your sponsor needs to say yes. The wait starts only once they approve.")
-            bigButton("Cancel — keep apps locked", "lock.fill",
+            helper("Your ally needs to say yes. The wait starts only once they approve.")
+            bigButton("Cancel: keep apps locked", "lock.fill",
                       bg: PawlColor.cardBg, fg: .primary) { vm.cancel() }
 
         case .coolingOff:
             helper("Apps unlock when the timer reaches zero. Waiting it out is the whole point.")
-            bigButton("Cancel — keep apps locked", "lock.fill",
+            bigButton("Cancel: keep apps locked", "lock.fill",
                       bg: PawlColor.cardBg, fg: .primary) { vm.cancel() }
 
         case .unshielded:
@@ -254,7 +254,7 @@ struct UnlockView: View {
         switch vm.state {
         case .locked: return vm.isPaired ? "Apps are blocked" : "Set up your key"
         case .reading: return "Checking your key"
-        case .awaitingApproval: return "Waiting for sponsor"
+        case .awaitingApproval: return "Waiting for ally"
         case .coolingOff: return "Unlocking soon"
         case .unshielded: return "Apps unlocked"
         }

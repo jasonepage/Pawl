@@ -21,6 +21,8 @@ struct UrgeView: View {
     var keptLine: String? = nil
     /// Their own notes from past tough moments and relapses, newest first.
     var pastNotes: [String] = []
+    /// 2.3: show the problem gambling help link only when gambling is the focus.
+    var showGamblingHelp: Bool = false
     var onLog: (_ intensity: Int?, _ trigger: String?, _ note: String?) -> Void
 
     private static let waitSeconds: TimeInterval = 10 * 60
@@ -72,8 +74,10 @@ struct UrgeView: View {
                 }
 
                 VStack(spacing: 6) {
-                    Link("Problem gambling help, 24/7",
-                         destination: URL(string: "https://www.ncpgambling.org/help-treatment/")!)
+                    if showGamblingHelp {
+                        Link("Problem gambling help, 24/7",
+                             destination: URL(string: "https://www.ncpgambling.org/help-treatment/")!)
+                    }
                     Link("Crisis support, call 988",
                          destination: URL(string: "tel://988")!)
                 }
@@ -84,7 +88,7 @@ struct UrgeView: View {
             .padding(20)
         }
         .background(PawlColor.groupedBg)
-        .navigationTitle("Tough moment")
+        .navigationTitle("Tempted")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             trustedName = TrustedContact.name() ?? ""
@@ -179,7 +183,7 @@ struct UrgeView: View {
             HStack(spacing: 18) {
                 stat("\(streakDays)", streakDays == 1 ? "day on track" : "days on track")
                 if rodeOutCount > 0 {
-                    stat("\(rodeOutCount)", rodeOutCount == 1 ? "time rode it out" : "times rode it out")
+                    stat("\(rodeOutCount)", rodeOutCount == 1 ? "time resisted" : "times resisted")
                 }
             }
             if let keptLine {
@@ -248,7 +252,7 @@ struct UrgeView: View {
         PawlCard {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Write it down").font(.headline)
-                Text("Future you will read this on the next hard night.")
+                Text("Future you will read this next time you're tempted.")
                     .font(.caption).foregroundStyle(.secondary)
 
                 VStack(alignment: .leading, spacing: 6) {
@@ -264,14 +268,14 @@ struct UrgeView: View {
                     .foregroundStyle(.secondary)
                 }
 
-                PawlField("What set it off?", prompt: "bored, payday, a text", text: $trigger)
+                PawlField("What set it off?", prompt: "bored, stressed, a notification", text: $trigger)
                 PawlField("What would you tell yourself right now?", prompt: "a note to future you", text: $note, multiline: true)
 
                 Button {
                     onLog(Int(intensity), trigger, note)
                     withAnimation { logged = true }
                 } label: {
-                    Text("I rode it out")
+                    Text("I resisted")
                 }
                 .buttonStyle(PawlBigButtonStyle(background: PawlColor.urgeBg, foreground: PawlColor.urgeText))
             }

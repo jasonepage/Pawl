@@ -41,10 +41,10 @@ struct AccountView: View {
                     Button("Save name") { Task { await auth.updateDisplayName(nameDraft) } }
                 }
                 if (auth.displayName ?? "").isEmpty {
-                    Text("Add your name so your sponsor sees it's you. Otherwise you appear as \u{201C}Someone you sponsor.\u{201D}")
+                    Text("Add your name so your ally sees it's you. Otherwise you appear as \u{201C}Someone you're an ally for.\u{201D}")
                         .font(.caption).foregroundStyle(PawlColor.brand)
                 } else {
-                    Text("Your sponsor sees this name on their alerts and requests.")
+                    Text("Your ally sees this name on their alerts and requests.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 Button("Sign out") {
@@ -64,7 +64,7 @@ struct AccountView: View {
                     }
                 }
                 .disabled(isDeleting)
-                Text("Deleting your account removes your profile, sponsor link, and all accountability history from our servers. Your on-device protection and clean-day streak stay on this iPhone. This can't be undone.")
+                Text("Deleting your account removes your profile, ally link, and all accountability history from our servers. Your on-device protection and streak stay on this iPhone. This can't be undone.")
                     .font(.caption).foregroundStyle(.secondary)
             } else {
                 SignInWithAppleButton(.signIn) { request in
@@ -78,7 +78,7 @@ struct AccountView: View {
                 .signInWithAppleButtonStyle(.black)
                 .frame(height: 44)
 
-                Text("Sign in to link a sponsor and turn on accountability. The blocker works without an account, and signing out never lifts your shield.")
+                Text("Sign in to link an ally and turn on accountability. The blocker works without an account, and signing out never lifts your shield.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -99,7 +99,7 @@ struct AccountView: View {
                 }
             }
         } message: {
-            Text("This permanently deletes your Pawl account, profile, sponsor link, and all accountability history from our servers. It can't be undone.\n\nYour on-device protection and clean-day streak stay on this iPhone.")
+            Text("This permanently deletes your Pawl account, profile, ally link, and all accountability history from our servers. It can't be undone.\n\nYour on-device protection and streak stay on this iPhone.")
         }
     }
 }

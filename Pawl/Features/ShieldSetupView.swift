@@ -93,7 +93,7 @@ struct ShieldSetupView: View {
             Button("Apply shield") {                                // FR-SHIELD-005
                 shield.apply(selection)
                 shieldActive = true
-                lastShieldAction = "Shield on — \(selection.applicationTokens.count) apps, \(selection.webDomainTokens.count) sites blocked."
+                lastShieldAction = "Shield on: \(selection.applicationTokens.count) apps, \(selection.webDomainTokens.count) sites blocked."
             }
             .disabled(selectionIsEmpty)
             // Exposed here ONLY for the dev slice. In the real product, lifting is
@@ -118,7 +118,7 @@ struct ShieldSetupView: View {
 
     private var disclosureSection: some View {
         Section {
-            Text("Honest note: Pawl's shield can't be removed from iOS Settings — only Pawl can. But deleting the app or revoking this access still removes protection until reinstall. The only fully hard lock is a sponsor-set Screen Time passcode (Phase 3).")
+            Text("Honest note: Pawl's shield can't be removed from iOS Settings. Only Pawl can. But deleting the app or revoking this access still removes protection until reinstall. The only fully hard lock is an ally-set Screen Time passcode (Phase 3).")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }

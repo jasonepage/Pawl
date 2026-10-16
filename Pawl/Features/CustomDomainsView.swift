@@ -75,7 +75,7 @@ struct CustomDomainsView: View {
         } header: {
             Text("Blocked websites (\(model.customDomains.count))")
         } footer: {
-            Text("Swipe to remove. Removing a site needs your key, your sponsor if you have one, and the cooling-off wait. It stays blocked until then.")
+            Text("Swipe to remove. Removing a site needs your key, your ally if you have one, and the cooling-off wait. It stays blocked until then.")
         }
     }
 

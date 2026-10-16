@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
     try {
       const { data: prof } = await admin
         .from("profiles").select("display_name").eq("id", uid).maybeSingle();
-      const who = prof?.display_name || "Someone you sponsor";
+      const who = prof?.display_name || "Someone you're an ally for";
 
       const { data: links } = await admin
         .from("sponsor_links").select("sponsor_id")

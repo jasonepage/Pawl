@@ -46,7 +46,7 @@ struct HardLockView: View {
         switch step {
         case 0:
             heading("The hard lock", "The only truly unfakeable tier.")
-            body("Pawl's shield is strong, but a determined person can still delete the app or turn off Screen Time. The one thing that closes those last doors is a Screen Time passcode they don't know, set by you, their sponsor, in person.")
+            body("Pawl's shield is strong, but a determined person can still delete the app or turn off Screen Time. The one thing that closes those last doors is a Screen Time passcode they don't know, set by you, their ally, in person.")
             body("Pawl can't see, set, or recover this passcode. iOS enforces it; you hold it. If it's ever forgotten, only Apple's device-reset process can clear it.")
         case 1:
             heading("1 · Set the passcode", "In the Settings app, not here.")
@@ -83,12 +83,12 @@ struct HardLockView: View {
 
     private var attestedState: some View {
         VStack(alignment: .leading, spacing: 12) {
-            heading("Hard lock is on", "Set by a sponsor.")
+            heading("Hard lock is on", "Set by an ally.")
             if let d = attestedDate {
                 Text("Attested \(d.formatted(date: .abbreviated, time: .shortened)).")
                     .font(.subheadline).foregroundStyle(.secondary)
             }
-            body("A sponsor set the device Screen Time passcode and verified it. iOS enforces it — Pawl can't see or change it. If protection is ever removed, the sponsor is alerted.")
+            body("An ally set the device Screen Time passcode and verified it. iOS enforces it. Pawl can't see or change it. If protection is ever removed, the ally is alerted.")
 
             Divider().padding(.vertical, 6)
 
@@ -101,7 +101,7 @@ struct HardLockView: View {
             Button("Reset hard lock", role: .destructive) { onReset(); dismiss() }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("This clears Pawl's record so you can set it up again. It does NOT change the device Screen Time passcode itself — to turn that off, go to Settings → Screen Time.")
+            Text("This clears Pawl's record so you can set it up again. It does NOT change the device Screen Time passcode itself. To turn that off, go to Settings → Screen Time.")
         }
     }
 

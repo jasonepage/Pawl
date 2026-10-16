@@ -103,7 +103,7 @@ public final class UnlockViewModel {
                     return
                 }
                 pairedCredential = encoded
-                message = "Paired ✓ Now lock the key away — give it to a sponsor or a timebox, out of reach."
+                message = "Paired ✓ Now lock the key away: give it to an ally or a timebox, out of reach."
             } else {
                 let endsAt = Date().addingTimeInterval(machine.coolingOff)
                 guard keyStore.savePending(newKey, endsAt: endsAt) else {
@@ -113,7 +113,7 @@ public final class UnlockViewModel {
                 pendingKeyEndsAt = endsAt
                 scheduleKeyCommit(at: endsAt)
                 let mins = Int(machine.coolingOff / 60)
-                message = "New key registered. It becomes your key in \(mins) min — your current key still works until then. Cancel to keep your current key."
+                message = "New key registered. It becomes your key in \(mins) min. Your current key still works until then. Cancel to keep your current key."
             }
         } catch {
             message = error.localizedDescription
@@ -250,7 +250,7 @@ public final class UnlockViewModel {
     private func apply(_ effect: UnlockEffect) {
         switch effect {
         case .requestSponsorApproval:
-            message = "Sent to your sponsor for approval…"
+            message = "Sent to your ally for approval…"
             requestSponsorApproval()
         case .cancelSponsorRequest:
             cancelSponsorApproval()
@@ -298,7 +298,7 @@ public final class UnlockViewModel {
     /// the pure machine. Fail-safe: any error / no service → stay locked (HC-4).
     private func requestSponsorApproval() {
         guard let approval, let commitmentID = activeCommitmentID else {
-            message = "Couldn't reach sponsor approval — staying locked."
+            message = "Couldn't reach ally approval. Staying locked."
             send(.approvalTimedOut)
             return
         }

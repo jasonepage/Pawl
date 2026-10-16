@@ -58,7 +58,7 @@ struct ApprovalsView: View {
         Section {
             VStack(alignment: .leading, spacing: 6) {
                 Text("You're all caught up").font(.headline)
-                Text("When someone you sponsor asks to unlock — or their protection drops — it shows up here. Keep notifications on so you don't miss one.")
+                Text("When someone you're an ally for asks to unlock, or their protection drops, it shows up here. Keep notifications on so you don't miss one.")
                     .font(.footnote).foregroundStyle(.secondary)
             }
             .padding(.vertical, 4)
@@ -102,7 +102,7 @@ struct ApprovalsView: View {
                         Text(alertTitle(group.kind))
                             .font(.subheadline.weight(.semibold))
                         if group.breach {
-                            Text("Hard lock breached — protection shouldn't have dropped")
+                            Text("Hard lock breached: protection shouldn't have dropped")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(.red)
                         }
@@ -137,14 +137,14 @@ struct ApprovalsView: View {
         } header: {
             Text("Protection alerts")
         } footer: {
-            Text("Pawl detects tampering after the fact — it can't prevent someone deleting the app or disabling Screen Time. Swipe an alert to clear it once you've followed up.")
+            Text("Pawl detects tampering after the fact. It can't prevent someone deleting the app or disabling Screen Time. Swipe an alert to clear it once you've followed up.")
         }
     }
 
     // MARK: - Who you sponsor (hard-lock status overview)
 
     private var protectionStatusSection: some View {
-        Section("Who you sponsor") {
+        Section("Who you're an ally for") {
             ForEach(approval.sponsoredProtection) { p in
                 HStack(alignment: .top, spacing: 12) {
                     Image(systemName: p.hardLockActive ? "lock.shield.fill" : "lock.open")
@@ -157,7 +157,7 @@ struct ApprovalsView: View {
                             Text(hardLockDetail(p))
                                 .font(.caption).foregroundStyle(.green)
                         } else {
-                            Text("Hard lock off — they can still disable Screen Time")
+                            Text("Hard lock off: they can still disable Screen Time")
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                     }
@@ -207,7 +207,7 @@ struct ApprovalsView: View {
     }
 
     private func alertTitle(_ kind: String) -> String {
-        kind == "auth_lost" ? "Screen Time was turned off" : "App went silent — may be deleted"
+        kind == "auth_lost" ? "Screen Time was turned off" : "App went silent, may be deleted"
     }
 
     private func alertColor(_ kind: String) -> Color {

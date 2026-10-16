@@ -377,7 +377,7 @@ struct OnboardingView: View {
                     summaryRow("hourglass", "Unlock wait", "15 minutes")
                 }
             }
-            body("From here, lifting the shield needs your key plus the wait. Turning off Screen Time still removes protection and alerts your sponsor if you have one. The only fully hard lock is a sponsor-set Screen Time passcode, a later step.")
+            body("From here, lifting the shield needs your key plus the wait. Turning off Screen Time still removes protection and alerts your ally if you have one. The only fully hard lock is an ally-set Screen Time passcode, a later step.")
         }
     }
 

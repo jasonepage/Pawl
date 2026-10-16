@@ -85,6 +85,8 @@ struct ContentView: View {
                     blockedSummary: model.blockedSummaryLine,
                     activeSetName: model.activeScheduledSetName,
                     hoursPerDay: model.hoursPerDay,
+                    showGamblingHelp: model.showGamblingHelp,
+                    asksSlipCost: model.asksSlipCost,
                     onPairKey: { tab = .unlock },
                     onEnableScreenTime: { Task { await model.reenableScreenTime() } },
                     onShowBlocked: { tab = .settings; openBlockedItems = true },

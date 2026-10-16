@@ -62,14 +62,14 @@ struct PaywallView: View {
                 .foregroundStyle(.secondary)
 
             VStack(alignment: .leading, spacing: 12) {
-                proFeature("person.2.fill", "Link your own sponsor",
-                           "A trusted person approves your unlocks — so the impulsive choice isn't yours alone.")
+                proFeature("person.2.fill", "Link your ally",
+                           "A trusted person approves your unlocks, so the impulsive choice isn't yours alone.")
                 proFeature("bell.badge.fill", "Protection-drop alerts",
-                           "Your sponsor is alerted the moment your protection is removed.")
+                           "Your ally is alerted the moment your protection is removed.")
             }
             .padding(.top, 4)
 
-            Text("Blocking, the security key, cooling-off, your streak, the crisis tools, and helping someone else stay free are always free.")
+            Text("Blocking, the security key, cooling-off, your streak, the urge tools, and helping someone else stay on track are always free.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .padding(.top, 4)

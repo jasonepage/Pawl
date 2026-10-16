@@ -21,11 +21,12 @@
 </p>
 
 <p align="center">
-  <img src="site/img/screens/00-shield.png" width="150" alt="What a blocked app shows: Locked by Pawl, open Pawl and use your security key, then wait out the cooling-off. No unlock button.">
-  <img src="site/img/screens/01-friction.png" width="150" alt="Ride it out: a breathing circle, the current streak, and a place to log the urge">
-  <img src="site/img/screens/02-streaks.png" width="150" alt="Home: 24 days on track, a tough moment button, and the apps and sites marked protected">
-  <img src="site/img/screens/03-wait.png" width="150" alt="Unlocking soon: a 14 minute 59 second countdown until apps unlock, with a cancel button that keeps them locked">
-  <img src="site/img/screens/04-block.png" width="150" alt="Apps are blocked: a tap to unlock button and a note that using the key starts a 15 minute wait">
+  <img src="site/img/screens/00-shield.png" width="130" alt="What a blocked app shows: Chess is locked, open Pawl and use your security key, then wait out the cooling-off. You've walked away 12 times this week. Buttons: Close this app, I'm tempted. No unlock button.">
+  <img src="site/img/screens/01-friction.png" width="130" alt="Urge screen: a 10 minute wait timer that says don't decide yet, days on track, hours kept, and the person's own notes from past moments">
+  <img src="site/img/screens/02-streaks.png" width="130" alt="Home: 44 days on track inside a ring, resisted 1 time, Protected, an I'm tempted button, and What's blocked: 2 apps">
+  <img src="site/img/screens/03-wait.png" width="130" alt="Unlocking soon: a 14 minute 59 second countdown until apps unlock, with a cancel button that keeps them locked">
+  <img src="site/img/screens/04-block.png" width="130" alt="Apps are blocked: a tap to unlock button and a note that using the key starts a 15 minute wait">
+  <img src="site/img/screens/05-choose.png" width="130" alt="Setup: Welcome to Pawl, what do you want to block? Cards for social media, games, shopping, news, adult content and gambling">
 </p>
 
 ---

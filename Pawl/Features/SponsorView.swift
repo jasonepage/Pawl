@@ -31,7 +31,7 @@ struct SponsorView: View {
     }
 
     var body: some View {
-        Section("Your sponsor") {
+        Section("Your ally") {
             if let link = activeProtected {
                 LabeledContent("Status", value: "Linked ✓")
                     // Someone agreed to stand with them. Earned moment; once per link.
@@ -41,7 +41,7 @@ struct SponsorView: View {
                         requestReview()
                     }
                 lapsedRenewRow   // no-op unless Pro has lapsed (docs/12 §8)
-                Button("Remove sponsor", role: .destructive) {
+                Button("Remove ally", role: .destructive) {
                     Task { await sponsor.revoke(link) }
                 }
             } else if let pending = pendingProtected {
@@ -49,7 +49,7 @@ struct SponsorView: View {
                     .font(.body.monospaced())
                     .tracking(2)
                     .textSelection(.enabled)
-                Text("Share this code with your sponsor. It links once they enter it on their phone. Waiting for them…")
+                Text("Share this code with your ally. It links once they enter it on their phone. Waiting for them…")
                     .font(.caption).foregroundStyle(.secondary)
                 Button("Cancel invite", role: .destructive) {
                     Task { await sponsor.cancelInvites() }
@@ -57,41 +57,41 @@ struct SponsorView: View {
                 lapsedRenewRow
             } else if !hasAccountability {
                 Button("Unlock with Pawl Pro") { onUnlock() }
-                Text("Linking a sponsor who approves your unlocks and is alerted if your protection drops is part of Pawl Pro. Blocking and the crisis tools stay free.")
+                Text("Linking an ally who approves your unlocks and is alerted if your protection drops is part of Pawl Pro. Blocking and the urge tools are always free.")
                     .font(.caption).foregroundStyle(.secondary)
             } else {
-                Button("Invite a sponsor") {
+                Button("Invite an ally") {
                     Task { await sponsor.createInvite() }
                 }
                 .disabled(sponsor.isBusy)
-                Text("Generates a one-time code your sponsor enters to link. They'll approve your unlocks and get alerted if protection drops.")
+                Text("Generates a one-time code your ally enters to link. They'll approve your unlocks and get alerted if protection drops.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             if nameMissing && (activeProtected != nil || pendingProtected != nil) {
-                Text("Add your name in Account above so your sponsor knows it's you.")
+                Text("Add your name in Account above so your ally knows it's you.")
                     .font(.caption).foregroundStyle(PawlColor.brand)
             }
         }
 
-        Section("Are you a sponsor?") {
+        Section("Are you an ally?") {
             TextField("Enter invite code", text: $codeEntry)
                 .textInputAutocapitalization(.characters)
                 .autocorrectionDisabled()
                 .font(.system(.body, design: .monospaced))
                 .tracking(2)
-            Button("Link as sponsor") {
+            Button("Link as ally") {
                 Task { await sponsor.redeem(code: codeEntry); codeEntry = "" }
             }
             .disabled(sponsor.isBusy || codeEntry.isEmpty)
 
             ForEach(sponsor.asSponsor.filter { $0.status == "active" }) { link in
-                LabeledContent("Sponsoring", value: sponsor.sponseeName(for: link))
-                Button("Stop sponsoring", role: .destructive) {
+                LabeledContent("Ally for", value: sponsor.sponseeName(for: link))
+                Button("Stop being their ally", role: .destructive) {
                     Task { await sponsor.revokeAsSponsor(link) }
                 }
                 .disabled(sponsor.isBusy)
             }
-            Text("You can sponsor more than one person. Enter another code above to add them. Approve unlock requests in the Approvals tab; stopping returns someone to solo mode.")
+            Text("You can be the ally for more than one person. Enter another code above to add them. Approve unlock requests in the Approvals tab; stopping returns someone to solo mode.")
                 .font(.caption).foregroundStyle(.secondary)
         }
 
@@ -111,7 +111,7 @@ struct SponsorView: View {
     private var lapsedRenewRow: some View {
         if !hasAccountability {
             Button("Renew Pawl Pro") { onUnlock() }
-            Text("Your Pro subscription has lapsed. Your sponsor link stays and nothing is severed, but you'll need Pro to link a new sponsor.")
+            Text("Your Pro subscription has lapsed. Your ally link stays and nothing is severed, but you'll need Pro to link a new ally.")
                 .font(.caption).foregroundStyle(.secondary)
         }
     }

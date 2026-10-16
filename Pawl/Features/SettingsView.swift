@@ -113,7 +113,7 @@ struct SettingsView: View {
             Text("Pawl")
                 .font(.system(size: 34, weight: .bold, design: .rounded))
                 .foregroundStyle(.primary)
-            Text("Friction that actually holds")
+            Text("An app and website blocker you unlock with a physical key.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -121,7 +121,7 @@ struct SettingsView: View {
         .padding(.top, 8)
         .padding(.bottom, 4)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Pawl. Friction that actually holds.")
+        .accessibilityLabel("Pawl. An app and website blocker you unlock with a physical key.")
     }
 
     // MARK: - Screen Time off (only shown when it is a problem)
@@ -150,7 +150,7 @@ struct SettingsView: View {
             .buttonStyle(.plain)
         } footer: {
             if !(hasPro || model.pro.isLegacyFree) {
-                Text("A sponsor who approves your unlocks and hears if your protection drops. Blocking stays free.")
+                Text("An ally who approves your unlocks and hears if your protection drops. Blocking stays free.")
             }
         }
     }
@@ -211,7 +211,7 @@ struct SettingsView: View {
     private var helpSection: some View {
         Section("Help") {
             NavigationLink {
-                ProtectionInfoView()
+                ProtectionInfoView(showGamblingHelp: model.showGamblingHelp)
             } label: {
                 SettingsRows.label("info.circle.fill", .gray, "How protection works")
             }
@@ -220,8 +220,10 @@ struct SettingsView: View {
             } label: {
                 SettingsRows.value("person.fill", .pink, "Someone to call", TrustedContact.phone() == nil ? "Add" : "Set")
             }
-            Link(destination: URL(string: "https://www.ncpgambling.org/help-treatment/")!) {
-                SettingsRows.label("lifepreserver.fill", .teal, "Problem gambling help")
+            if model.showGamblingHelp {
+                Link(destination: URL(string: "https://www.ncpgambling.org/help-treatment/")!) {
+                    SettingsRows.label("lifepreserver.fill", .teal, "Problem gambling help")
+                }
             }
             Link(destination: URL(string: "tel://988")!) {
                 SettingsRows.label("phone.fill", .red, "Crisis support, call 988")

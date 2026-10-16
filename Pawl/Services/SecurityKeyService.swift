@@ -68,7 +68,7 @@ public final class SecurityKeyService: NSObject {
             case .cancelled:    return "Cancelled."
             case .noCredential: return "The key didn't return a credential."
             case .failed(let why):
-                return "Security key error: \(why)\n(If this mentions the domain/relying party, the Associated Domain isn't set up yet — see the setup doc.)"
+                return "Security key error: \(why)\n(If this mentions the domain/relying party, the Associated Domain isn't set up yet. See the setup doc.)"
             case .registrationRejected(let why):
                 return "That key's pairing response didn't pass the check (\(why)). Nothing was saved. Try again."
             }
