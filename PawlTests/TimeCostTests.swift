@@ -15,7 +15,8 @@ final class TimeCostTests: XCTestCase {
 
     func testSentence() {
         XCTAssertEqual(TimeCost.sentence(hoursPerDay: 1), "1 hour a day is about 365 hours a year, or 15 full days.")
-        XCTAssertEqual(TimeCost.sentence(hoursPerDay: 2.5), "2.5 hours a day is about 912 hours a year, or 38 full days.")
+        // 2.5 x 365 = 912.5, and .rounded() takes a half up, so 913.
+        XCTAssertEqual(TimeCost.sentence(hoursPerDay: 2.5), "2.5 hours a day is about 913 hours a year, or 38 full days.")
         XCTAssertNil(TimeCost.sentence(hoursPerDay: 0))
     }
 }

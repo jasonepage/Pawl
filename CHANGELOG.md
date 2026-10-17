@@ -2,6 +2,10 @@
 
 ## 2.3 (in progress)
 
+- Under the hood, step 0 of the pending-change cleanup: one shared piece of code for every
+  change that waits out the cooling-off (save, wait, apply, clear), with 14 new tests. Nothing
+  uses it yet, so the app behaves exactly as before. Also fixes a test that expected 912 hours a
+  year for 2.5 hours a day; the app correctly says 913 (912.5 rounds up).
 - Copy pass so Pawl reads as a general app and website blocker. "Log a relapse" is now "Log a
   slip", "Rode it out" is now "Resisted", "clean-day streak" is now "streak", "I'm in a tough
   moment" is now "I'm tempted", and "crisis tools" is now "urge tools". The Settings header now
