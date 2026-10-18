@@ -2,6 +2,11 @@
 
 ## 2.3 (in progress)
 
+- Under the hood, step 2: turning off a website category now waits through the shared code
+  too. The wait used to be saved in three loose settings; it now has its own typed record. A
+  turn-off started on 2.2 is moved over on first launch with the exact same end time, so the
+  countdown does not change. The key check and the messages are unchanged. Six new tests,
+  five of them for the move.
 - Under the hood, step 1 of the pending-change cleanup: removing apps now waits out the
   cooling-off through the shared code from step 0. It reads the same saved keys as before, so a
   removal started on 2.2 keeps its countdown after updating. The key check and the messages are

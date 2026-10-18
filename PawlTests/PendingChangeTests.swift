@@ -88,6 +88,20 @@ final class PendingChangeTests: XCTestCase {
         XCTAssertEqual(store.load()?.endsAt, t0)
     }
 
+    // 6 (WebCategories here; DurationPair joins in step 3)
+    func test_store_payloadTypes_roundTripEveryCombination() {
+        let defaults = makeDefaults()
+        let cats = PendingChangeStore<WebCategories>(name: storeName + ".cats", defaults: defaults)
+        for gambling in [false, true] {
+            for adult in [false, true] {
+                let value = WebCategories(gambling: gambling, adult: adult)
+                cats.save(PendingChange(payload: value, endsAt: t0))
+                XCTAssertEqual(cats.load()?.payload, value)
+                XCTAssertEqual(cats.load()?.endsAt, t0)
+            }
+        }
+    }
+
     // MARK: Controller
 
     // 7
@@ -235,6 +249,99 @@ final class PendingChangeTests: XCTestCase {
         await fulfillment(of: [fired], timeout: 0.5)
 
         XCTAssertNil(ctl.store.load())
+    }
+
+    // MARK: Category migration (old pawl.pendingCat.* keys)
+
+    // The 2.2 key names, copied here as constants so these tests keep pinning them.
+    private let oldCatGambling = "pawl.pendingCat.gambling"
+    private let oldCatAdult = "pawl.pendingCat.adult"
+    private let oldCatEnd = "pawl.pendingCat.endsAt"
+    private let newCatData = "pawl.pendingCategories.data"
+    private let newCatEnd = "pawl.pendingCategories.endsAt"
+
+    private func writeOldCategoryKeys(_ defaults: UserDefaults, gambling: Bool, adult: Bool, end: Double) {
+        defaults.set(gambling, forKey: oldCatGambling)
+        defaults.set(adult, forKey: oldCatAdult)
+        defaults.set(end, forKey: oldCatEnd)
+    }
+
+    // 16
+    func test_categoryMigration_oldKeys_loadWithExactSameEndTime() {
+        let defaults = makeDefaults()
+        writeOldCategoryKeys(defaults, gambling: true, adult: false, end: 1_800_000_000)
+
+        let loaded = WebCategories.makeStore(defaults: defaults).load()
+
+        XCTAssertEqual(loaded?.payload, WebCategories(gambling: true, adult: false))
+        XCTAssertEqual(loaded?.endsAt.timeIntervalSince1970, 1_800_000_000)   // exact, no drift
+    }
+
+    // 17
+    func test_categoryMigration_movesToNewKeys_andDeletesOldOnes() {
+        let defaults = makeDefaults()
+        writeOldCategoryKeys(defaults, gambling: true, adult: false, end: 1_800_000_000)
+        let store = WebCategories.makeStore(defaults: defaults)
+
+        _ = store.load()
+
+        XCTAssertNil(defaults.object(forKey: oldCatGambling))
+        XCTAssertNil(defaults.object(forKey: oldCatAdult))
+        XCTAssertNil(defaults.object(forKey: oldCatEnd))
+        XCTAssertEqual(defaults.double(forKey: newCatEnd), 1_800_000_000)
+        let data = try! XCTUnwrap(defaults.data(forKey: newCatData))
+        XCTAssertEqual(try? JSONDecoder().decode(WebCategories.self, from: data),
+                       WebCategories(gambling: true, adult: false))
+
+        let second = store.load()
+        XCTAssertEqual(second?.payload, WebCategories(gambling: true, adult: false))
+        XCTAssertEqual(second?.endsAt.timeIntervalSince1970, 1_800_000_000)
+    }
+
+    // 18
+    func test_categoryMigration_oldKeysPastEndTime_restoreCommitsOnce() async {
+        let defaults = makeDefaults()
+        writeOldCategoryKeys(defaults, gambling: false, adult: true, end: 1_800_000_000)
+        let clock = Clock(Date(timeIntervalSince1970: 1_800_000_060))   // a minute after the end
+        let ctl = PendingChangeController<WebCategories>(store: WebCategories.makeStore(defaults: defaults),
+                                                         now: { clock.now })
+        var applied: [WebCategories] = []
+        ctl.apply = { applied.append($0) }
+
+        await ctl.restore()
+
+        XCTAssertEqual(applied, [WebCategories(gambling: false, adult: true)])
+        XCTAssertNil(ctl.pending)
+        XCTAssertNil(ctl.store.load())
+        XCTAssertNil(defaults.object(forKey: oldCatEnd))
+    }
+
+    // 19
+    func test_categoryMigration_nothingOldOrNew_returnsNilAndWritesNothing() {
+        let defaults = makeDefaults()
+        let store = WebCategories.makeStore(defaults: defaults)
+
+        XCTAssertNil(store.load())
+
+        for key in [oldCatGambling, oldCatAdult, oldCatEnd, newCatData, newCatEnd] {
+            XCTAssertNil(defaults.object(forKey: key), key)
+        }
+    }
+
+    // 20 (cannot happen in practice; pins the rule)
+    func test_categoryMigration_oldAndNewBothPresent_newWinsAndOldIsDeleted() {
+        let defaults = makeDefaults()
+        let store = WebCategories.makeStore(defaults: defaults)
+        store.save(PendingChange(payload: WebCategories(gambling: false, adult: false), endsAt: t0))
+        writeOldCategoryKeys(defaults, gambling: true, adult: true, end: 1_700_000_000)
+
+        let loaded = store.load()
+
+        XCTAssertEqual(loaded?.payload, WebCategories(gambling: false, adult: false))
+        XCTAssertEqual(loaded?.endsAt, t0)
+        XCTAssertNil(defaults.object(forKey: oldCatGambling))
+        XCTAssertNil(defaults.object(forKey: oldCatAdult))
+        XCTAssertNil(defaults.object(forKey: oldCatEnd))
     }
 
     // MARK: Same-key continuity (paths with no migration hook)

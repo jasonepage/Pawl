@@ -140,6 +140,11 @@ final class AppModel {
             self.shield.apply(selection)
             self.blockChangeMessage = "Your changes are now applied."
         }
+        pendingCategories.apply = { [weak self] categories in
+            guard let self else { return }
+            self.setWebCategories(gambling: categories.gambling, adult: categories.adult)
+            self.blockChangeMessage = "Your changes are now applied."
+        }
     }
 
     /// Number of gambling/crypto sites currently blocked in Safari — the live App Group list
@@ -375,8 +380,10 @@ final class AppModel {
 
     // MARK: - Website category editing (gambling / adult), with asymmetry
 
-    private var categoryTimer: Task<Void, Never>?
-    private(set) var pendingCategoryChange: Date?
+    /// 2.3: a gated category turn-off waiting out the cooling-off. Moved off the three raw
+    /// pawl.pendingCat.* keys; a turn-off saved by 2.2 is moved over with its exact end time.
+    let pendingCategories = PendingChangeController<WebCategories>(store: WebCategories.makeStore())
+    var pendingCategoryChange: Date? { pendingCategories.endsAt }
 
     // 2.2: the user's own typed website list (FR-SHIELD-003/004). Adding is instant;
     // removing is gated exactly like removing an app or a category (FR-SHIELD-010).
@@ -398,7 +405,7 @@ final class AppModel {
     /// (tightening is free); turning one OFF is removing protection — paired key + cooling-off —
     /// and it stays ON until the wait ends (FR-SHIELD-010, HC-4).
     func requestWebCategories(gambling: Bool, adult: Bool) async {
-        clearPendingCategory()
+        pendingCategories.clear()
         let curG = gamblingOn, curA = adultOn
         let turningOff = (curG && !gambling) || (curA && !adult)
 
@@ -415,55 +422,18 @@ final class AppModel {
         guard await approveLoosening(kind: "disable_category") else { return }
 
         let endsAt = Date().addingTimeInterval(cooldownSeconds)
-        let d = UserDefaults.standard
-        d.set(gambling, forKey: "pawl.pendingCat.gambling")
-        d.set(adult, forKey: "pawl.pendingCat.adult")
-        d.set(endsAt.timeIntervalSince1970, forKey: "pawl.pendingCat.endsAt")
-        pendingCategoryChange = endsAt
-        scheduleCategoryCommit(at: endsAt)
+        pendingCategories.begin(WebCategories(gambling: gambling, adult: adult), endsAt: endsAt)
         blockChangeMessage = "Turning that off starts in \(Int(cooldownSeconds / 60)) min. It stays on until then."
     }
 
     func cancelCategoryChange() {
         let had = pendingCategoryChange != nil
-        clearPendingCategory()
+        pendingCategories.clear()
         if had { blockChangeMessage = "Cancelled. Protection unchanged." }
     }
 
-    func restorePendingCategoryChange() {
-        let end = UserDefaults.standard.double(forKey: "pawl.pendingCat.endsAt")
-        guard end > 0 else { return }
-        let endsAt = Date(timeIntervalSince1970: end)
-        if Date() >= endsAt { commitCategoryChange() }
-        else { pendingCategoryChange = endsAt; scheduleCategoryCommit(at: endsAt) }
-    }
-
-    private func commitCategoryChange() {
-        let d = UserDefaults.standard
-        guard d.double(forKey: "pawl.pendingCat.endsAt") > 0 else { return }
-        setWebCategories(gambling: d.bool(forKey: "pawl.pendingCat.gambling"),
-                         adult: d.bool(forKey: "pawl.pendingCat.adult"))
-        clearPendingCategory()
-        blockChangeMessage = "Your changes are now applied."
-    }
-
-    private func clearPendingCategory() {
-        categoryTimer?.cancel(); categoryTimer = nil
-        let d = UserDefaults.standard
-        d.removeObject(forKey: "pawl.pendingCat.gambling")
-        d.removeObject(forKey: "pawl.pendingCat.adult")
-        d.removeObject(forKey: "pawl.pendingCat.endsAt")
-        pendingCategoryChange = nil
-    }
-
-    private func scheduleCategoryCommit(at endsAt: Date) {
-        categoryTimer?.cancel()
-        categoryTimer = Task { [weak self] in
-            let delay = endsAt.timeIntervalSinceNow
-            if delay > 0 { try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000)) }
-            if Task.isCancelled { return }
-            self?.commitCategoryChange()
-        }
+    func restorePendingCategoryChange() async {
+        await pendingCategories.restore()
     }
 
     // MARK: - Typed website list (2.2, FR-SHIELD-003/004)

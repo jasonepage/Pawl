@@ -172,3 +172,46 @@ public final class PendingChangeController<Payload: Codable & Equatable> {
         }
     }
 }
+
+// MARK: - Payload types for the paths that had no typed store
+
+/// Which website categories should be on once a pending turn-off applies (step 2). Before 2.3
+/// this lived in three raw UserDefaults keys; `makeStore` reads that old layout once and moves it.
+public struct WebCategories: Codable, Equatable {
+    public var gambling: Bool
+    public var adult: Bool
+
+    public init(gambling: Bool, adult: Bool) {
+        self.gambling = gambling
+        self.adult = adult
+    }
+
+    /// The 2.2 keys. Kept only so a turn-off saved by 2.2 is picked up after the update.
+    static let oldGamblingKey = "pawl.pendingCat.gambling"
+    static let oldAdultKey    = "pawl.pendingCat.adult"
+    static let oldEndKey      = "pawl.pendingCat.endsAt"
+
+    /// The store AppModel uses. A brand-new name on purpose, so no old key can be mistaken for
+    /// a new one. The end time moves over as the exact same Double, so a person mid-wait keeps
+    /// exactly the time they had.
+    @MainActor
+    public static func makeStore(defaults: UserDefaults = .standard) -> PendingChangeStore<WebCategories> {
+        PendingChangeStore(
+            name: "pawl.pendingCategories",
+            defaults: defaults,
+            legacy: PendingChangeStore<WebCategories>.Legacy(
+                load: {
+                    let end = defaults.double(forKey: oldEndKey)
+                    guard end > 0 else { return nil }
+                    return PendingChange(
+                        payload: WebCategories(gambling: defaults.bool(forKey: oldGamblingKey),
+                                               adult: defaults.bool(forKey: oldAdultKey)),
+                        endsAt: Date(timeIntervalSince1970: end))
+                },
+                delete: {
+                    defaults.removeObject(forKey: oldGamblingKey)
+                    defaults.removeObject(forKey: oldAdultKey)
+                    defaults.removeObject(forKey: oldEndKey)
+                }))
+    }
+}

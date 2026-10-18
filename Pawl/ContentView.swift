@@ -42,7 +42,7 @@ struct ContentView: View {
             await model.syncCommitment()                     // FR-P2-SYNC-* (push/reconcile if signed in)
             model.restorePendingDurations()                  // resume/commit a gated loosening
             await model.restorePendingSelectionChange()      // resume/commit a gated block removal
-            model.restorePendingCategoryChange()             // resume/commit a gated category turn-off
+            await model.restorePendingCategoryChange()       // resume/commit a gated category turn-off
             model.restorePendingDomainRemoval()              // 2.2: iCloud mirror + gated typed-site removal
             model.restorePendingSetsChange()                 // 2.2: scheduled sets, their activities, gated edits
             await model.sponsor.refresh()                    // so sponsor mode engages app-wide (FR-P2-LINK-005)
