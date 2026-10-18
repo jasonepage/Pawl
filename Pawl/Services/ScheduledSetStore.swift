@@ -9,6 +9,8 @@
 //  Scheduled block sets: iCloud mirror of the App Group copy (so they survive a reinstall),
 //  the pending gated replacement, and the DeviceActivity registrations that wake the
 //  monitor extension when a window opens or closes. Nothing goes to Supabase.
+//  2.3: the pending replacement is saved and timed by PendingChangeController;
+//  `makePendingStore` names its store and moves a change saved by 2.2 over to it.
 //
 
 import Foundation
@@ -17,8 +19,6 @@ import DeviceActivity
 @MainActor
 public final class ScheduledSetStore {
     private let cloudKey = "pawl.sets.scheduled"
-    private let pendingSetsKey = "pawl.pendingSets.target"
-    private let pendingEndKey = "pawl.pendingSets.endsAt"
     private static let center = DeviceActivityCenter()
 
     public init() {}
@@ -48,29 +48,36 @@ public final class ScheduledSetStore {
 
     // MARK: - Pending (gated) replacement of the whole list
 
+    /// What views read while a change waits. AppModel builds it from the controller.
     public struct PendingSets: Equatable {
         public let target: [ScheduledSet]
         public let endsAt: Date
     }
 
-    public func savePending(_ p: PendingSets) {
-        let d = UserDefaults.standard
-        d.set(try? JSONEncoder().encode(p.target), forKey: pendingSetsKey)
-        d.set(p.endsAt.timeIntervalSince1970, forKey: pendingEndKey)
-    }
+    /// The 2.2 keys: the target list as JSON and the end time. Kept only so a change saved by
+    /// 2.2 is picked up after the update.
+    static let oldPendingSetsKey = "pawl.pendingSets.target"
+    static let oldPendingEndKey  = "pawl.pendingSets.endsAt"
 
-    public func loadPending() -> PendingSets? {
-        let d = UserDefaults.standard
-        let end = d.double(forKey: pendingEndKey)
-        guard end > 0, let data = d.data(forKey: pendingSetsKey),
-              let target = try? JSONDecoder().decode([ScheduledSet].self, from: data) else { return nil }
-        return PendingSets(target: target, endsAt: Date(timeIntervalSince1970: end))
-    }
-
-    public func clearPending() {
-        let d = UserDefaults.standard
-        d.removeObject(forKey: pendingSetsKey)
-        d.removeObject(forKey: pendingEndKey)
+    /// The pending-change store AppModel uses. A new name, so no old key is shared with a new
+    /// one; a 2.2 change moves over once with the exact same end time.
+    public static func makePendingStore(defaults: UserDefaults = .standard) -> PendingChangeStore<[ScheduledSet]> {
+        let listKey = oldPendingSetsKey, endKey = oldPendingEndKey   // plain locals for the closures below
+        return PendingChangeStore(
+            name: "pawl.pendingSetsChange",
+            defaults: defaults,
+            legacy: PendingChangeStore<[ScheduledSet]>.Legacy(
+                load: {
+                    let end = defaults.double(forKey: endKey)
+                    guard end > 0, let data = defaults.data(forKey: listKey),
+                          let target = try? JSONDecoder().decode([ScheduledSet].self, from: data)
+                    else { return nil }
+                    return PendingChange(payload: target, endsAt: Date(timeIntervalSince1970: end))
+                },
+                delete: {
+                    defaults.removeObject(forKey: listKey)
+                    defaults.removeObject(forKey: endKey)
+                }))
     }
 
     // MARK: - DeviceActivity

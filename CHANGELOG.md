@@ -2,6 +2,10 @@
 
 ## 2.3 (in progress)
 
+- Under the hood, step 4: removing a typed website and making a scheduled set block less now
+  wait through the shared code too, so all five kinds of waiting change use one piece of code.
+  Each is saved under a new name, and a wait started on 2.2 is moved over with the exact same
+  end time. The key check, the ally step and the messages are unchanged. Two new tests.
 - Under the hood, step 3: a looser cooling-off or grace now waits through the shared code. It
   is saved under a new name, and a looser setting started on 2.2 is moved over with the exact
   same end time. Still no key needed for this one, same as before. One small change on launch:

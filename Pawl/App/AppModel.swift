@@ -148,6 +148,19 @@ final class AppModel {
         pendingDurationsCtl.apply = { [weak self] pair in
             await self?.applyDurations(cooldown: pair.cooldown, grace: pair.grace)
         }
+        pendingDomains.apply = { [weak self] domains in
+            guard let self else { return }
+            let remaining = Set(self.customDomains).subtracting(domains)
+            self.customDomainStore.save(Array(remaining))
+            self.customDomains = self.customDomainStore.load()
+            if SharedState.phase() == "locked" { self.shield.apply(self.selectionStore.load()) }
+            self.blockChangeMessage = "Your list is updated."
+        }
+        pendingSetsCtl.apply = { [weak self] target in
+            guard let self else { return }
+            self.applySets(target)
+            self.blockChangeMessage = "Your sets are updated."
+        }
     }
 
     /// Number of gambling/crypto sites currently blocked in Safari — the live App Group list
@@ -391,8 +404,10 @@ final class AppModel {
     // 2.2: the user's own typed website list (FR-SHIELD-003/004). Adding is instant;
     // removing is gated exactly like removing an app or a category (FR-SHIELD-010).
     private let customDomainStore = CustomDomainStore()
-    private var domainTimer: Task<Void, Never>?
-    private(set) var pendingDomainRemoval: CustomDomainStore.PendingRemoval?
+    let pendingDomains = PendingChangeController<[String]>(store: CustomDomainStore.makePendingStore())
+    var pendingDomainRemoval: CustomDomainStore.PendingRemoval? {
+        pendingDomains.pending.map { CustomDomainStore.PendingRemoval(domains: $0.payload, endsAt: $0.endsAt) }
+    }
     /// Mirrors the stored list so SwiftUI sees changes (a computed read of UserDefaults would not).
     private(set) var customDomains: [String] = []
 
@@ -400,8 +415,10 @@ final class AppModel {
     // gating above. Adding a set or tightening one applies now; loosening (fewer apps, fewer
     // hours, off, deleted) is gated like every other removal (FR-SHIELD-010).
     private let scheduledSetStore = ScheduledSetStore()
-    private var setsTimer: Task<Void, Never>?
-    private(set) var pendingSets: ScheduledSetStore.PendingSets?
+    let pendingSetsCtl = PendingChangeController<[ScheduledSet]>(store: ScheduledSetStore.makePendingStore())
+    var pendingSets: ScheduledSetStore.PendingSets? {
+        pendingSetsCtl.pending.map { ScheduledSetStore.PendingSets(target: $0.payload, endsAt: $0.endsAt) }
+    }
     private(set) var scheduledSets: [ScheduledSet] = []
 
     /// Change which website categories are blocked. Turning one ON applies immediately
@@ -475,7 +492,7 @@ final class AppModel {
     func requestRemoveCustomDomains(_ domains: [String]) async {
         let targets = Set(domains).intersection(customDomains)
         guard !targets.isEmpty else { return }
-        clearPendingDomainRemoval()
+        pendingDomains.clear()
 
         // "disable_category" on purpose: the server (migration 04) and the sponsor's app only
         // know unlock / remove_app / disable_category, and to the sponsor this is "turn off a
@@ -483,10 +500,7 @@ final class AppModel {
         guard await approveLoosening(kind: "disable_category") else { return }
 
         let endsAt = Date().addingTimeInterval(cooldownSeconds)
-        let pending = CustomDomainStore.PendingRemoval(domains: Array(targets).sorted(), endsAt: endsAt)
-        customDomainStore.savePending(pending)
-        pendingDomainRemoval = pending
-        scheduleDomainCommit(at: endsAt)
+        pendingDomains.begin(Array(targets).sorted(), endsAt: endsAt)
         blockChangeMessage = targets.count == 1
             ? "Removal starts in \(Int(cooldownSeconds / 60)) min. The site stays blocked until then."
             : "Removal starts in \(Int(cooldownSeconds / 60)) min. The sites stay blocked until then."
@@ -494,43 +508,15 @@ final class AppModel {
 
     func cancelDomainRemoval() {
         let had = pendingDomainRemoval != nil
-        clearPendingDomainRemoval()
+        pendingDomains.clear()
         if had { blockChangeMessage = "Cancelled. Your list is unchanged." }
     }
 
     /// On launch: pull the iCloud mirror back after a reinstall, then resume or finish a wait.
-    func restorePendingDomainRemoval() {
+    func restorePendingDomainRemoval() async {
         customDomainStore.restoreFromCloudIfNeeded()
         customDomains = customDomainStore.load()
-        guard let pending = customDomainStore.loadPending() else { return }
-        if Date() >= pending.endsAt { commitDomainRemoval() }
-        else { pendingDomainRemoval = pending; scheduleDomainCommit(at: pending.endsAt) }
-    }
-
-    private func commitDomainRemoval() {
-        guard let pending = customDomainStore.loadPending() else { return }
-        let remaining = Set(customDomains).subtracting(pending.domains)
-        customDomainStore.save(Array(remaining))
-        customDomains = customDomainStore.load()
-        clearPendingDomainRemoval()
-        if SharedState.phase() == "locked" { shield.apply(selectionStore.load()) }
-        blockChangeMessage = "Your list is updated."
-    }
-
-    private func clearPendingDomainRemoval() {
-        domainTimer?.cancel(); domainTimer = nil
-        customDomainStore.clearPending()
-        pendingDomainRemoval = nil
-    }
-
-    private func scheduleDomainCommit(at endsAt: Date) {
-        domainTimer?.cancel()
-        domainTimer = Task { [weak self] in
-            let delay = endsAt.timeIntervalSinceNow
-            if delay > 0 { try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000)) }
-            if Task.isCancelled { return }
-            self?.commitDomainRemoval()
-        }
+        await pendingDomains.restore()
     }
 
     // MARK: - Time kept (2.2)
@@ -598,28 +584,23 @@ final class AppModel {
 
     func cancelSetsChange() {
         let had = pendingSets != nil
-        clearPendingSets()
+        pendingSetsCtl.clear()
         if had { blockChangeMessage = "Cancelled. Your sets are unchanged." }
     }
 
     /// On launch: pull the iCloud mirror back after a reinstall, re-register the schedules, then
     /// resume or finish a wait.
-    func restorePendingSetsChange() {
+    func restorePendingSetsChange() async {
         scheduledSetStore.restoreFromCloudIfNeeded()
         scheduledSets = scheduledSetStore.load()
-        guard let p = scheduledSetStore.loadPending() else { return }
-        if Date() >= p.endsAt { commitSetsChange() }
-        else { pendingSets = p; scheduleSetsCommit(at: p.endsAt) }
+        await pendingSetsCtl.restore()
     }
 
     private func gateSetsChange(_ target: [ScheduledSet], what: String) async {
-        clearPendingSets()
+        pendingSetsCtl.clear()
         guard await approveLoosening(kind: "remove_app") else { return }
         let endsAt = Date().addingTimeInterval(cooldownSeconds)
-        let p = ScheduledSetStore.PendingSets(target: target, endsAt: endsAt)
-        scheduledSetStore.savePending(p)
-        pendingSets = p
-        scheduleSetsCommit(at: endsAt)
+        pendingSetsCtl.begin(target, endsAt: endsAt)
         blockChangeMessage = "\(what) It applies in \(Int(cooldownSeconds / 60)) min."
     }
 
@@ -627,29 +608,6 @@ final class AppModel {
         scheduledSetStore.save(sets)
         scheduledSets = sets
         if SharedState.phase() == "locked" { shield.apply(selectionStore.load()) }
-    }
-
-    private func commitSetsChange() {
-        guard let p = scheduledSetStore.loadPending() else { return }
-        applySets(p.target)
-        clearPendingSets()
-        blockChangeMessage = "Your sets are updated."
-    }
-
-    private func clearPendingSets() {
-        setsTimer?.cancel(); setsTimer = nil
-        scheduledSetStore.clearPending()
-        pendingSets = nil
-    }
-
-    private func scheduleSetsCommit(at endsAt: Date) {
-        setsTimer?.cancel()
-        setsTimer = Task { [weak self] in
-            let delay = endsAt.timeIntervalSinceNow
-            if delay > 0 { try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000)) }
-            if Task.isCancelled { return }
-            self?.commitSetsChange()
-        }
     }
 
     // MARK: - Friction customization (cooldown + grace)

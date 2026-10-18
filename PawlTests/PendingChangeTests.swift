@@ -394,7 +394,7 @@ final class PendingChangeTests: XCTestCase {
         ctl.clear()
     }
 
-    // MARK: Same-key continuity (paths with no migration hook)
+    // MARK: Continuity: what 2.2 saved still loads after the update
 
     // 23
     func test_continuity_selection_readsWhatSelectionChangeStoreWrote() {
@@ -411,5 +411,48 @@ final class PendingChangeTests: XCTestCase {
         let loaded = store.load()
         XCTAssertEqual(loaded?.payload, selection)
         XCTAssertEqual(loaded?.endsAt.timeIntervalSince1970, 1_800_000_000)
+    }
+
+    // 24
+    func test_continuity_typedSites_readsWhatCustomDomainStoreWrote() {
+        // The exact 2.2 key names and encoding (a plain string list, not JSON), copied here as
+        // constants so this test keeps pinning them.
+        let oldListKey = "pawl.pendingDomains.remove"
+        let oldEndKey = "pawl.pendingDomains.endsAt"
+        let defaults = makeDefaults()
+        defaults.set(["example.com", "news.example.org"], forKey: oldListKey)
+        defaults.set(1_800_000_000.0, forKey: oldEndKey)
+        let store = CustomDomainStore.makePendingStore(defaults: defaults)
+
+        let loaded = store.load()
+
+        XCTAssertEqual(loaded?.payload, ["example.com", "news.example.org"])
+        XCTAssertEqual(loaded?.endsAt.timeIntervalSince1970, 1_800_000_000)   // exact, no drift
+        XCTAssertNil(defaults.object(forKey: oldListKey))
+        XCTAssertNil(defaults.object(forKey: oldEndKey))
+        XCTAssertEqual(store.load()?.payload, ["example.com", "news.example.org"])
+        XCTAssertEqual(store.load()?.endsAt.timeIntervalSince1970, 1_800_000_000)
+    }
+
+    // 25
+    func test_continuity_scheduledSets_readsWhatScheduledSetStoreWrote() {
+        // The exact 2.2 key names and encoding (the target list as JSON), copied here as
+        // constants so this test keeps pinning them.
+        let oldTargetKey = "pawl.pendingSets.target"
+        let oldEndKey = "pawl.pendingSets.endsAt"
+        let target = [ScheduledSet(name: "Work", weekdays: [2, 3, 4, 5, 6], startMinute: 9 * 60, endMinute: 17 * 60)]
+        let defaults = makeDefaults()
+        defaults.set(try! JSONEncoder().encode(target), forKey: oldTargetKey)
+        defaults.set(1_800_000_000.0, forKey: oldEndKey)
+        let store = ScheduledSetStore.makePendingStore(defaults: defaults)
+
+        let loaded = store.load()
+
+        XCTAssertEqual(loaded?.payload, target)
+        XCTAssertEqual(loaded?.endsAt.timeIntervalSince1970, 1_800_000_000)   // exact, no drift
+        XCTAssertNil(defaults.object(forKey: oldTargetKey))
+        XCTAssertNil(defaults.object(forKey: oldEndKey))
+        XCTAssertEqual(store.load()?.payload, target)
+        XCTAssertEqual(store.load()?.endsAt.timeIntervalSince1970, 1_800_000_000)
     }
 }

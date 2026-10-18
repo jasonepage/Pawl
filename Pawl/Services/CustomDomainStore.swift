@@ -14,9 +14,9 @@
 //  Nothing here goes to Supabase. A typed site is the user's business, not the sponsor's.
 //
 //  Removal is an unlock action (key, sponsor if linked, then cooldown), the same rule as
-//  removing an app or switching off a website category (FR-SHIELD-010). The sites to drop
-//  and the time they drop are kept in standard UserDefaults alongside the other pending
-//  changes, so a relaunch resumes the wait instead of forgetting it.
+//  removing an app or switching off a website category (FR-SHIELD-010). 2.3: the pending
+//  removal is saved and timed by PendingChangeController; `makePendingStore` below names its
+//  store and moves a removal saved by 2.2 over to it.
 //
 
 import Foundation
@@ -24,8 +24,6 @@ import Foundation
 @MainActor
 public final class CustomDomainStore {
     private let cloudKey = "pawl.web.customDomains"
-    private let pendingRemoveKey = "pawl.pendingDomains.remove"
-    private let pendingEndKey = "pawl.pendingDomains.endsAt"
 
     /// Hard cap so a pasted list cannot grow the shield filter without limit.
     public static let maxDomains = 500
@@ -56,27 +54,34 @@ public final class CustomDomainStore {
 
     // MARK: - Pending removal (gated)
 
+    /// What views read while a removal waits. AppModel builds it from the controller.
     public struct PendingRemoval: Equatable {
         public let domains: [String]
         public let endsAt: Date
     }
 
-    public func savePending(_ p: PendingRemoval) {
-        let d = UserDefaults.standard
-        d.set(p.domains, forKey: pendingRemoveKey)
-        d.set(p.endsAt.timeIntervalSince1970, forKey: pendingEndKey)
-    }
+    /// The 2.2 keys: a plain string list and the end time. Kept only so a removal saved by 2.2
+    /// is picked up after the update.
+    static let oldPendingRemoveKey = "pawl.pendingDomains.remove"
+    static let oldPendingEndKey    = "pawl.pendingDomains.endsAt"
 
-    public func loadPending() -> PendingRemoval? {
-        let d = UserDefaults.standard
-        let end = d.double(forKey: pendingEndKey)
-        guard end > 0, let domains = d.stringArray(forKey: pendingRemoveKey), !domains.isEmpty else { return nil }
-        return PendingRemoval(domains: domains, endsAt: Date(timeIntervalSince1970: end))
-    }
-
-    public func clearPending() {
-        let d = UserDefaults.standard
-        d.removeObject(forKey: pendingRemoveKey)
-        d.removeObject(forKey: pendingEndKey)
+    /// The pending-removal store AppModel uses. A new name, so no old key is shared with a new
+    /// one; a 2.2 removal moves over once with the exact same end time.
+    public static func makePendingStore(defaults: UserDefaults = .standard) -> PendingChangeStore<[String]> {
+        let listKey = oldPendingRemoveKey, endKey = oldPendingEndKey   // plain locals for the closures below
+        return PendingChangeStore(
+            name: "pawl.pendingDomainRemoval",
+            defaults: defaults,
+            legacy: PendingChangeStore<[String]>.Legacy(
+                load: {
+                    let end = defaults.double(forKey: endKey)
+                    guard end > 0, let domains = defaults.stringArray(forKey: listKey),
+                          !domains.isEmpty else { return nil }
+                    return PendingChange(payload: domains, endsAt: Date(timeIntervalSince1970: end))
+                },
+                delete: {
+                    defaults.removeObject(forKey: listKey)
+                    defaults.removeObject(forKey: endKey)
+                }))
     }
 }
