@@ -215,3 +215,44 @@ public struct WebCategories: Codable, Equatable {
                 }))
     }
 }
+
+/// A looser cooldown and grace waiting to apply (step 3). Before 2.3, DurationStore saved these
+/// as three separate keys, not JSON; `makeStore` reads that old layout once and moves it.
+public struct DurationPair: Codable, Equatable {
+    public var cooldown: TimeInterval
+    public var grace: TimeInterval
+
+    public init(cooldown: TimeInterval, grace: TimeInterval) {
+        self.cooldown = cooldown
+        self.grace = grace
+    }
+
+    /// The 2.2 keys. Kept only so a looser setting saved by 2.2 is picked up after the update.
+    static let oldCooldownKey = "pawl.pendingDur.cooldown"
+    static let oldGraceKey    = "pawl.pendingDur.grace"
+    static let oldEndKey      = "pawl.pendingDur.endsAt"
+
+    /// The store AppModel uses. The name is new on purpose: "pawl.pendingDur" would make the new
+    /// end time key the same key as the old one, and deleting the old keys would then delete the
+    /// new end time too. The end time moves over as the exact same Double.
+    @MainActor
+    public static func makeStore(defaults: UserDefaults = .standard) -> PendingChangeStore<DurationPair> {
+        PendingChangeStore(
+            name: "pawl.pendingDurations",
+            defaults: defaults,
+            legacy: PendingChangeStore<DurationPair>.Legacy(
+                load: {
+                    let end = defaults.double(forKey: oldEndKey)
+                    guard end > 0 else { return nil }
+                    return PendingChange(
+                        payload: DurationPair(cooldown: defaults.double(forKey: oldCooldownKey),
+                                              grace: defaults.double(forKey: oldGraceKey)),
+                        endsAt: Date(timeIntervalSince1970: end))
+                },
+                delete: {
+                    defaults.removeObject(forKey: oldCooldownKey)
+                    defaults.removeObject(forKey: oldGraceKey)
+                    defaults.removeObject(forKey: oldEndKey)
+                }))
+    }
+}

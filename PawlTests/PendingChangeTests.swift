@@ -88,7 +88,7 @@ final class PendingChangeTests: XCTestCase {
         XCTAssertEqual(store.load()?.endsAt, t0)
     }
 
-    // 6 (WebCategories here; DurationPair joins in step 3)
+    // 6
     func test_store_payloadTypes_roundTripEveryCombination() {
         let defaults = makeDefaults()
         let cats = PendingChangeStore<WebCategories>(name: storeName + ".cats", defaults: defaults)
@@ -98,6 +98,15 @@ final class PendingChangeTests: XCTestCase {
                 cats.save(PendingChange(payload: value, endsAt: t0))
                 XCTAssertEqual(cats.load()?.payload, value)
                 XCTAssertEqual(cats.load()?.endsAt, t0)
+            }
+        }
+        let durations = PendingChangeStore<DurationPair>(name: storeName + ".dur", defaults: defaults)
+        for cooldown in [60.0, 900.0, 3600.0] {
+            for grace in [0.0, 300.0, 1800.0] {
+                let value = DurationPair(cooldown: cooldown, grace: grace)
+                durations.save(PendingChange(payload: value, endsAt: t0))
+                XCTAssertEqual(durations.load()?.payload, value)
+                XCTAssertEqual(durations.load()?.endsAt, t0)
             }
         }
     }
@@ -342,6 +351,47 @@ final class PendingChangeTests: XCTestCase {
         XCTAssertNil(defaults.object(forKey: oldCatGambling))
         XCTAssertNil(defaults.object(forKey: oldCatAdult))
         XCTAssertNil(defaults.object(forKey: oldCatEnd))
+    }
+
+    // MARK: Duration migration (old pawl.pendingDur.* keys)
+
+    // 21
+    func test_durationMigration_oldKeys_loadIntoDurationPair_andOldKeysGo() {
+        // The 2.2 key names, copied here as constants so this test keeps pinning them.
+        let oldCooldown = "pawl.pendingDur.cooldown"
+        let oldGrace = "pawl.pendingDur.grace"
+        let oldEnd = "pawl.pendingDur.endsAt"
+        let defaults = makeDefaults()
+        defaults.set(1800.0, forKey: oldCooldown)
+        defaults.set(300.0, forKey: oldGrace)
+        defaults.set(1_800_000_000.0, forKey: oldEnd)
+        let store = DurationPair.makeStore(defaults: defaults)
+
+        let loaded = store.load()
+
+        XCTAssertEqual(loaded?.payload, DurationPair(cooldown: 1800, grace: 300))
+        XCTAssertEqual(loaded?.endsAt.timeIntervalSince1970, 1_800_000_000)   // exact, no drift
+        XCTAssertNil(defaults.object(forKey: oldCooldown))
+        XCTAssertNil(defaults.object(forKey: oldGrace))
+        XCTAssertNil(defaults.object(forKey: oldEnd))
+        // Deleting the old keys must not take the moved change with it.
+        let second = store.load()
+        XCTAssertEqual(second?.payload, DurationPair(cooldown: 1800, grace: 300))
+        XCTAssertEqual(second?.endsAt.timeIntervalSince1970, 1_800_000_000)
+    }
+
+    // 22
+    func test_durationFacade_matchesWhatTheControllerHolds() {
+        let clock = Clock(t0)
+        let ctl = PendingChangeController<DurationPair>(store: DurationPair.makeStore(defaults: makeDefaults()),
+                                                       now: { clock.now })
+        let endsAt = t0.addingTimeInterval(900)
+        ctl.begin(DurationPair(cooldown: 1800, grace: 300), endsAt: endsAt)
+
+        let facade = ctl.pending.map { PendingDurations($0) }
+
+        XCTAssertEqual(facade, PendingDurations(cooldown: 1800, grace: 300, endsAt: endsAt))
+        ctl.clear()
     }
 
     // MARK: Same-key continuity (paths with no migration hook)

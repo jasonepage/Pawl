@@ -93,9 +93,9 @@ final class AppModel {
 
     // Friction customization. Tightening (longer cooldown / shorter grace) applies now;
     // loosening waits out the current cooldown so it can't be weakened in the moment.
-    private let durationStore = DurationStore()
-    private var durationTimer: Task<Void, Never>?
-    private(set) var pendingDurations: PendingDurations?
+    // 2.3: the pending loosening lives in a shared controller. No key gate on this path, by design.
+    let pendingDurationsCtl = PendingChangeController<DurationPair>(store: DurationPair.makeStore())
+    var pendingDurations: PendingDurations? { pendingDurationsCtl.pending.map { PendingDurations($0) } }
 
     // Key-gated blocklist editing (FR-SHIELD-010). Adding targets is free; removing one is an
     // unlock action (security key + cooling-off) and the removed targets stay blocked until then.
@@ -144,6 +144,9 @@ final class AppModel {
             guard let self else { return }
             self.setWebCategories(gambling: categories.gambling, adult: categories.adult)
             self.blockChangeMessage = "Your changes are now applied."
+        }
+        pendingDurationsCtl.apply = { [weak self] pair in
+            await self?.applyDurations(cooldown: pair.cooldown, grace: pair.grace)
         }
     }
 
@@ -662,46 +665,19 @@ final class AppModel {
             await applyDurations(cooldown: cd, grace: gr)
         } else {
             let endsAt = Date().addingTimeInterval(cooldownSeconds)
-            let pending = PendingDurations(cooldown: cd, grace: gr, endsAt: endsAt)
-            durationStore.save(pending)
-            pendingDurations = pending
-            scheduleDurationCommit(at: endsAt)
+            pendingDurationsCtl.begin(DurationPair(cooldown: cd, grace: gr), endsAt: endsAt)
         }
     }
 
     func cancelPendingDurations() {
-        durationTimer?.cancel(); durationTimer = nil
-        durationStore.clear()
-        pendingDurations = nil
+        pendingDurationsCtl.clear()
     }
 
     /// On launch: resume a pending loosening, or commit it if its wait already elapsed.
-    func restorePendingDurations() {
-        guard let p = durationStore.load() else { return }
-        if Date() >= p.endsAt {
-            Task { await commitPendingDurations() }
-        } else {
-            pendingDurations = p
-            scheduleDurationCommit(at: p.endsAt)
-        }
-    }
-
-    private func commitPendingDurations() async {
-        guard let p = durationStore.load() else { return }
-        await applyDurations(cooldown: p.cooldown, grace: p.grace)
-        durationStore.clear()
-        pendingDurations = nil
-        durationTimer?.cancel(); durationTimer = nil
-    }
-
-    private func scheduleDurationCommit(at endsAt: Date) {
-        durationTimer?.cancel()
-        durationTimer = Task { [weak self] in
-            let delay = endsAt.timeIntervalSinceNow
-            if delay > 0 { try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000)) }
-            if Task.isCancelled { return }
-            await self?.commitPendingDurations()
-        }
+    /// 2.3: awaited like the other four, so an expired loosening is applied before the next
+    /// restore starts (it used to commit in a detached Task).
+    func restorePendingDurations() async {
+        await pendingDurationsCtl.restore()
     }
 
     private func applyDurations(cooldown: TimeInterval, grace: TimeInterval) async {

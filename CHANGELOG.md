@@ -2,6 +2,12 @@
 
 ## 2.3 (in progress)
 
+- Under the hood, step 3: a looser cooling-off or grace now waits through the shared code. It
+  is saved under a new name, and a looser setting started on 2.2 is moved over with the exact
+  same end time. Still no key needed for this one, same as before. One small change on launch:
+  if that wait already ended while the app was closed, the new setting is now applied before
+  the other waits are restored, instead of at the same time. Two new tests, and one existing
+  test now also covers durations.
 - Under the hood, step 2: turning off a website category now waits through the shared code
   too. The wait used to be saved in three loose settings; it now has its own typed record. A
   turn-off started on 2.2 is moved over on first launch with the exact same end time, so the
