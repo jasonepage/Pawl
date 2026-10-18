@@ -2,6 +2,10 @@
 
 ## 2.3 (in progress)
 
+- Under the hood, step 1 of the pending-change cleanup: removing apps now waits out the
+  cooling-off through the shared code from step 0. It reads the same saved keys as before, so a
+  removal started on 2.2 keeps its countdown after updating. The key check and the messages are
+  unchanged. One new test proves the old saved removal still loads.
 - Under the hood, step 0 of the pending-change cleanup: one shared piece of code for every
   change that waits out the cooling-off (save, wait, apply, clear), with 14 new tests. Nothing
   uses it yet, so the app behaves exactly as before. Also fixes a test that expected 912 hours a

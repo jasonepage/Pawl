@@ -236,4 +236,23 @@ final class PendingChangeTests: XCTestCase {
 
         XCTAssertNil(ctl.store.load())
     }
+
+    // MARK: Same-key continuity (paths with no migration hook)
+
+    // 23
+    func test_continuity_selection_readsWhatSelectionChangeStoreWrote() {
+        // The exact key names and encoding the 2.2 SelectionChangeStore used, copied here as
+        // constants so this test keeps passing now that the class is deleted.
+        let oldDataKey = "pawl.pendingSel.data"
+        let oldEndKey = "pawl.pendingSel.endsAt"
+        let defaults = makeDefaults()
+        let selection = FamilyActivitySelection()
+        defaults.set(try! JSONEncoder().encode(selection), forKey: oldDataKey)
+        defaults.set(t0.timeIntervalSince1970, forKey: oldEndKey)
+
+        let store = PendingChangeStore<FamilyActivitySelection>(name: "pawl.pendingSel", defaults: defaults)
+        let loaded = store.load()
+        XCTAssertEqual(loaded?.payload, selection)
+        XCTAssertEqual(loaded?.endsAt.timeIntervalSince1970, 1_800_000_000)
+    }
 }

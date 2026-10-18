@@ -41,7 +41,7 @@ struct ContentView: View {
             await RecoveryService.restoreOnLaunch()          // FR-PERSIST-002/003 (local, offline-safe)
             await model.syncCommitment()                     // FR-P2-SYNC-* (push/reconcile if signed in)
             model.restorePendingDurations()                  // resume/commit a gated loosening
-            model.restorePendingSelectionChange()            // resume/commit a gated block removal
+            await model.restorePendingSelectionChange()      // resume/commit a gated block removal
             model.restorePendingCategoryChange()             // resume/commit a gated category turn-off
             model.restorePendingDomainRemoval()              // 2.2: iCloud mirror + gated typed-site removal
             model.restorePendingSetsChange()                 // 2.2: scheduled sets, their activities, gated edits

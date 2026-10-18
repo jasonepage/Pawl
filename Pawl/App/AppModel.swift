@@ -101,9 +101,12 @@ final class AppModel {
     // unlock action (security key + cooling-off) and the removed targets stay blocked until then.
     private let security = SecurityKeyService()
     private let keyStore = KeyStore()
-    private let selectionChangeStore = SelectionChangeStore()
-    private var selectionTimer: Task<Void, Never>?
-    private(set) var pendingSelectionChange: Date?     // endsAt of a gated removal, if any
+    /// 2.3: a gated removal waiting out the cooling-off. It uses the same keys the old
+    /// SelectionChangeStore did (pawl.pendingSel.data and .endsAt), so a removal saved by 2.2
+    /// is picked up as is. What it does when the wait ends is set in init.
+    let pendingSelection = PendingChangeController<FamilyActivitySelection>(
+        store: PendingChangeStore(name: "pawl.pendingSel"))
+    var pendingSelectionChange: Date? { pendingSelection.endsAt }   // endsAt of a gated removal, if any
     var blockChangeMessage: String?
     var currentSelection: FamilyActivitySelection { selectionStore.load() }
 
@@ -127,6 +130,15 @@ final class AppModel {
         if didOnboard && role == .blocker {
             shield.setDeletionBlock(true)
             shield.setClockLock(true)       // 2.1: FR-CLOCK-001, same lifecycle as the deletion block
+        }
+
+        // 2.3: what each pending change does once its wait ends. The key gate is not here; it
+        // runs in the request methods before begin() is ever called.
+        pendingSelection.apply = { [weak self] selection in
+            guard let self else { return }
+            self.selectionStore.save(selection)
+            self.shield.apply(selection)
+            self.blockChangeMessage = "Your changes are now applied."
         }
     }
 
@@ -317,7 +329,7 @@ final class AppModel {
     /// Removing a target is a loosening: paired key + (sponsor approval if linked) + cooling-off,
     /// and the removed targets stay blocked until it all clears (FR-SHIELD-010, HC-4).
     func requestSelectionChange(_ new: FamilyActivitySelection) async {
-        clearPendingSelection()                              // supersede any in-flight change
+        pendingSelection.clear()                             // supersede any in-flight change
         let current = selectionStore.load()
         let removed = !current.applicationTokens.subtracting(new.applicationTokens).isEmpty
             || !current.categoryTokens.subtracting(new.categoryTokens).isEmpty
@@ -345,52 +357,20 @@ final class AppModel {
 
         // Cleared → wait out the cooling-off before the removal takes effect.
         let endsAt = Date().addingTimeInterval(cooldownSeconds)
-        selectionChangeStore.save(PendingSelectionChange(selection: new, endsAt: endsAt))
-        pendingSelectionChange = endsAt
-        scheduleSelectionCommit(at: endsAt)
+        pendingSelection.begin(new, endsAt: endsAt)
         blockChangeMessage = "Removal starts in \(Int(cooldownSeconds / 60)) min. They stay blocked until then."
     }
 
     func cancelSelectionChange() {
         let had = pendingSelectionChange != nil
-        clearPendingSelection()
+        pendingSelection.clear()
         if had { blockChangeMessage = "Cancelled. Nothing was removed." }
     }
 
     /// On launch: resume a pending removal, or commit it if its wait already elapsed while the
     /// app was closed (so force-quitting can't skip the cooling-off).
-    func restorePendingSelectionChange() {
-        guard let p = selectionChangeStore.load() else { return }
-        if Date() >= p.endsAt {
-            commitSelectionChange()
-        } else {
-            pendingSelectionChange = p.endsAt
-            scheduleSelectionCommit(at: p.endsAt)
-        }
-    }
-
-    private func commitSelectionChange() {
-        guard let p = selectionChangeStore.load() else { return }
-        selectionStore.save(p.selection)
-        shield.apply(p.selection)
-        clearPendingSelection()
-        blockChangeMessage = "Your changes are now applied."
-    }
-
-    private func clearPendingSelection() {
-        selectionTimer?.cancel(); selectionTimer = nil
-        selectionChangeStore.clear()
-        pendingSelectionChange = nil
-    }
-
-    private func scheduleSelectionCommit(at endsAt: Date) {
-        selectionTimer?.cancel()
-        selectionTimer = Task { [weak self] in
-            let delay = endsAt.timeIntervalSinceNow
-            if delay > 0 { try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000)) }
-            if Task.isCancelled { return }
-            self?.commitSelectionChange()
-        }
+    func restorePendingSelectionChange() async {
+        await pendingSelection.restore()
     }
 
     // MARK: - Website category editing (gambling / adult), with asymmetry
