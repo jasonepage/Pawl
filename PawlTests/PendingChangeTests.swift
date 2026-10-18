@@ -4,11 +4,11 @@
 
 //
 //  PendingChangeTests.swift
-//  2.3 Workstream B, step 0: the shared pending-change store and controller on their own,
-//  before any AppModel path uses them. Every test uses a throwaway UserDefaults suite and,
-//  except the two timer tests, an injected clock, so nothing sleeps and nothing touches the
-//  app's real defaults. Numbers match the test plan. Test 6 (WebCategories and DurationPair
-//  round-trips) moves to steps 2 and 3, where those types are added.
+//  2.3 Workstream B: the shared pending-change store and controller (tests 1 to 15), the
+//  category and duration moves off their 2.2 keys (16 to 22), and proof that a wait saved by
+//  2.2 on each of the other paths still loads after the update (23 to 25). Every test uses a
+//  throwaway UserDefaults suite and, except the two timer tests, an injected clock, so nothing
+//  sleeps and nothing touches the app's real defaults. Numbers match the test plan.
 //
 
 import XCTest

@@ -37,8 +37,9 @@ public struct PendingChange<Payload: Codable & Equatable>: Codable, Equatable {
 @MainActor
 public final class PendingChangeStore<Payload: Codable & Equatable> {
 
-    /// How to read and delete a pending change saved in an older layout. Only paths that moved
-    /// keys use this (web categories, durations). `load` returns nil when nothing old is there.
+    /// How to read and delete a pending change saved in an older layout. Every path except the
+    /// app selection uses this, because their 2.2 keys did not match `<name>.data` and
+    /// `<name>.endsAt`. `load` returns nil when nothing old is there.
     public struct Legacy {
         public var load: () -> PendingChange<Payload>?
         public var delete: () -> Void

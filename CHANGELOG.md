@@ -2,6 +2,9 @@
 
 ## 2.3 (in progress)
 
+- Under the hood, steps 5 and 6: all five waits are restored one after another on launch, in
+  the same order as before, and no leftover timer or save code remains in the app model. The
+  app model is about 110 lines shorter. Nothing a person sees changes.
 - Under the hood, step 4: removing a typed website and making a scheduled set block less now
   wait through the shared code too, so all five kinds of waiting change use one piece of code.
   Each is saved under a new name, and a wait started on 2.2 is moved over with the exact same
