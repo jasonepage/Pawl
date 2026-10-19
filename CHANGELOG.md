@@ -2,6 +2,24 @@
 
 ## 2.3 (in progress)
 
+- More good moments to ask for an App Store rating: a full week with Pawl on every day and no
+  slip, right after buying Pro, and right after the hard lock is set up. Logging an urge from
+  Home's "I'm tempted" button now counts too (only the block screen path did before). The same
+  limits apply: never in the first 3 days, at least 60 days between asks, each moment once, and
+  never on an unlock or a slip. One new test.
+- Setup now suggests where to keep your key, right after you pair it (or when you say you
+  don't have one yet): someone you trust across town, a time lock box, a bank safe deposit
+  box, your desk at work, or mailing it to a friend. Whoever holds the key decides when Pawl
+  can open.
+- Home is clearer. "This week" sits right under the urge button and shows each day as a dot:
+  green when Pawl was on, with a number for urges you resisted that day, and a gray mark (never
+  red) for a slip. With Pawl Pro it also shows big numbers for hours back, blocked attempts,
+  urges resisted and unlocks, the time of day that was hardest (with a shortcut to add a
+  scheduled set for it), the trigger you typed most, and your own words from this week. It
+  still never scores, grades or compares, and leaves out anything that was zero. What's blocked
+  shows chips and no longer says "Locked by your key" before a key is paired. History is now
+  "Recent": four entries, plain days like "Yesterday", press and hold to remove. "Log a slip"
+  is gray instead of red. Four new tests.
 - Settings is simpler. The logo header is a little smaller, and below it are four plain groups: What's
   blocked (Apps, Websites, Scheduled sets, each its own page), Unlocking (your key, unlock
   timing, hard lock), When you're tempted (someone to call, help lines), and Pawl (Pro, how it

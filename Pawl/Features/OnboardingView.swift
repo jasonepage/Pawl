@@ -272,7 +272,8 @@ struct OnboardingView: View {
             art(keyPaired ? "checkmark.seal.fill" : "key.fill")
             heading("Pair your key", keyHeadlineSub)
             if keyPaired {
-                body("Now put the key out of reach. Give it to someone you trust or lock it in a drawer somewhere else. That distance is the whole point.")
+                body("Now put the key out of reach. That distance is the whole point. Whoever holds your key decides when Pawl can open.")
+                keyPlacesCard
             } else if pairLater {
                 body("No problem. Set up Pawl now and pair your key when it arrives.")
                 card {
@@ -285,6 +286,7 @@ struct OnboardingView: View {
                                 "Open the Unlock tab and tap \u{201C}Pair security key\u{201D} once you have it in hand. The key becomes active after your cooling-off wait.")
                     }
                 }
+                keyPlacesCard
             } else {
                 body("A security key is a small device, about the size of a USB stick, that proves it's really you. Banks and Google use the same kind for their strongest protection.")
                 card {
@@ -387,6 +389,32 @@ struct OnboardingView: View {
                 }
             }
             .disabled(working)
+        }
+    }
+
+    // MARK: Where to keep the key
+
+    /// 2.3: the key is the accountability now, so setup gives real places to put it. Each one
+    /// makes getting it back take a person, a trip, or a wait, which is what beats 1am.
+    private var keyPlacesCard: some View {
+        card {
+            VStack(alignment: .leading, spacing: 14) {
+                Text("Where to keep it").font(.headline)
+                infoRow("person.2.fill", "Someone you trust",
+                        "A sister, parent or close friend across town. You have to ask, and they hand it back in person.")
+                infoRow("timer", "A time lock box",
+                        "A box with a timer that won't open until the time runs out. Search \u{201C}time lock box\u{201D} online.")
+                infoRow("building.columns.fill", "A bank safe deposit box",
+                        "It only opens during bank hours, never late at night.")
+                infoRow("briefcase.fill", "Your desk at work",
+                        "Getting it means a trip, and the office is closed at night.")
+                infoRow("envelope.fill", "Mail it to a friend",
+                        "Ask them to mail it back only when you ask. That takes days.")
+                Text("Pick a place far enough that a late-night urge would have to wait until morning.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 

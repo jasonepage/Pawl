@@ -75,7 +75,7 @@ struct ContentView: View {
             HomeView(
                 needsKey: !model.isKeyPaired,
                 screenTimeOff: !model.auth.isApproved,
-                blockedSummary: model.blockedSummaryLine,
+                blockedItems: model.blockedSummaryParts,
                 activeSetName: model.activeScheduledSetName,
                 hoursPerDay: model.hoursPerDay,
                 showGamblingHelp: model.showGamblingHelp,

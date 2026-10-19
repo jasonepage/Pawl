@@ -60,6 +60,7 @@ public final class HomeViewModel {
             attempts: SharedState.blockAttemptStamps(),
             completedUnlocks: unlocks.filter { $0.outcome == .completed || $0.outcome == .expired }
                                      .compactMap { $0.coolingOffEndsAt ?? $0.completedAt },
+            triggers: urges.compactMap { u in u.trigger.map { (date: u.occurredAt, text: $0) } },
             now: Date()
         )
         cleanDays = Streak.cleanDays(

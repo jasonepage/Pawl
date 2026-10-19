@@ -8,12 +8,12 @@
 //
 //  Decides WHEN to ask for a rating. iOS shows the rating sheet at most three times per
 //  year per app and silently drops any extra request, so each ask is spent on a moment the
-//  person earned: a streak milestone or a few resisted urges.
+//  person earned: a streak milestone, a few resisted urges, a full week with Pawl on and no
+//  slip, buying Pro, or setting up the hard lock with someone they trust.
 //  Never on an unlock. Lifting the shield must not feel rewarding.
 //
 //  The views call `shouldAsk` and, on true, SwiftUI's `requestReview` environment action.
-//  Settings also has an always-available "Rate Pawl" row that opens the App Store directly,
-//  because the system sheet cannot be forced.
+//  Never on an unlock, never on a slip, never while the cooling-off is running.
 //
 
 import Foundation
@@ -23,6 +23,9 @@ enum ReviewPrompter {
     enum Moment: String {
         case streakMilestone   // the home streak hero hit 7, 30, 60, 90, 180 or 365 days
         case urgeLogged        // a resisted urge was logged (third or later)
+        case fullWeek          // 2.3: Home's week shows seven days on and no slip (tag: week start)
+        case proPurchased      // 2.3: Pro was just bought (once ever)
+        case hardLockOn        // 2.3: someone they trust set the Screen Time passcode (once ever)
     }
 
     static let appID = "6783119309"

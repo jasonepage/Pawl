@@ -54,4 +54,13 @@ final class ReviewPrompterTests: XCTestCase {
         XCTAssertEqual(ReviewPrompter.writeReviewURL.absoluteString,
                        "https://apps.apple.com/app/id6783119309?action=write-review")
     }
+
+    // 2.3: the new one-shot moments ask once, ever, and still respect the spacing.
+    func test_newMomentsAskOnceEach() {
+        XCTAssertTrue(ReviewPrompter.shouldAsk(.proPurchased, tag: "first", now: day(10), defaults: defaults))
+        XCTAssertFalse(ReviewPrompter.shouldAsk(.hardLockOn, tag: "first", now: day(20), defaults: defaults))
+        XCTAssertTrue(ReviewPrompter.shouldAsk(.hardLockOn, tag: "first", now: day(80), defaults: defaults))
+        XCTAssertFalse(ReviewPrompter.shouldAsk(.proPurchased, tag: "first", now: day(400), defaults: defaults))
+        XCTAssertTrue(ReviewPrompter.shouldAsk(.fullWeek, tag: "2026-10-13", now: day(400), defaults: defaults))
+    }
 }

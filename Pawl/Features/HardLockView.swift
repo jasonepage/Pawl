@@ -14,6 +14,7 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct HardLockView: View {
     var onAttest: () -> Void
@@ -22,6 +23,7 @@ struct HardLockView: View {
     let attestedDate: Date?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.requestReview) private var requestReview
     @State private var step = 0
     @State private var showResetConfirm = false
 
@@ -72,7 +74,18 @@ struct HardLockView: View {
         if step < 3 {
             primary("Continue") { step += 1 }
         } else {
-            primary("Passcode set and verified") { onAttest(); dismiss() }
+            primary("Passcode set and verified") {
+                onAttest()
+                // 2.3: setting this up with someone they trust is a real commitment. Ask once.
+                if ReviewPrompter.shouldAsk(.hardLockOn, tag: "first") {
+                    let ask = requestReview
+                    Task {
+                        try? await Task.sleep(for: ReviewPrompter.askDelay)
+                        ask()
+                    }
+                }
+                dismiss()
+            }
         }
         if step > 0 {
             Button("Back") { step -= 1 }

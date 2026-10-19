@@ -28,6 +28,7 @@ import StoreKit
 struct PaywallView: View {
     let pro: ProStore
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.requestReview) private var requestReview
 
     private let privacyURL = URL(string: "https://getpawl.com/privacy")!
     // Apple's standard EULA satisfies the Terms-of-Use link requirement (docs/12 §9) until a
@@ -46,6 +47,15 @@ struct PaywallView: View {
             // Transaction.updates stream, which can lag) so Pro status reflects right away, then dismiss.
             if case .success(let purchase) = result, case .success = purchase {
                 Task { await pro.refreshEntitlements() }
+                // 2.3: someone who just chose to pay is a good moment to ask, once ever. The
+                // sheet closes first; the ask follows after the usual short pause.
+                if ReviewPrompter.shouldAsk(.proPurchased, tag: "first") {
+                    let ask = requestReview
+                    Task {
+                        try? await Task.sleep(for: ReviewPrompter.askDelay)
+                        ask()
+                    }
+                }
                 dismiss()
             }
         }

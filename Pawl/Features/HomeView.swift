@@ -6,8 +6,10 @@
 //  HomeView.swift
 //  Pawl — Home
 //
-//  Clean-day streak, the urge/panic entry point, and the relapse log
-//  (SRS §3.5, §3.6). Redesigned for calm, high-contrast, large-target accessibility:
+//  Streak, the urge entry point, the week, what's blocked, and the recent log
+//  (SRS §3.5, §3.6). 2.3: the week card moved above What's blocked and got richer, What's
+//  blocked shows chips, Recent is shorter with press-and-hold to remove, and nothing about a
+//  slip is red. Redesigned for calm, high-contrast, large-target accessibility:
 //  Dynamic Type, dark mode, and VoiceOver. Runs today without any capabilities.
 //
 
@@ -19,8 +21,8 @@ struct HomeView: View {
     var needsKey: Bool = false
     /// True when Screen Time authorization is missing (e.g. after a reinstall) — protection is off.
     var screenTimeOff: Bool = false
-    /// One line of what is blocked, for example "Gambling · 3 apps · 2 sites". From AppModel.
-    var blockedSummary: String = ""
+    /// What is blocked, as short pieces shown as chips, for example ["Gambling", "3 apps"].
+    var blockedItems: [String] = []
     /// A scheduled set whose hours are on right now, if any.
     var activeSetName: String? = nil
     /// Setup answer, hours a day that went to the habit. 0 when unknown.
@@ -56,14 +58,15 @@ struct HomeView: View {
                     streakHero
                     urgeButton
                     if needsKey { keyNudge }
-                    blockedCard
                     if let week = vm.week {
-                        if pro?.isPro == true {
-                            WeekCard(report: week, hoursPerDay: hoursPerDay)
-                        } else {
-                            weekProCard
-                        }
+                        WeekCard(report: week,
+                                 hoursPerDay: hoursPerDay,
+                                 isPro: pro?.isPro == true,
+                                 latestNote: weekNote(week),
+                                 onGetPro: { showPaywall = true },
+                                 onPlanSet: onShowBlocked)
                     }
+                    blockedCard
                     if !vm.history.isEmpty { historyCard }
                     relapseButton
                 }
@@ -77,6 +80,15 @@ struct HomeView: View {
             .onChange(of: vm.cleanDays, initial: true) { _, days in
                 guard milestones.contains(days),
                       ReviewPrompter.shouldAsk(.streakMilestone, tag: "\(days)") else { return }
+                askForReview()
+            }
+            // 2.3: a full week with Pawl on every day and no slip is an earned moment too.
+            // Tagged by the week's first day, so each week can count once.
+            .onChange(of: vm.week) { _, week in
+                guard let week, let first = week.days.first?.date,
+                      week.days.allSatisfy({ $0.kind == .protected }),
+                      ReviewPrompter.shouldAsk(.fullWeek, tag: first.formatted(.iso8601.year().month().day()))
+                else { return }
                 askForReview()
             }
             .sheet(isPresented: $showPaywall) {
@@ -110,22 +122,13 @@ struct HomeView: View {
         .tint(PawlColor.brand)
     }
 
-    /// 2.3: without Pro, the weekly report's spot says what it is and opens the paywall.
-    /// Plain and short: nothing here is locked away from protection.
-    private var weekProCard: some View {
-        PawlCard {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("This week").font(.title3)
-                Text("Your weekly report is part of Pawl Pro. It shows the days Pawl was on and what it blocked.")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                Button("See Pawl Pro") { showPaywall = true }
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(PawlColor.brand)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+    /// The newest note written on an urge inside this week's window, for "In your words".
+    private func weekNote(_ week: WeeklyReport) -> String? {
+        guard let start = week.days.first?.date else { return nil }
+        for urge in vm.urges where urge.occurredAt >= start {     // newest first
+            if let n = urge.note?.trimmingCharacters(in: .whitespacesAndNewlines), !n.isEmpty { return n }
         }
+        return nil
     }
 
     /// Shows the system rating sheet after a short pause so it never lands mid-transition.
@@ -331,7 +334,14 @@ struct HomeView: View {
             UrgeView(streakDays: vm.cleanDays, rodeOutCount: vm.urges.count,
                      keptLine: keptSinceStart, pastNotes: pastNotes,
                      showGamblingHelp: showGamblingHelp) { intensity, trigger, note in
-                Task { await vm.logUrge(intensity: intensity, trigger: trigger, note: note) }
+                Task {
+                    await vm.logUrge(intensity: intensity, trigger: trigger, note: note)
+                    // 2.3: same earned moment as the block screen path below (it was missing here).
+                    if vm.urges.count >= ReviewPrompter.minUrgesBeforeAsk,
+                       ReviewPrompter.shouldAsk(.urgeLogged) {
+                        askForReview()
+                    }
+                }
             }
         } label: {
             Label("I'm tempted", systemImage: "lifepreserver")
@@ -344,34 +354,58 @@ struct HomeView: View {
 
     private var blockedCard: some View {
         Button(action: onShowBlocked) {
-        PawlCard {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    Text("What's blocked").font(.headline)
-                    Spacer(minLength: 8)
-                    Image(systemName: screenTimeOff ? "lock.open" : "lock.fill")
-                        .foregroundStyle(screenTimeOff ? PawlColor.dangerText : PawlColor.brand)
-                    Image(systemName: "chevron.right")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(.tertiary)
-                }
-                Text(blockedSummary.isEmpty ? "Nothing yet" : blockedSummary)
-                    .font(.title3.weight(.semibold))
-                    .fixedSize(horizontal: false, vertical: true)
-                if let name = activeSetName {
-                    Label("\(name) is on right now", systemImage: "calendar")
+            PawlCard {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Text("What's blocked").font(.headline)
+                        Spacer(minLength: 8)
+                        Image(systemName: "chevron.right")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                    if blockedItems.isEmpty {
+                        Text("Nothing yet. Tap to choose what to block.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ChipFlow(spacing: 8) {
+                            ForEach(blockedItems, id: \.self) { item in
+                                Text(item)
+                                    .font(.subheadline.weight(.semibold))
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(PawlColor.cleanBg)
+                                    .foregroundStyle(PawlColor.cleanText)
+                                    .clipShape(Capsule())
+                            }
+                        }
+                    }
+                    if let name = activeSetName {
+                        Label("\(name) is on right now", systemImage: "calendar")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                    Label(lockLine, systemImage: lockSymbol)
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(screenTimeOff ? PawlColor.dangerText : Color.secondary)
                 }
-                Text(screenTimeOff ? "Screen Time is off, so nothing is blocked" : "Locked by your key")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
             }
-        }
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
-        .accessibilityHint("Opens Settings, What's blocked.")
+        .accessibilityHint("Opens What's blocked.")
+    }
+
+    /// The one line under the chips: what actually keeps these blocked right now.
+    private var lockLine: String {
+        if screenTimeOff { return "Screen Time is off, so nothing is blocked" }
+        if needsKey { return "Blocked now. Pair a key so you can unlock later." }
+        return "Locked by your key"
+    }
+
+    private var lockSymbol: String {
+        if screenTimeOff { return "lock.open" }
+        return needsKey ? "key" : "lock.fill"
     }
 
     // MARK: Relapse
@@ -383,7 +417,7 @@ struct HomeView: View {
                 .font(.body.weight(.medium))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .foregroundStyle(PawlColor.dangerText)
+                .foregroundStyle(.secondary)
         }
         .accessibilityHint("Opens a private note. Your shield stays on.")
     }
@@ -392,35 +426,51 @@ struct HomeView: View {
 
     @State private var entryToRemove: HomeViewModel.HistoryEntry?
 
+    @State private var showAllHistory = false
+
+    /// 2.3: "Recent". Newest four, with a plain day ("Today", "Yesterday", "Oct 14"), the
+    /// person's note in quotes, and press-and-hold to remove (the log is an honor system).
     private var historyCard: some View {
-        PawlCard {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("History").font(.headline)
-                ForEach(vm.history.prefix(8)) { entry in
-                    HStack(alignment: .top, spacing: 10) {
-                        historyBadge(entry)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(entry.occurredAt, format: .dateTime.month().day().year())
-                                .font(.subheadline)
-                            if let note = entry.note, !note.isEmpty {
-                                Text(note).font(.footnote).foregroundStyle(.secondary)
+        let entries = Array(vm.history.prefix(showAllHistory ? 50 : 4))
+        return PawlCard {
+            VStack(alignment: .leading, spacing: 14) {
+                Text("Recent").font(.headline)
+                ForEach(entries) { entry in
+                    HStack(alignment: .top, spacing: 12) {
+                        historyIcon(entry)
+                        VStack(alignment: .leading, spacing: 3) {
+                            HStack(alignment: .firstTextBaseline) {
+                                Text(historyTitle(entry)).font(.subheadline.weight(.semibold))
+                                Spacer(minLength: 8)
+                                Text(relativeDay(entry.occurredAt))
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                            if let note = entry.note?.trimmingCharacters(in: .whitespacesAndNewlines), !note.isEmpty {
+                                Text("\u{201C}\(note)\u{201D}")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
                         }
-                        Spacer(minLength: 8)
-                        Button {
-                            entryToRemove = entry
-                        } label: {
-                            Image(systemName: "xmark.circle")
-                                .font(.body)
-                                .foregroundStyle(.tertiary)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("Remove this entry")
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                    .contextMenu {
+                        Button("Remove", systemImage: "trash", role: .destructive) { entryToRemove = entry }
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityAction(named: "Remove") { entryToRemove = entry }
                 }
-                Text("This log is yours. Remove an entry if it was a mistake.")
-                    .font(.caption).foregroundStyle(.tertiary)
+                if vm.history.count > 4 {
+                    Button(showAllHistory ? "Show less" : "Show all \(vm.history.count)") {
+                        withAnimation { showAllHistory.toggle() }
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(PawlColor.brand)
+                }
+                Text("This log is yours. Press and hold an entry to remove it.")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
             }
         }
         .confirmationDialog("Remove this entry?", isPresented: Binding(
@@ -450,26 +500,45 @@ struct HomeView: View {
         return "This only removes the note. Nothing else changes."
     }
 
-    /// Green "Rode it out" for an urge, red "Relapse" for a relapse.
+    /// A small round icon: a check on green for a resisted urge, a neutral gray arrow for a
+    /// slip. Never red: a slip is part of recovery, not a failure.
     @ViewBuilder
-    private func historyBadge(_ entry: HomeViewModel.HistoryEntry) -> some View {
+    private func historyIcon(_ entry: HomeViewModel.HistoryEntry) -> some View {
         switch entry {
         case .urge:
-            Label("Resisted", systemImage: "checkmark")
-                .font(.caption.weight(.semibold))
-                .padding(.horizontal, 8).padding(.vertical, 4)
-                .background(PawlColor.cleanBg)
+            Image(systemName: "checkmark")
+                .font(.system(size: 13, weight: .bold))
                 .foregroundStyle(PawlColor.cleanText)
-                .clipShape(Capsule())
+                .frame(width: 30, height: 30)
+                .background(PawlColor.cleanBg, in: Circle())
         case .relapse:
-            Label("Slip", systemImage: "arrow.counterclockwise")
-                .font(.caption.weight(.semibold))
-                .padding(.horizontal, 8).padding(.vertical, 4)
-                .background(PawlColor.dangerText.opacity(0.12))
-                .foregroundStyle(PawlColor.dangerText)
-                .clipShape(Capsule())
+            Image(systemName: "arrow.counterclockwise")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(.secondary)
+                .frame(width: 30, height: 30)
+                .background(Color.secondary.opacity(0.15), in: Circle())
         }
     }
+
+    private func historyTitle(_ entry: HomeViewModel.HistoryEntry) -> String {
+        switch entry {
+        case .urge:    return "Resisted an urge"
+        case .relapse: return "Logged a slip"
+        }
+    }
+
+    /// "Today, 9:41 PM", "Yesterday", "Tuesday" (this week) or "Oct 14".
+    private func relativeDay(_ date: Date) -> String {
+        let cal = Calendar.current
+        if cal.isDateInToday(date) { return "Today, " + date.formatted(date: .omitted, time: .shortened) }
+        if cal.isDateInYesterday(date) { return "Yesterday" }
+        if let days = cal.dateComponents([.day], from: cal.startOfDay(for: date), to: cal.startOfDay(for: Date())).day,
+           days < 7 {
+            return date.formatted(.dateTime.weekday(.wide))
+        }
+        return date.formatted(.dateTime.month(.abbreviated).day())
+    }
+
 }
 
 /// Logging a relapse, one step at a time. The first screen is just a kind line and a
@@ -651,4 +720,41 @@ private struct RelapseSheet: View {
 
 #Preview {
     HomeView()
+}
+
+/// 2.3: lays chips out left to right and wraps to a new line when the row is full.
+private struct ChipFlow: Layout {
+    var spacing: CGFloat = 8
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let maxWidth = proposal.width ?? .infinity
+        var x: CGFloat = 0, y: CGFloat = 0, rowHeight: CGFloat = 0, widest: CGFloat = 0
+        for view in subviews {
+            let size = view.sizeThatFits(.unspecified)
+            if x > 0 && x + size.width > maxWidth {
+                x = 0
+                y += rowHeight + spacing
+                rowHeight = 0
+            }
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
+            widest = max(widest, x - spacing)
+        }
+        return CGSize(width: proposal.width ?? widest, height: y + rowHeight)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var x = bounds.minX, y = bounds.minY, rowHeight: CGFloat = 0
+        for view in subviews {
+            let size = view.sizeThatFits(.unspecified)
+            if x > bounds.minX && x + size.width > bounds.maxX {
+                x = bounds.minX
+                y += rowHeight + spacing
+                rowHeight = 0
+            }
+            view.place(at: CGPoint(x: x, y: y), proposal: ProposedViewSize(size))
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
+        }
+    }
 }

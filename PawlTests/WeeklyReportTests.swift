@@ -68,4 +68,73 @@ final class WeeklyReportTests: XCTestCase {
         XCTAssertEqual(r.relapsesLogged, 0)
         XCTAssertTrue(r.days.allSatisfy { $0.kind == .protected })
     }
+
+    // MARK: - 2.3: day counts, hardest time, common trigger
+
+    func testEachDayCarriesItsOwnUrgeAndAttemptCounts() {
+        let now = date(2026, 10, 12, 15)
+        let r = WeeklyReport.make(commitmentStart: daysAgo(30, from: now), relapses: [],
+                                  urges: [date(2026, 10, 11, 9), date(2026, 10, 11, 20)],
+                                  attempts: [date(2026, 10, 12, 8), date(2026, 10, 12, 9), date(2026, 10, 12, 10)],
+                                  completedUnlocks: [], now: now, calendar: cal)
+        XCTAssertEqual(r.days[5].urges, 2)       // Oct 11
+        XCTAssertEqual(r.days[5].attempts, 0)
+        XCTAssertEqual(r.days[6].attempts, 3)    // today, Oct 12
+        XCTAssertEqual(r.days[6].urges, 0)
+        XCTAssertEqual(r.days.prefix(5).map(\.urges), [0, 0, 0, 0, 0])
+    }
+
+    func testHardestTimeNeedsAClearWinner() {
+        let now = date(2026, 10, 12, 15)
+        // Three late-night moments and one morning one: late night wins.
+        let r = WeeklyReport.make(commitmentStart: daysAgo(30, from: now), relapses: [],
+                                  urges: [date(2026, 10, 10, 23), date(2026, 10, 12, 1), date(2026, 10, 11, 10)],
+                                  attempts: [date(2026, 10, 11, 23)],
+                                  completedUnlocks: [], now: now, calendar: cal)
+        XCTAssertEqual(r.hardestTime, .lateNight)
+
+        // Fewer than three moments: nothing to say.
+        let few = WeeklyReport.make(commitmentStart: daysAgo(30, from: now), relapses: [],
+                                    urges: [date(2026, 10, 10, 23), date(2026, 10, 11, 23)],
+                                    attempts: [], completedUnlocks: [], now: now, calendar: cal)
+        XCTAssertNil(few.hardestTime)
+
+        // A tie: nothing to say.
+        let tie = WeeklyReport.make(commitmentStart: daysAgo(30, from: now), relapses: [],
+                                    urges: [date(2026, 10, 10, 9), date(2026, 10, 11, 9),
+                                            date(2026, 10, 10, 19), date(2026, 10, 11, 19)],
+                                    attempts: [], completedUnlocks: [], now: now, calendar: cal)
+        XCTAssertNil(tie.hardestTime)
+    }
+
+    func testTimeOfDayBuckets() {
+        XCTAssertEqual(WeeklyReport.TimeOfDay(hour: 4), .lateNight)
+        XCTAssertEqual(WeeklyReport.TimeOfDay(hour: 5), .morning)
+        XCTAssertEqual(WeeklyReport.TimeOfDay(hour: 12), .afternoon)
+        XCTAssertEqual(WeeklyReport.TimeOfDay(hour: 17), .evening)
+        XCTAssertEqual(WeeklyReport.TimeOfDay(hour: 22), .lateNight)
+    }
+
+    func testCommonTriggerIsTrimmedLowercasedAndNeedsTwo() {
+        let now = date(2026, 10, 12, 15)
+        let r = WeeklyReport.make(commitmentStart: daysAgo(30, from: now), relapses: [], urges: [],
+                                  attempts: [], completedUnlocks: [],
+                                  triggers: [(date(2026, 10, 10), "Stressed"), (date(2026, 10, 11), " stressed "),
+                                             (date(2026, 10, 12, 9), "bored")],
+                                  now: now, calendar: cal)
+        XCTAssertEqual(r.commonTrigger, "stressed")
+
+        let once = WeeklyReport.make(commitmentStart: daysAgo(30, from: now), relapses: [], urges: [],
+                                     attempts: [], completedUnlocks: [],
+                                     triggers: [(date(2026, 10, 10), "bored"), (date(2026, 10, 11), "lonely")],
+                                     now: now, calendar: cal)
+        XCTAssertNil(once.commonTrigger)
+
+        // A trigger from before this week does not count.
+        let old = WeeklyReport.make(commitmentStart: daysAgo(30, from: now), relapses: [], urges: [],
+                                    attempts: [], completedUnlocks: [],
+                                    triggers: [(date(2026, 9, 1), "bored"), (date(2026, 10, 11), "bored")],
+                                    now: now, calendar: cal)
+        XCTAssertNil(old.commonTrigger)
+    }
 }

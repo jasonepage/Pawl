@@ -445,6 +445,12 @@ final class AppModel {
 
     /// One short line for Home and Settings, for example "Gambling · 3 apps · 2 sites · 1 set".
     var blockedSummaryLine: String {
+        let parts = blockedSummaryParts
+        return parts.isEmpty ? "Nothing yet" : parts.joined(separator: " · ")
+    }
+
+    /// 2.3: the same pieces as a list, so Home can show them as chips.
+    var blockedSummaryParts: [String] {
         var parts: [String] = []
         if gamblingOn { parts.append("Gambling") }
         if adultOn { parts.append("Adult") }
@@ -454,7 +460,7 @@ final class AppModel {
         if sites > 0 { parts.append(sites == 1 ? "1 site" : "\(sites) sites") }
         let sets = scheduledSets.count
         if sets > 0 { parts.append(sets == 1 ? "1 set" : "\(sets) sets") }
-        return parts.isEmpty ? "Nothing yet" : parts.joined(separator: " · ")
+        return parts
     }
 
     /// Name of a scheduled set whose window is open right now, if any.
