@@ -57,6 +57,13 @@ public final class PendingChangeStore<Payload: Codable & Equatable> {
     private var dataKey: String { name + ".data" }
     private var endKey: String { name + ".endsAt" }
 
+    /// Same Swift 6.3.3 Release-only (Archive) compiler crash as PendingChangeController's deinit
+    /// below: "EarlyPerfInliner" crashes on this generic class's deinit too. Turning optimization
+    /// off for the deinit alone skips that pass. It only releases memory, so behavior is unchanged.
+    /// Remove once a later Xcode archives cleanly without it.
+    @_optimize(none)
+    deinit {}
+
     public init(name: String, defaults: UserDefaults = .standard, legacy: Legacy? = nil) {
         self.name = name
         self.defaults = defaults
