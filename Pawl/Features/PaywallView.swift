@@ -88,6 +88,7 @@ struct PaywallView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title).font(.subheadline.weight(.semibold))
                 Text(detail).font(.footnote).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)   // wrap, never cut off with "..."
             }
             Spacer(minLength: 0)
         }

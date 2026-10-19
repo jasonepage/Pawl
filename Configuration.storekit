@@ -56,7 +56,7 @@
           },
           "localizations" : [
             {
-              "description" : "The part you can't do alone: link a sponsor who approves your unlocks and is alerted the moment your protection drops.",
+              "description" : "Scheduled sets and your weekly report",
               "displayName" : "Pawl Pro (Yearly)",
               "locale" : "en_US"
             }
@@ -84,7 +84,7 @@
           "introductoryOffer" : null,
           "localizations" : [
             {
-              "description" : "The part you can't do alone: link a sponsor who approves your unlocks and is alerted the moment your protection drops.",
+              "description" : "Scheduled sets and your weekly report",
               "displayName" : "Pawl Pro (Monthly)",
               "locale" : "en_US"
             }
