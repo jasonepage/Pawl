@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Privacy Policy. Pawl</title>
-<meta name="description" content="How Pawl handles your data: most of it never leaves your device, Pawl never sees which apps or sites you block, and there is no tracking or advertising. You can delete your account inside the app.">
+<meta name="description" content="How Pawl handles your data: since 2.3 it collects none. No account, no server, no tracking or advertising. Your data stays on your iPhone and in your own iCloud.">
 <link rel="canonical" href="https://getpawl.com/privacy">
 <meta name="theme-color" content="#3c6a14">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Pawl">
 <meta property="og:url" content="https://getpawl.com/privacy">
 <meta property="og:title" content="Privacy Policy. Pawl">
-<meta property="og:description" content="How Pawl handles your data: most of it never leaves your device, Pawl never sees which apps or sites you block, and there is no tracking or advertising. You can delete your account inside the app.">
+<meta property="og:description" content="How Pawl handles your data: since 2.3 it collects none. No account, no server, no tracking or advertising. Your data stays on your iPhone and in your own iCloud.">
 <meta property="og:image" content="https://getpawl.com/img/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -70,19 +70,17 @@
 <main>
 
   <h1>Privacy Policy</h1>
-  <p class="updated">Last updated: June 28, 2026</p>
+  <p class="updated">Last updated: October 19, 2026</p>
 
   <p>Pawl is a self-control tool that helps you stop something you're struggling with, such as gambling, adult
   content, or any distracting app, by blocking it with Apple's Screen Time and making it deliberately
-  hard to unblock. This policy explains what Pawl does and doesn't collect, how the small amount of data
-  we do handle is used, and how you can delete it.</p>
+  hard to unblock. This policy explains what Pawl does and doesn't collect.</p>
 
   <div class="callout">
-    <p style="margin:0"><strong>The short version.</strong> Pawl works without an account, and most of
-    your data never leaves your iPhone. We never see which specific apps or websites you block. We don't
-    use advertising, we don't track you across other apps, and we never sell your data. If you create an
-    account, you can delete it and everything tied to it from right inside the app: Settings → Account →
-    Delete account.</p>
+    <p style="margin:0"><strong>The short version.</strong> Since version 2.3, Pawl collects no data. There is
+    no account, no sign-in and no Pawl server. Your data stays on your iPhone and in your own private
+    iCloud. We never see which apps or websites you block. We don't use advertising, we don't track you,
+    and we never sell data. If you signed in on an older version, see <a href="#older">Section 6</a>.</p>
   </div>
 
   <h2>1. Who this applies to</h2>
@@ -96,96 +94,59 @@
   choices are not transmitted to us.</p>
 
   <h2>3. Data that stays on your device</h2>
-  <p>When you use Pawl without signing in, the following stays on your iPhone (and, where you've enabled
-  it, your own private iCloud) and is <strong>not</strong> sent to us:</p>
+  <p>The following stays on your iPhone and in your own private iCloud, and is <strong>not</strong> sent
+  to us:</p>
   <ul>
-    <li>Your clean-day streak and history.</li>
-    <li>Your relapse log and urge/“tough moment” entries.</li>
-    <li>Your blocking selections (as opaque Screen Time tokens), friction settings, and the optional
-        “someone you trust” phone number.</li>
+    <li>Your streak and history.</li>
+    <li>Your slip log and urge entries.</li>
+    <li>Your blocking selections (as opaque Screen Time tokens), websites you type in, scheduled sets,
+    friction settings, the hard lock record, and the optional “someone to call” phone number.</li>
+    <li>The record of your paired security key. The key itself never leaves your hands.</li>
   </ul>
-  <p>You can remove this by deleting the app (see <a href="#ondevice">Section 9</a>).</p>
+  <p>iCloud storage is Apple's and is tied to your Apple Account. We cannot read it.</p>
 
-  <h2>4. Data we collect only if you create an account</h2>
-  <p>Signing in is <strong>optional</strong> and only needed for the sponsor / accountability feature.
-  Account sign-in uses <strong>Sign in with Apple</strong>. If you sign in, we store the following in our
-  backend (hosted on Supabase) to provide the feature:</p>
-  <table>
-    <tr><th>Data</th><th>Why</th></tr>
-    <tr><td>Apple user identifier</td><td>Identifies your account so your data and sponsor link persist across launches.</td></tr>
-    <tr><td>Email address (from Apple; may be Apple's private relay)</td><td>Account identity and contact. You can use Apple's “Hide My Email.”</td></tr>
-    <tr><td>Display name (optional, you type it)</td><td>So your sponsor sees it's you rather than “Someone you sponsor.”</td></tr>
-    <tr><td>Sponsor link + unlock requests</td><td>Lets a trusted person approve your unlock requests.</td></tr>
-    <tr><td>Heartbeat + device push token, device identifier</td><td>Detects if your protection is removed and alerts your sponsor; delivers notifications.</td></tr>
-    <tr><td>Commitment status &amp; friction settings</td><td>Keeps your setup in sync; lets the sponsor feature work.</td></tr>
-  </table>
+  <h2>4. Purchases</h2>
+  <p>Pawl Pro is sold through the App Store. Apple handles payment. The app only learns whether your Pro
+  subscription is active, so it can turn on the Pro features. We don't receive your payment details.</p>
 
+  <h2>5. Who we share data with</h2>
+  <p>No one. Pawl has no server of its own, so there is nothing for us to share. Apple runs Screen Time,
+  iCloud and the App Store under its own privacy policy. No advertisers and no data brokers.</p>
+
+  <h2 id="older">6. If you signed in on version 2.2 or earlier</h2>
+  <p>Versions up to 2.2 had an optional ally (sponsor) feature that used Sign in with Apple and a backend
+  hosted on <strong>Supabase</strong>. If you signed in, that backend stored your Apple user identifier,
+  email address (possibly Apple's private relay address), optional display name, ally link, unlock
+  requests, commitment status and settings, a device identifier and push token, check-ins, and
+  protection alerts. Your slip and urge entries were never sent there.</p>
+  <p>Version 2.3 removed that feature. The app no longer signs in or sends anything to that backend, and
+  on its first launch it clears the old sign-in from your phone. While older versions are still in use,
+  the data above is kept only so those versions keep working. It is protected by row-level security and
+  encrypted in transit, and it is never used for anything else.</p>
   <div class="callout">
-    <p style="margin:0"><strong>Sensitive by nature.</strong> The fact that you use Pawl can imply you're
-    working on a gambling, adult-content, or focus problem. We treat your information as sensitive. Your
-    <strong>relapse and urge entries are private to you</strong> and are never shared with your sponsor.
-    A sponsor only ever sees your display name, your unlock requests, and alerts that your protection was
-    removed.</p>
+    <p style="margin:0"><strong>To delete old account data:</strong> if you still have version 2.2 or
+    earlier, open Pawl → <strong>Settings</strong> → <strong>Account</strong> →
+    <strong>Delete account</strong>. If you have updated, or can't open the app, email
+    <a href="mailto:privacy@getpawl.com">privacy@getpawl.com</a> from the email tied to that account and
+    we'll delete it and revoke Sign in with Apple.</p>
   </div>
 
-  <h2>5. How we use data</h2>
-  <ul>
-    <li>To provide the optional sponsor/accountability feature and send the related notifications.</li>
-    <li>To keep your account and setup working across devices and reinstalls.</li>
-    <li>To keep the service secure and operational.</li>
-  </ul>
-  <p>We do <strong>not</strong> use your data for advertising, we do <strong>not</strong> track you across
-  other companies' apps or websites, and we do <strong>not</strong> sell or rent your personal data.</p>
+  <h2 id="delete">7. Removing your data</h2>
+  <p>Because your data lives on your phone and in your iCloud, you control it. To remove what Pawl keeps on
+  your iPhone: open <strong>Settings → Screen Time</strong>, turn off Screen Time (or remove Pawl under
+  “Apps with Screen Time Access”), then delete Pawl from your Home Screen. To remove the copy in iCloud,
+  manage Pawl's data in your iPhone's iCloud settings.</p>
 
-  <h2>6. Who we share data with</h2>
-  <ul>
-    <li><strong>Your chosen sponsor:</strong> only your display name, unlock requests, and protection
-        alerts, and only while the link is active. Never your relapse/urge log.</li>
-    <li><strong>Service providers</strong> that run the backend on our behalf: <strong>Supabase</strong>
-        (database and authentication) and <strong>Apple</strong> (Sign in with Apple and push
-        notifications). They process data only to provide their service to us.</li>
-    <li><strong>No advertisers or data brokers.</strong></li>
-  </ul>
-
-  <h2>7. Where data is stored and how it's protected</h2>
-  <p>Account data is stored in our Supabase Postgres database, protected by row-level security so each
-  person can reach only their own rows (and a sponsor only the limited fields above). Data is encrypted in
-  transit. Push tokens and the Apple sign-in token are accessible only to our secure server functions.</p>
-
-  <h2>8. Retention</h2>
-  <p>We keep account data for as long as your account exists. When you delete your account, the associated
-  data is deleted (see below). On-device data is kept until you remove it.</p>
-
-  <h2 id="delete">9. Your choices and rights, including deleting your account</h2>
-  <p>You can request access to, correction of, or deletion of your personal data. You also have a built-in,
-  one-tap way to delete everything:</p>
-
-  <div class="callout">
-    <p style="margin:0 0 8px"><strong>Delete your account from inside the app:</strong></p>
-    <p style="margin:0">Open Pawl → <strong>Settings</strong> tab → <strong>Account</strong> →
-    <strong>Delete account</strong> → confirm. This permanently and immediately deletes your Pawl account
-    and all data tied to it (profile, sponsor link, unlock history, devices, heartbeats, and alerts) and
-    revokes Sign in with Apple. It cannot be undone. (Your on-device protection and streak remain on your
-    iPhone; remove those by deleting the app; see below.)</p>
-  </div>
-
-  <p>If you can no longer access the app and want your account deleted, email us at the address below from
-  the email associated with your account and we'll delete it.</p>
-
-  <h3 id="ondevice">Removing on-device data</h3>
-  <p>To remove the data Pawl keeps on your iPhone: open <strong>Settings → Screen Time</strong>, turn off
-  Screen Time (or remove Pawl under “Apps with Screen Time Access”), then delete Pawl from your Home Screen.</p>
-
-  <h2>10. Children</h2>
+  <h2>8. Children</h2>
   <p>Pawl is not directed to children and is rated 17+. We do not knowingly collect data from children under
   13. If you believe a child has provided us data, contact us and we'll delete it.</p>
 
-  <h2>11. Changes to this policy</h2>
+  <h2>9. Changes to this policy</h2>
   <p>If we make material changes we'll update the date at the top and, where appropriate, notify you in the
   app. Continued use after an update means you accept the revised policy.</p>
 
-  <h2>12. Contact</h2>
-  <p>Questions, requests, or account-deletion help: <a href="mailto:privacy@getpawl.com">privacy@getpawl.com</a>.</p>
+  <h2>10. Contact</h2>
+  <p>Questions or deletion requests: <a href="mailto:privacy@getpawl.com">privacy@getpawl.com</a>.</p>
 </main>
 
 <footer>

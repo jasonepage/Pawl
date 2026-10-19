@@ -2,7 +2,7 @@
 
 Goal: deleting + reinstalling the app must NOT reset the streak or remove protection
 (SRS FR-PERSIST-001/002/003). We use **iCloud Key-Value storage** — the right-sized
-tool for Phase 1's small data. (CloudKit/Supabase come in Phase 2.)
+tool for Phase 1's small data. (2.3: iCloud is the only sync. The Supabase layer added in Phase 2 was removed.)
 
 ## How it works
 - The commitment, streak, relapse log, and urge log are saved to iCloud KVS

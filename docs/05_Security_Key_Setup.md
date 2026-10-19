@@ -41,7 +41,7 @@ You need three things to line up. They must all use the **same domain** (the doc
 ## Testing the flow (once the domain is live)
 1. Plug your USB-C YubiKey into the iPhone (or use an NFC/Lightning one — the OS handles transport).
 2. **Setup tab → Unlock → Pair security key.** iOS shows its system key sheet; complete it. The credential ID is stored as your "paired key."
-3. **Lock the key away** (the whole point — give it to a sponsor / timebox).
+3. **Lock the key away** (the whole point — give it to someone you trust / timebox).
 4. **Insert / tap your security key to unlock** → starts the 15-minute cooling-off → shield lifts → auto-relock. Use **"Dev: skip the wait"** to test fast.
 
 ## Honest note on the model (HC-7)

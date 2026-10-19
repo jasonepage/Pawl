@@ -98,6 +98,6 @@ The project currently targets iOS 26.5; our spec floor is **18.0** for a broader
 | Next (Phase 1 cont.) | **App Group** capability (`group.io.github.jasonepage.Pawl`) + two **extension targets** (DeviceActivityMonitor, ShieldConfiguration) | I'll give a checklist like this one. Needed for the cooling-off timer + custom block screen. |
 | Phase 1 cont. | **CloudKit** capability (iCloud) | For reinstall-proofing. No server, no cost beyond the dev account. |
 | Phase 1 cont. | **Near Field Communication Tag Reading** capability + buy a few **NTAG215** tags (~$0.30 each) | For the NFC key. |
-| **Phase 2 (months away)** | **Supabase** account + APNs | ⚠️ This is the only "BaaS" step, and it's far off. **I'll tell you clearly when we get here.** You won't need Render. |
+| ~~Phase 2~~ | ~~Supabase account + APNs~~ | Removed in 2.3. Pawl has no backend, so there is nothing to set up here. |
 
 **Bottom line for now:** do steps 0–4. The one with a real lead time is **2b** (the Apple entitlement request) — kick that off and let me know.

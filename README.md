@@ -58,18 +58,19 @@ which, and never learns the names of the apps you pick.
 | Audit | **None.** Nobody independent has reviewed the code. |
 | Team | One developer. No company, no funding, no investors. |
 | Platform | iPhone and iPad, iOS 18 and later. No Android, no Mac. |
-| Backend | Supabase, used only for the optional sponsor features. The solo blocker works with no account. |
+| Backend | **None.** No server, no account, no sign-in. Everything stays on your phone and in your own iCloud. (Up to 2.2, an optional ally feature used a Supabase server. 2.3 removed it.) |
 | Tracking | No analytics, no ads, no crash reporter. |
-| Price | The blocker, the key, the urge tools and the sponsor (approver) side are free. Pawl Pro, a subscription, adds linking your own sponsor and tamper alerts. The Pro code is in this repo too. |
+| Price | Blocking, the key, the wait, your streak and the urge tools are free. Pawl Pro, a subscription, adds making new scheduled sets and the weekly report. Sets you made before Pro existed keep working free. The Pro code is in this repo too. |
 
 ## What it does not promise
 
 Read this before you trust it with anything.
 
 - **iOS lets the owner of a phone turn Screen Time off.** No app can stop
-  that. Pawl can only notice it the next time it runs and, if you have a
-  sponsor, push them an alert. For a real lock, a sponsor sets the Screen Time passcode in person
-  and keeps it (the "hard lock" flow). iOS enforces that passcode, not Pawl.
+  that. Pawl can only notice it the next time it runs, and it tells no one:
+  there is no server to send an alert. For a real lock, someone you trust sets
+  the Screen Time passcode in person and keeps it (the "hard lock" flow). iOS
+  enforces that passcode, not Pawl.
 - **The key check.** Since 2.1 (the version on the App Store today) Pawl
   checks the key's whole response on the phone: the challenge it just
   issued, the hash of `getpawl.com`, the "user present" flag, a signature
@@ -85,22 +86,17 @@ Read this before you trust it with anything.
   (`ShieldService.setClockLock`), so moving the clock forward should not
   shorten the cooling off wait. Whether iOS enforces that for an app using
   individual Screen Time permission has not been confirmed on a device yet.
-- **Debug builds have developer buttons.** "Skip the wait", "simulate
-  sponsor approve" and "allow deletion" exist for testing. They sit inside
+- **Debug builds have developer buttons.** "Skip the wait" and "allow
+  deletion" exist for testing. They sit inside
   `#if DEBUG`, which is only switched on in the Debug build setting, so they
   are not in the App Store build. If you build Pawl yourself in Debug, you
   get them. That is on purpose: it is your own phone.
-- **No blocklist is complete.** The optional gambling list ships about 4,000
-  domains and the adult filter is Apple's. New sites appear every week. Sites
+- **No blocklist is complete.** The optional gambling list ships 167 domains,
+  built into the app, and the adult filter is Apple's. New sites appear every week. Sites
   you type in yourself are blocked exactly as typed.
 - **A determined person can get around any blocker on a phone they own**
   (another phone, a laptop, a friend's device). Pawl makes the 1am version
   slow. It does not make it impossible.
-- **Sponsor alerts trust the phone.** The "Pawl went quiet" alert depends on
-  heartbeats the phone sends. Someone who pulls their own sign-in token out of
-  the app could keep sending heartbeats from a script after deleting Pawl.
-  Since 2.1 the server refuses every other direct edit that could hide an
-  alert (see `supabase/migrations/12_owner_write_lockdown.sql`).
 - **Most of the code has no automated tests.** The unlock loop and the key
   check do. The rest was tested by hand on real phones.
 - **No reproducible builds.** You cannot prove the App Store binary was built
@@ -125,10 +121,9 @@ Read this before you trust it with anything.
    off period. You can make the wait longer at any time. Making it shorter is
    itself delayed. After the grace window (30 minutes by default) the shield
    comes back on by itself.
-5. **Optional sponsor.** A person you trust links to you with an invite code.
-   Then every unlock also needs their approval. They get a push alert if
-   Screen Time is turned off, or if your Pawl has not checked in for 24 hours
-   (which usually means it was deleted).
+5. **The key is the accountability.** Give it to someone you trust, like your
+   sister across town. Whoever holds the key decides when Pawl can loosen.
+   They don't install anything and nobody makes an account.
 6. **Your clean day streak survives deleting the app.** It lives in your
    iCloud, not on the phone.
 
@@ -142,17 +137,13 @@ nothing in the app scolds you for using it.
 | Which apps and sites you block | Your phone and your iCloud (as Apple's opaque tokens) | You |
 | Streak, relapse log, urge log | Your phone and your iCloud | You |
 | Your registered key's credential ID | Your phone (the app's shared storage) | You |
-| Account, display name, commitment settings | Supabase, only if you sign in | You and your linked sponsor |
-| Unlock requests and approvals | Supabase | You and your sponsor |
-| Heartbeats and tamper alerts | Supabase | You and your sponsor |
+| Whether you have Pawl Pro | Apple (the App Store handles the purchase) | You. Pawl only learns whether Pro is active |
 
-Every Supabase table has row level security turned on. That means the database
-itself refuses to hand one person's rows to another. The rules are in
-`supabase/schema.sql` and `supabase/migrations/`.
-
-The Supabase URL and "anon" key in `Pawl/SupabaseConfig.swift` are meant to be
-public. They are inside every copy of the app anyway. The row level security
-rules are what protect the data, not that key.
+Pawl has no server. Nothing in this table leaves your phone except to your own
+iCloud. Up to 2.2, an optional ally feature kept accounts, unlock requests and
+check-ins on a Supabase server. 2.3 removed that feature, along with sign-in
+and push notifications. On first launch after updating, the app clears what it
+left on the phone (`Pawl/Services/LegacySponsorCleanup.swift`).
 
 ## Check it yourself
 
@@ -161,14 +152,12 @@ The best thing a stranger can do today is read. Start here:
 | File | What |
 |---|---|
 | `Pawl/Domain/UnlockMachine.swift` | The whole unlock loop, as a pure function with no iOS code |
-| `PawlTests/UnlockMachineTests.swift` | 19 tests for that loop |
+| `PawlTests/UnlockMachineTests.swift` | 9 tests for that loop |
 | `Pawl/Domain/WebAuthnVerifier.swift` | The key check (2.1), and what it still cannot prove |
 | `PawlTests/WebAuthnVerifierTests.swift` | 28 tests for the key check, with synthetic key data |
 | `Pawl/Services/SecurityKeyService.swift` | Talking to the key through Apple's AuthenticationServices |
 | `Pawl/Services/ShieldService.swift` | Applying and lifting the shield, the app deletion block |
 | `Pawl/Services/DurationSettings.swift` | Why making the wait shorter is itself delayed |
-| `supabase/schema.sql` | Tables, row level security, server functions |
-| `supabase/functions/` | The five server functions, each checks who is calling |
 
 Security fixes are explained in a comment at the spot where they happened.
 Search the code for `SECURITY FIX` to find them.
@@ -178,15 +167,14 @@ Search the code for `SECURITY FIX` to find them.
 | Path | What |
 |---|---|
 | `Pawl/Domain/` | Pure logic: the unlock loop, streaks, models |
-| `Pawl/Services/` | iOS and backend code: shield, key, iCloud, Supabase, StoreKit |
+| `Pawl/Services/` | iOS code: shield, key, iCloud, StoreKit |
 | `Pawl/Features/` | SwiftUI screens |
 | `PawlShield/` | The block screen you see when you open a blocked app |
 | `PawlShieldAction/` | The buttons on that block screen |
 | `PawlMonitor/` | The Screen Time extension that puts the shield back on schedule |
 | `PawlTests/` | Unit tests |
-| `supabase/` | Database schema, migrations, server functions |
 | `site/` | getpawl.com, static HTML |
-| `docs/` | Requirements, design and setup documents |
+| `docs/` | Requirements, design and setup documents (`docs/archive/` holds the retired server and ally docs) |
 
 Some code comments point to planning documents (for example `docs/12` or
 `docs/16`) that are not in this repo. Those were business planning notes. The
@@ -205,9 +193,8 @@ the simulator), and a paid Apple Developer account. Apple must also approve
 the Family Controls entitlement for your team before the blocker will run
 outside development. The security key needs a domain you own with an
 `apple-app-site-association` file; change `PawlConfig.relyingPartyID` to it.
-Setup steps are in `docs/04_Xcode_Setup_Checklist.md`,
-`docs/05_Security_Key_Setup.md` and, for the backend,
-`docs/09_Supabase_APNs_Setup.md` and `docs/10_EdgeFunctions_Push.md`.
+Setup steps are in `docs/04_Xcode_Setup_Checklist.md` and
+`docs/05_Security_Key_Setup.md`.
 
 Run the tests in Xcode with Product, then Test.
 
@@ -227,6 +214,3 @@ A security finding goes to [SECURITY.md](SECURITY.md), not a public issue.
 this. Changes to Pawl's own files have to be published under the same license.
 MPL rather than GPL on purpose: GPL family licenses conflict with the App
 Store's terms, and a blocker that cannot ship on the App Store helps nobody.
-
-**One exception:** most of the gambling blocklist comes from HaGeZi's lists and
-stays under GPL-3.0. See [BLOCKLIST_LICENSE.md](BLOCKLIST_LICENSE.md).

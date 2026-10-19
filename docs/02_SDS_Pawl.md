@@ -6,6 +6,12 @@
 **Scope:** Phase 1 in full; Phases 2–3 stubbed. Traces to `01_SRS_Pawl.md`.
 **Platform:** Swift / SwiftUI, iOS 18.0+ (**HC-2**, Decision D2).
 
+> **2.3 update (October 2026).** Phase 2 (Supabase accounts, sponsor linking, ally approval of
+> unlocks, push, heartbeats and tamper alerts) was built and then removed in 2.3. Requirements and
+> design marked Phase 2, and the sponsor and server parts of Phase 3, describe that removed system
+> and are kept for history only. The hard lock (a Screen Time passcode set by someone the person
+> trusts) remains, recorded on the phone and in iCloud only. Pawl has no backend.
+
 > Mermaid diagrams are embedded as fenced ```mermaid blocks; they render on GitHub and in most Markdown viewers. Constraint citations (**HC-1 … HC-7**) and SRS requirement IDs are referenced inline.
 
 ---
@@ -148,6 +154,8 @@ Private database, custom zone `CommitmentZone` (enables atomic-ish batch fetch o
 - **No public database, no sharing** in P1 (sponsor sharing arrives in P2).
 
 ### 3.3 Supabase schema (Phase 2)
+
+> **Removed in 2.3.** This schema and the server behind it are gone. Kept for history only.
 
 > Promoted from stub on 2026-06-22. **Supabase is the canonical source of truth** for account/commitment/accountability data (Decision D-P2-1); the App Group stays runtime-authoritative for the live shield and iCloud KVS is retained as the offline/reinstall cache (see §4.8). Runnable DDL + RLS + RPCs: **`supabase/schema.sql`**. Traces SRS §6.1.
 

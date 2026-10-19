@@ -6,6 +6,12 @@
 **Product name:** Pawl (selected — see Name Sprint, `03_Name_Sprint_Shortlist.md`). Formal USPTO Class 9/42 clearance still pending.
 **Scope of this revision:** Phase 1 in full detail; Phases 2–3 as lower-fidelity stubs.
 
+> **2.3 update (October 2026).** Phase 2 (Supabase accounts, sponsor linking, ally approval of
+> unlocks, push, heartbeats and tamper alerts) was built and then removed in 2.3. Requirements and
+> design marked Phase 2, and the sponsor and server parts of Phase 3, describe that removed system
+> and are kept for history only. The hard lock (a Screen Time passcode set by someone the person
+> trusts) remains, recorded on the phone and in iCloud only. Pawl has no backend.
+
 > **Reading convention.** Functional requirements are uniquely numbered and written as testable "shall" statements. Where a requirement meets a Hard Technical Constraint, the constraint (**HC-1 … HC-7**, defined in §2.5) is cited inline rather than designed around. Requirements are tagged with a phase: **[P1] / [P2] / [P3]**.
 
 ---
@@ -235,6 +241,8 @@ This is the core loop and the feature that wins the 1am fight. The state machine
 > Lower fidelity by design. To be expanded when the phase is scheduled and Decision D4 (pricing) is settled.
 
 ### 6.1 Phase 2 — Accountability (Supabase + APNs)
+
+> **Removed in 2.3.** Everything in §6.1 was built and then taken out. Kept for history only.
 
 > **Status:** promoted from stub to full requirements on 2026-06-22 after the open decisions were confirmed with the owner. IDs are stable; the original umbrella IDs (`FR-P2-ACCT/SPON/HEART/AUTH/NOTIF-001`) are retained and expanded with granular siblings. Design in SDS §3.3, §4.6–4.8; roadmap in `08_Phase2_Plan.md`; owner setup in `09_Supabase_APNs_Setup.md`.
 

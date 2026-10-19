@@ -53,9 +53,9 @@ should return:
 Plug in the USB-C YubiKey → **Setup → Unlock → Pair security key** → iOS shows its key sheet.
 Success = domain + AASA + capability are all correct.
 
-## If you'd rather pay to consolidate on Render (Phase-2 continuity)
-Legitimate choice since Phase 2's backend (Supabase/APNs work) can live near it. A Render
-**Web Service** (~$7/mo) can serve this folder and host the backend later. Set a header rule
+## If you'd rather host on Render
+A Render **Web Service** (~$7/mo) can serve this folder. (This used to mention hosting the Phase 2
+backend nearby. That backend was removed in 2.3.) Set a header rule
 for `/.well-known/apple-app-site-association` → `Content-Type: application/json`. For a
 static-only file, though, Cloudflare Pages is the cleaner, faster option.
 
