@@ -126,6 +126,14 @@ public final class PendingChangeController<Payload: Codable & Equatable> {
         self.now = now
     }
 
+    /// Works around a Swift 6.3.3 compiler crash in Release builds only (Archive). The optimizer's
+    /// inliner crashes inside this generic class's deinit ("EarlyPerfInliner" on
+    /// PendingChangeController deinit). Turning optimization off for the deinit alone skips that
+    /// pass. The deinit only releases memory, so nothing about how the app behaves changes.
+    /// Remove once a later Xcode archives cleanly without it.
+    @_optimize(none)
+    deinit {}
+
     /// Save a change and start waiting. The caller has already passed the gate.
     public func begin(_ payload: Payload, endsAt: Date) {
         let change = PendingChange(payload: payload, endsAt: endsAt)
