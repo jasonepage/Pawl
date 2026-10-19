@@ -98,7 +98,8 @@ struct ContentView: View {
             .tabItem { Label("Unlock", systemImage: "key.fill") }
             .tag(AppTab.unlock)
 
-            SettingsView(model: model, openBlockedItems: $openBlockedItems)
+            SettingsView(model: model, openBlockedItems: $openBlockedItems,
+                         onOpenUnlock: { tab = .unlock })
                 .tabItem { Label("Settings", systemImage: "gearshape") }
                 .tag(AppTab.settings)
         }

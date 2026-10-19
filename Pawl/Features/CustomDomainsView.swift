@@ -24,7 +24,7 @@ struct CustomDomainsView: View {
             if let pending = model.pendingDomainRemoval { pendingSection(pending) }
             listSection
         }
-        .navigationTitle("Specific websites")
+        .navigationTitle("Your websites")
         .navigationBarTitleDisplayMode(.inline)
     }
 

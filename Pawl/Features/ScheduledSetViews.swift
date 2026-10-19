@@ -14,7 +14,7 @@
 import SwiftUI
 import FamilyControls
 
-// MARK: - List section (used by BlockedItemsView)
+// MARK: - List section (used by ScheduledSetsView and BlockedItemsView)
 
 struct ScheduledSetsSection: View {
     let model: AppModel
@@ -66,7 +66,7 @@ struct ScheduledSetsSection: View {
         } header: {
             Text("Scheduled sets")
         } footer: {
-            Text("A set blocks its apps only during its hours, like a Work set from 9 to 5. When the hours end, those apps open on their own. Adding a set or adding hours applies right away. Fewer apps, fewer hours, turning a set off, or deleting it needs your key + a cooling-off.")
+            Text("A set blocks its apps only during its hours, like a Work set from 9 to 5, then they open on their own. Blocking more works right away. Blocking less (fewer apps, fewer hours, turning a set off, deleting it) needs your key and the wait.")
         }
     }
 }

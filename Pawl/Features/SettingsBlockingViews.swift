@@ -4,116 +4,198 @@
 
 //
 //  SettingsBlockingViews.swift
-//  Pawl, Settings sub-screens (2.2)
+//  Pawl, Settings sub-screens (2.2, reworked in 2.3)
 //
-//  What's blocked, the friction timers, the trusted contact, and the long "how it works"
-//  copy. Each used to be a section on the Settings index; the index got too tall to read.
-//  Behavior is unchanged and still goes through AppModel.
+//  2.3: What's blocked is three small sections (always-on apps, websites, scheduled sets).
+//  Each has its own page off the Settings index (Apps, Websites, Scheduled sets), and Home's
+//  "What's blocked" card still opens all three together (BlockedItemsView). Then the unlock
+//  timing, the trusted contact, and the "how it works" copy. Behavior is unchanged and still
+//  goes through AppModel: adding is instant, removing needs the key + the wait.
 //
 
 import SwiftUI
 import FamilyControls
 
-// MARK: - What's blocked
+// MARK: - Pages
 
+/// Everything blocked on one page. Opened from Home's "What's blocked" card.
 struct BlockedItemsView: View {
+    let model: AppModel
+
+    var body: some View {
+        List {
+            AppsBlockSection(model: model)
+            WebsitesBlockSection(model: model)
+            ScheduledSetsSection(model: model)
+            BlockChangeMessageSection(model: model)
+        }
+        .navigationTitle("What's blocked")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct BlockedAppsView: View {
+    let model: AppModel
+
+    var body: some View {
+        List {
+            AppsBlockSection(model: model)
+            BlockChangeMessageSection(model: model)
+        }
+        .navigationTitle("Apps")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct BlockedWebsitesView: View {
+    let model: AppModel
+
+    var body: some View {
+        List {
+            WebsitesBlockSection(model: model)
+            BlockChangeMessageSection(model: model)
+        }
+        .navigationTitle("Websites")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct ScheduledSetsView: View {
+    let model: AppModel
+
+    var body: some View {
+        List {
+            ScheduledSetsSection(model: model)
+            BlockChangeMessageSection(model: model)
+        }
+        .navigationTitle("Scheduled sets")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+/// The last thing a block change said ("Removal starts in 15 min..."), shown under the list.
+struct BlockChangeMessageSection: View {
+    let model: AppModel
+
+    var body: some View {
+        if let m = model.blockChangeMessage {
+            Section {
+                Text(m).font(.callout).foregroundStyle(PawlColor.brand)
+            }
+        }
+    }
+}
+
+// MARK: - Sections
+
+/// Always-on apps and categories, picked with Apple's Screen Time picker.
+struct AppsBlockSection: View {
     let model: AppModel
 
     @State private var editSelection = FamilyActivitySelection()
     @State private var showBlockPicker = false
 
     var body: some View {
-        List {
-            appsSection
-            ScheduledSetsSection(model: model)
-            websitesSection
-            if let m = model.blockChangeMessage {
-                Section {
-                    Text(m).font(.callout).foregroundStyle(PawlColor.brand)
-                }
-            }
-        }
-        .navigationTitle("What's blocked")
-        .navigationBarTitleDisplayMode(.inline)
-        .familyActivityPicker(isPresented: $showBlockPicker, selection: $editSelection)
-        .onChange(of: showBlockPicker) { wasShowing, showing in
-            if wasShowing && !showing {           // picker dismissed: apply the edit
-                Task { await model.requestSelectionChange(editSelection) }
-            }
-        }
-    }
-
-    private var appsSection: some View {
         Section {
-            let summary = model.blockedSummary
-            SettingsRows.value("apps.iphone", .blue, "Apps & categories", summary.apps == 0 ? "None" : "\(summary.apps)")
             Button {
                 editSelection = model.currentSelection
                 showBlockPicker = true
             } label: {
-                SettingsRows.label("pencil", .blue, "Edit always-on apps")
+                SettingsRows.detail("apps.iphone", .blue, "Choose apps", countLine, value: "Edit")
+            }
+            .familyActivityPicker(isPresented: $showBlockPicker, selection: $editSelection)
+            .onChange(of: showBlockPicker) { wasShowing, showing in
+                if wasShowing && !showing {           // picker dismissed: apply the edit
+                    Task { await model.requestSelectionChange(editSelection) }
+                }
             }
             if let endsAt = model.pendingSelectionChange {
                 TimelineView(.periodic(from: .now, by: 1)) { _ in
                     LabeledContent("Removal applies in", value: SettingsRows.countdown(to: endsAt))
                 }
-                Button("Cancel removal", role: .cancel) { model.cancelSelectionChange() }
+                Button("Keep them blocked", role: .cancel) { model.cancelSelectionChange() }
             }
         } header: {
             Text("Always on")
         } footer: {
-            Text("These are blocked around the clock and open only with your key. Adding apps applies right away. Removing one needs your key + a cooling-off, and it stays blocked until the wait ends.")
+            Text("Blocked all day, every day. Adding apps works right away. Removing one needs your key and the wait, and it stays blocked until then.")
         }
     }
 
-    private var websitesSection: some View {
-        Section {
-            if model.gamblingOn {
-                Button(role: .destructive) {
-                    Task { await model.requestWebCategories(gambling: false, adult: model.adultOn) }
-                } label: {
-                    SettingsRows.value("dice.fill", .green, "Gambling sites", "On · \(model.webBlockCount)")
-                }
-            } else {
-                Button {
-                    Task { await model.requestWebCategories(gambling: true, adult: model.adultOn) }
-                } label: {
-                    SettingsRows.value("dice.fill", .green, "Gambling sites", "Off")
-                }
-            }
-            if model.adultOn {
-                Button(role: .destructive) {
-                    Task { await model.requestWebCategories(gambling: model.gamblingOn, adult: false) }
-                } label: {
-                    SettingsRows.value("eye.slash.fill", .indigo, "Adult sites", "On")
-                }
-            } else {
-                Button {
-                    Task { await model.requestWebCategories(gambling: model.gamblingOn, adult: true) }
-                } label: {
-                    SettingsRows.value("eye.slash.fill", .indigo, "Adult sites", "Off")
-                }
-            }
-            if let endsAt = model.pendingCategoryChange {
-                TimelineView(.periodic(from: .now, by: 1)) { _ in
-                    LabeledContent("Turn-off applies in", value: SettingsRows.countdown(to: endsAt))
-                }
-                Button("Cancel", role: .cancel) { model.cancelCategoryChange() }
-            }
-            NavigationLink {
-                CustomDomainsView(model: model)
-            } label: {
-                SettingsRows.value("globe", .blue, "Specific websites", "\(model.customDomains.count)")
-            }
-        } header: {
-            Text("Websites")
-        } footer: {
-            Text("Tap a category to turn it on or off. Gambling uses Pawl's own list, adult sites use Apple's filter, and specific websites are ones you type in. Turning something on is instant. Turning it off needs your key + a cooling-off.")
+    private var countLine: String {
+        let n = model.blockedSummary.apps
+        switch n {
+        case 0:  return "None yet"
+        case 1:  return "1 app or category"
+        default: return "\(n) apps and categories"
         }
     }
 }
 
-// MARK: - Cooling-off and grace
+/// Website categories (gambling list, Apple's adult filter) and the user's own typed sites.
+struct WebsitesBlockSection: View {
+    let model: AppModel
+    /// The category flags live in the App Group, which SwiftUI can't observe. Bumped after each
+    /// change finishes so the toggles re-read the real state (a turn-off that is waiting, or was
+    /// cancelled at the key, snaps back to on).
+    @State private var refresh = 0
+
+    var body: some View {
+        let _ = refresh
+        Section {
+            Toggle(isOn: Binding(
+                get: { model.gamblingOn },
+                set: { on in
+                    Task {
+                        await model.requestWebCategories(gambling: on, adult: model.adultOn)
+                        refresh += 1
+                    }
+                })) {
+                SettingsRows.detail("dice.fill", .green, "Gambling sites",
+                                    "Pawl's list of \(model.webBlockCount) sites")
+            }
+            Toggle(isOn: Binding(
+                get: { model.adultOn },
+                set: { on in
+                    Task {
+                        await model.requestWebCategories(gambling: model.gamblingOn, adult: on)
+                        refresh += 1
+                    }
+                })) {
+                SettingsRows.detail("eye.slash.fill", .indigo, "Adult sites", "Apple's adult website filter")
+            }
+            if let endsAt = model.pendingCategoryChange {
+                TimelineView(.periodic(from: .now, by: 1)) { _ in
+                    LabeledContent("Turns off in", value: SettingsRows.countdown(to: endsAt))
+                }
+                Button("Keep it on", role: .cancel) {
+                    model.cancelCategoryChange()
+                    refresh += 1
+                }
+            }
+            NavigationLink {
+                CustomDomainsView(model: model)
+            } label: {
+                SettingsRows.detail("globe", .blue, "Your websites", ownLine)
+            }
+        } header: {
+            Text("Websites")
+        } footer: {
+            Text("Turning a category on works right away. Turning it off needs your key and the wait, and it stays on until then.")
+        }
+    }
+
+    private var ownLine: String {
+        let n = model.customDomains.count
+        switch n {
+        case 0:  return "Add any site by its address"
+        case 1:  return "1 site you added"
+        default: return "\(n) sites you added"
+        }
+    }
+}
+
+// MARK: - Unlock timing
 
 struct FrictionView: View {
     let model: AppModel
@@ -125,42 +207,44 @@ struct FrictionView: View {
         List {
             Section {
                 Stepper(value: $cooldownMin, in: 15...120, step: 5) {
-                    SettingsRows.label("hourglass", .teal, "Cooling-off: \(cooldownMin) min")
+                    minutesRow("Wait before unlocking", cooldownMin)
                 }
                 Stepper(value: $graceMin, in: 15...180, step: 5) {
-                    SettingsRows.label("clock.arrow.circlepath", .teal, "Grace: \(graceMin) min")
+                    minutesRow("Then stays open for", graceMin)
                 }
-                Button {
+                Button("Save") {
                     Task {
                         await model.requestDurations(cooldown: Double(cooldownMin) * 60,
                                                      grace: Double(graceMin) * 60)
                     }
-                } label: {
-                    SettingsRows.label("checkmark.circle.fill", .green, "Apply")
                 }
                 .disabled(Double(cooldownMin) * 60 == model.cooldownSeconds
                           && Double(graceMin) * 60 == model.graceSeconds)
 
                 if let pending = model.pendingDurations {
                     TimelineView(.periodic(from: .now, by: 1)) { _ in
-                        LabeledContent("Looser settings apply in", value: SettingsRows.countdown(to: pending.endsAt))
+                        LabeledContent("Looser timing starts in", value: SettingsRows.countdown(to: pending.endsAt))
                     }
-                    Button("Cancel change", role: .cancel) { model.cancelPendingDurations() }
+                    Button("Keep the current timing", role: .cancel) { model.cancelPendingDurations() }
                 }
             } footer: {
-                Text("Cooling-off is the wait after your key before apps unlock. Grace is how long they stay unlocked before Pawl relocks them. Stricter settings (longer cooling-off, shorter grace) apply right away. Looser settings wait out your cooling-off first, so there's no shortcut in the moment.")
+                Text("After you use your key, Pawl waits this long before anything opens. Then it stays open this long and locks again by itself. Stricter timing saves right away. Looser timing waits out your current wait first, so there's no shortcut in the moment.")
             }
-            if let m = model.blockChangeMessage {
-                Section {
-                    Text(m).font(.callout).foregroundStyle(PawlColor.brand)
-                }
-            }
+            BlockChangeMessageSection(model: model)
         }
-        .navigationTitle("Cooling-off and grace")
+        .navigationTitle("Unlock timing")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             cooldownMin = max(15, Int(model.cooldownSeconds / 60))
             graceMin = max(15, Int(model.graceSeconds / 60))
+        }
+    }
+
+    private func minutesRow(_ title: String, _ minutes: Int) -> some View {
+        HStack {
+            Text(title)
+            Spacer(minLength: 8)
+            Text("\(minutes) min").monospacedDigit().foregroundStyle(.secondary)
         }
     }
 }
@@ -226,7 +310,7 @@ struct ProtectionInfoView: View {
                     .font(.footnote).foregroundStyle(.secondary)
             }
         }
-        .navigationTitle("How protection works")
+        .navigationTitle("How Pawl works")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

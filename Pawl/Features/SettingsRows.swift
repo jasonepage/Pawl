@@ -4,7 +4,7 @@
 
 //
 //  SettingsRows.swift
-//  Pawl, Settings (2.2)
+//  Pawl, Settings (2.2, rows reworked in 2.3)
 //
 //  The row pieces every Settings screen shares: the colored badge, a badge plus title, a
 //  badge plus title plus trailing value, and the mm:ss countdown. Pulled out of
@@ -34,6 +34,40 @@ enum SettingsRows {
             label(symbol, color, title)
             Spacer(minLength: 8)
             Text(value).foregroundStyle(.secondary)
+        }
+    }
+
+    /// 2.3: badge, a title with one plain line under it, and an optional value on the right.
+    /// The Settings index uses this so every row says what it is and how it is set right now,
+    /// instead of a cryptic value like "15 / 30 min".
+    static func detail(_ symbol: String, _ color: Color, _ title: String, _ subtitle: String,
+                       value: String? = nil) -> some View {
+        HStack(spacing: 12) {
+            badge(symbol, color)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).foregroundStyle(.primary)
+                Text(subtitle)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 8)
+            if let value {
+                Text(value).foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 2)
+    }
+
+    /// 2.3: a row that leaves Pawl (a web page or a phone call). Plain text like every other row,
+    /// not tinted, with a small arrow so it reads as "opens somewhere else".
+    static func external(_ symbol: String, _ color: Color, _ title: String) -> some View {
+        HStack {
+            Label { Text(title).foregroundStyle(.primary) } icon: { badge(symbol, color) }
+            Spacer(minLength: 8)
+            Image(systemName: "arrow.up.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.tertiary)
         }
     }
 

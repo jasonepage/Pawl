@@ -2,6 +2,13 @@
 
 ## 2.3 (in progress)
 
+- Settings is simpler. The logo header is a little smaller, and below it are four plain groups: What's
+  blocked (Apps, Websites, Scheduled sets, each its own page), Unlocking (your key, unlock
+  timing, hard lock), When you're tempted (someone to call, help lines), and Pawl (Pro, how it
+  works, privacy, version). Every row says in one line what it is and how it is set now, so
+  "Cooling-off and grace: 15 / 30 min" now reads "Unlock timing: 15 min wait, then open for 30
+  min". Website categories are switches. Scheduled sets are one tap from Settings instead of
+  two. Nothing about how blocking or unlocking works changes.
 - The ally (sponsor) feature and the Supabase server behind it are gone. Your physical key is
   the accountability now: give it to someone you trust and they decide when Pawl can loosen.
   Unlocking and every loosening (removing an app, a site, a category, a set) need the key and

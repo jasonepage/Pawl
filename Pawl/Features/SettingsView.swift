@@ -6,11 +6,15 @@
 //  SettingsView.swift
 //  Pawl, settings
 //
-//  2.2: an index, not a wall. The top level is a short list of rows that fits on one
-//  screen; what is blocked, the friction timers, the hard lock, and the long explanations
-//  each live one tap deeper (SettingsBlockingViews.swift). Functionality is unchanged:
-//  every gated action still routes through AppModel (FR-SHIELD-010), adding protection
-//  is instant, and removing it needs the key + cooling-off.
+//  2.3 redesign: four plain groups, in the order people need them.
+//    1. What's blocked: Apps, Websites, Scheduled sets (each its own page)
+//    2. Unlocking: the key, how long unlocking takes, the hard lock
+//    3. When you're tempted: someone to call, help lines
+//    4. Pawl: Pro, how it works, privacy, the version
+//  Every row says what it is and how it is set right now in one short line, so nothing needs
+//  a footer to explain it. The brand header stays on top, a little more compact than 2.2.
+//  Behavior is unchanged: every gated action still routes through AppModel (FR-SHIELD-010),
+//  adding protection is instant, and removing it needs the key + the wait.
 //
 
 import SwiftUI
@@ -19,9 +23,11 @@ struct SettingsView: View {
     let model: AppModel
     /// Flipped by Home to land straight on What's blocked.
     var openBlockedItems: Binding<Bool> = .constant(false)
+    /// Switches to the Unlock tab, where the key is paired and used.
+    var onOpenUnlock: () -> Void = {}
 
     @State private var showPaywall = false
-    // Mirror of Pro entitlement in local @State so the row re-renders reliably on lifecycle events
+    // Mirror of Pro entitlement in local @State so rows re-render reliably on lifecycle events
     // (purchase, sheet close, appear) without relying on cross-object Observation timing.
     @State private var hasPro = false
 
@@ -31,20 +37,17 @@ struct SettingsView: View {
                 Section {
                     brandHeader
                         .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
+                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 8, trailing: 16))
                         .listRowSeparator(.hidden)
                 }
 
                 if !model.auth.isApproved {
                     screenTimeOffSection
                 }
-
-                proSection
-
-                blockingSection
-
-                helpSection
-                appSection
+                blockedSection
+                unlockingSection
+                temptedSection
+                pawlSection
 
                 #if DEBUG
                 developerSection
@@ -52,10 +55,10 @@ struct SettingsView: View {
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(isPresented: openBlockedItems) {
                 BlockedItemsView(model: model)
             }
-            .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showPaywall,
                    onDismiss: { Task { await model.pro.refreshEntitlements(); syncPro() } }) {
                 PaywallView(pro: model.pro)
@@ -72,12 +75,12 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Branded header
+    // MARK: - Brand header
 
     private var brandHeader: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             ZStack {
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                RoundedRectangle(cornerRadius: 17, style: .continuous)
                     .fill(
                         LinearGradient(
                             colors: [Color(red: 0.30, green: 0.50, blue: 0.11),
@@ -85,22 +88,21 @@ struct SettingsView: View {
                             startPoint: .topLeading, endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 76, height: 76)
-                    .shadow(color: PawlColor.brand.opacity(0.45), radius: 14, y: 5)
+                    .frame(width: 64, height: 64)
+                    .shadow(color: PawlColor.brand.opacity(0.45), radius: 12, y: 4)
                 Image(systemName: "lock.shield.fill")
-                    .font(.system(size: 36, weight: .semibold))
+                    .font(.system(size: 30, weight: .semibold))
                     .foregroundStyle(.white)
             }
             Text("Pawl")
-                .font(.system(size: 34, weight: .bold, design: .rounded))
+                .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundStyle(.primary)
             Text("An app and website blocker you unlock with a physical key.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, 8)
-        .padding(.bottom, 4)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Pawl. An app and website blocker you unlock with a physical key.")
     }
@@ -112,50 +114,80 @@ struct SettingsView: View {
             Button {
                 Task { await model.reenableScreenTime() }
             } label: {
-                SettingsRows.value("exclamationmark.triangle.fill", .red, "Screen Time access is off", "Fix")
+                SettingsRows.detail("exclamationmark.triangle.fill", .red, "Screen Time access is off",
+                                    "Pawl can't block anything until it's back on. Tap to fix.")
             }
-        } footer: {
-            Text("Pawl can't block anything without Screen Time access. iOS removes it when you reinstall the app. If your blocked apps look empty afterward, re-add them under What's blocked.")
         }
     }
 
-    // MARK: - Pawl Pro
+    // MARK: - 1. What's blocked
 
-    private var proSection: some View {
+    private var blockedSection: some View {
         Section {
-            Button {
-                showPaywall = true
+            NavigationLink {
+                BlockedAppsView(model: model)
             } label: {
-                SettingsRows.value("star.circle.fill", .yellow, "Pawl Pro", proStatusText)
+                SettingsRows.detail("apps.iphone", .blue, "Apps", appsLine)
             }
-            .buttonStyle(.plain)
+            NavigationLink {
+                BlockedWebsitesView(model: model)
+            } label: {
+                SettingsRows.detail("globe", .green, "Websites", websitesLine)
+            }
+            NavigationLink {
+                ScheduledSetsView(model: model)
+            } label: {
+                SettingsRows.detail("calendar", .orange, "Scheduled sets", setsLine,
+                                    value: (!hasPro && model.scheduledSets.isEmpty) ? "Pro" : nil)
+            }
+        } header: {
+            Text("What's blocked")
         } footer: {
-            if !hasPro {
-                Text("Scheduled sets and the weekly report. Blocking, the key and the wait stay free.")
-            }
+            Text("Adding a block works right away. Removing one needs your key and the wait.")
         }
     }
 
-    private var proStatusText: String { hasPro ? "Active" : "Free" }
+    private var appsLine: String {
+        let n = model.blockedSummary.apps
+        switch n {
+        case 0:  return "None yet. Pick apps to block all day."
+        case 1:  return "1 app or category, blocked all day"
+        default: return "\(n) apps and categories, blocked all day"
+        }
+    }
 
-    /// Pull the current entitlement into @State so the row re-renders. Pro status can change while
-    /// Settings is on screen (right after a purchase), and @State mutation guarantees the update.
-    private func syncPro() { hasPro = model.pro.isPro }
+    private var websitesLine: String {
+        var parts: [String] = []
+        if model.gamblingOn { parts.append("Gambling") }
+        if model.adultOn { parts.append("Adult") }
+        let own = model.customDomains.count
+        if own > 0 { parts.append(own == 1 ? "1 site you added" : "\(own) sites you added") }
+        return parts.isEmpty ? "None yet" : parts.joined(separator: ", ")
+    }
 
-    // MARK: - Blocking (the index rows; detail lives one tap deeper)
+    private var setsLine: String {
+        let n = model.scheduledSets.count
+        guard n > 0 else { return "Block apps only at certain hours" }
+        let count = n == 1 ? "1 set" : "\(n) sets"
+        if let active = model.activeScheduledSetName { return "\(count). \(active) is on now." }
+        return count
+    }
 
-    private var blockingSection: some View {
-        Section("Blocking") {
-            NavigationLink {
-                BlockedItemsView(model: model)
-            } label: {
-                SettingsRows.value("shield.lefthalf.filled", .green, "What's blocked", blockedSummaryText)
+    // MARK: - 2. Unlocking
+
+    private var unlockingSection: some View {
+        Section {
+            Button(action: onOpenUnlock) {
+                SettingsRows.detail("key.fill", .gray, "Security key",
+                                    model.isKeyPaired
+                                        ? "Paired. Use or re-pair it on the Unlock tab."
+                                        : "Not paired yet. Pair it on the Unlock tab.")
             }
             NavigationLink {
                 FrictionView(model: model)
             } label: {
-                SettingsRows.value("hourglass", .teal, "Cooling-off and grace",
-                                   "\(Int(model.cooldownSeconds / 60)) / \(Int(model.graceSeconds / 60)) min")
+                SettingsRows.detail("hourglass", .teal, "Unlock timing",
+                                    "\(Int(model.cooldownSeconds / 60)) min wait, then open for \(Int(model.graceSeconds / 60)) min")
             }
             NavigationLink {
                 HardLockView(onAttest: { model.attestHardLock() },
@@ -163,47 +195,79 @@ struct SettingsView: View {
                              alreadyAttested: model.hardLockAttested,
                              attestedDate: model.hardLockDate)
             } label: {
-                SettingsRows.value("lock.shield.fill", .brown, "Hard lock", model.hardLockAttested ? "On" : "Set up")
+                SettingsRows.detail("lock.shield.fill", .brown, "Hard lock",
+                                    model.hardLockAttested
+                                        ? "On. Someone you trust keeps a Screen Time passcode."
+                                        : "Off. Someone you trust can set a Screen Time passcode.")
             }
+        } header: {
+            Text("Unlocking")
         }
     }
 
-    private var blockedSummaryText: String { model.blockedSummaryLine }
+    // MARK: - 3. When you're tempted
 
-    // MARK: - Help
-
-    private var helpSection: some View {
-        Section("Help") {
-            NavigationLink {
-                ProtectionInfoView(showGamblingHelp: model.showGamblingHelp)
-            } label: {
-                SettingsRows.label("info.circle.fill", .gray, "How protection works")
-            }
+    private var temptedSection: some View {
+        Section {
             NavigationLink {
                 TrustedContactView()
             } label: {
-                SettingsRows.value("person.fill", .pink, "Someone to call", TrustedContact.phone() == nil ? "Add" : "Set")
+                SettingsRows.detail("person.fill", .pink, "Someone to call", contactLine)
             }
             if model.showGamblingHelp {
                 Link(destination: URL(string: "https://www.ncpgambling.org/help-treatment/")!) {
-                    SettingsRows.label("lifepreserver.fill", .teal, "Problem gambling help")
+                    SettingsRows.external("lifepreserver.fill", .teal, "Problem gambling help")
                 }
             }
             Link(destination: URL(string: "tel://988")!) {
-                SettingsRows.label("phone.fill", .red, "Crisis support, call 988")
+                SettingsRows.external("phone.fill", .red, "Crisis support, call 988")
             }
+        } header: {
+            Text("When you're tempted")
         }
     }
 
-    // MARK: - App
+    private var contactLine: String {
+        if let name = TrustedContact.name() { return "\(name), one tap from the urge screen" }
+        if TrustedContact.phone() != nil { return "Set, one tap from the urge screen" }
+        return "Add someone to call when you're tempted"
+    }
 
-    private var appSection: some View {
-        Section("App") {
+    // MARK: - 4. Pawl
+
+    private var pawlSection: some View {
+        Section {
+            Button {
+                showPaywall = true
+            } label: {
+                SettingsRows.detail("star.fill", .yellow, "Pawl Pro",
+                                    hasPro ? "Active" : "Scheduled sets and the weekly report")
+            }
+            NavigationLink {
+                ProtectionInfoView(showGamblingHelp: model.showGamblingHelp)
+            } label: {
+                SettingsRows.label("info.circle.fill", .gray, "How Pawl works")
+            }
             Link(destination: URL(string: "https://getpawl.com/privacy")!) {
-                SettingsRows.label("hand.raised.fill", .blue, "Privacy Policy")
+                SettingsRows.external("hand.raised.fill", .blue, "Privacy Policy")
             }
+        } header: {
+            Text("Pawl")
+        } footer: {
+            Text(versionLine)
         }
     }
+
+    private var versionLine: String {
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info?["CFBundleVersion"] as? String ?? "?"
+        return "Pawl \(version) (\(build))"
+    }
+
+    /// Pull the current entitlement into @State so rows re-render. Pro status can change while
+    /// Settings is on screen (right after a purchase), and @State mutation guarantees the update.
+    private func syncPro() { hasPro = model.pro.isPro }
 
     // MARK: - Developer
 
