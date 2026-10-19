@@ -34,7 +34,7 @@ final class ReviewPrompterTests: XCTestCase {
     func test_sixtyDaySpacingBetweenAsks() {
         XCTAssertTrue(ReviewPrompter.shouldAsk(.urgeLogged, now: day(10), defaults: defaults))
         XCTAssertFalse(ReviewPrompter.shouldAsk(.urgeLogged, now: day(40), defaults: defaults))
-        XCTAssertFalse(ReviewPrompter.shouldAsk(.sponsorLinked, tag: "L1", now: day(69), defaults: defaults))
+        XCTAssertFalse(ReviewPrompter.shouldAsk(.streakMilestone, tag: "60", now: day(69), defaults: defaults))
         XCTAssertTrue(ReviewPrompter.shouldAsk(.urgeLogged, now: day(70), defaults: defaults))
     }
 

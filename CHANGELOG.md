@@ -2,6 +2,23 @@
 
 ## 2.3 (in progress)
 
+- The ally (sponsor) feature and the Supabase server behind it are gone. Your physical key is
+  the accountability now: give it to someone you trust and they decide when Pawl can loosen.
+  Unlocking and every loosening (removing an app, a site, a category, a set) need the key and
+  the cooling-off wait, with no ally approval step. There is no sign-in, no account, no push
+  notifications and no background check-in anymore, and Pawl collects no data. The Approvals
+  tab, the account screen and the "support someone else" setup path are removed.
+- The gambling site list is built into the app: the 167 sites written for Pawl, up from 34. It
+  no longer downloads a longer list on launch. A list an older version already downloaded stays
+  on the phone.
+- The hard lock stays, on the phone and in iCloud only. Its "your ally is alerted" lines are
+  gone because nothing sends alerts now.
+- Pawl Pro now covers making new scheduled sets and the weekly report. Sets you already made
+  keep running and stay editable without Pro. Blocking, the key, the wait, the streak and the
+  urge tools stay free.
+- On first launch after updating, Pawl quietly clears what the ally feature left behind: the
+  saved "this phone has an ally" flag, the old sign-in, and the free-for-life Pro flags. Someone
+  who was set up only to approve for others goes through setup. Nothing that blocks is touched.
 - Under the hood, steps 5 and 6: all five waits are restored one after another on launch, in
   the same order as before, and no leftover timer or save code remains in the app model. The
   app model is about 110 lines shorter. Nothing a person sees changes.
@@ -33,9 +50,8 @@
   moment" is now "I'm tempted", and "crisis tools" is now "urge tools". The Settings header now
   says "An app and website blocker you unlock with a physical key." Nothing about how the app
   works changes.
-- "Sponsor" is now "ally" in every place a person reads it, including push alerts. Code names,
-  database tables and comments still say sponsor. The server push text is changed in this
-  branch but is deployed the day 2.3 is approved.
+- "Sponsor" is now "ally" in every place a person reads it. (The ally feature itself was then
+  removed later in 2.3, see the top of this list.)
 - The problem gambling help link and note show only when gambling is your focus or the gambling
   site list is on. The 988 crisis line always shows.
 - The block screen's "I need a minute" button is now "I'm tempted", the same words as the

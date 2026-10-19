@@ -14,7 +14,7 @@ import SwiftUI
 
 /// The main tabs, tagged so one tab can programmatically switch to another
 /// (e.g. the Home "pair your key" nudge jumps to Unlock).
-enum AppTab: Hashable { case home, unlock, approvals, settings }
+enum AppTab: Hashable { case home, unlock, settings }
 
 struct ContentView: View {
     @State private var model = AppModel()
@@ -39,15 +39,12 @@ struct ContentView: View {
         .tint(PawlColor.brand)
         .task {
             await RecoveryService.restoreOnLaunch()          // FR-PERSIST-002/003 (local, offline-safe)
-            await model.syncCommitment()                     // FR-P2-SYNC-* (push/reconcile if signed in)
+            await model.loadCommitment()                     // phone + iCloud (FR-PERSIST-*)
             await model.restorePendingDurations()            // resume/commit a gated loosening
             await model.restorePendingSelectionChange()      // resume/commit a gated block removal
             await model.restorePendingCategoryChange()       // resume/commit a gated category turn-off
             await model.restorePendingDomainRemoval()        // 2.2: iCloud mirror + gated typed-site removal
             await model.restorePendingSetsChange()           // 2.2: scheduled sets, their activities, gated edits
-            await model.sponsor.refresh()                    // so sponsor mode engages app-wide (FR-P2-LINK-005)
-            model.applyGrandfatherIfNeeded()                 // 2.0 P1: legacy sponsor users → Pro-free for life
-            await model.refreshBlocklist()                   // Tier-1: grow the gambling web list from Supabase
             checkPendingUrge()                               // FR-SHACT-004 pickup on cold launch
         }
         .onChange(of: scenePhase) { _, phase in
@@ -64,10 +61,9 @@ struct ContentView: View {
     ///
     /// A shield action extension cannot open its containing app, so this is the pickup end
     /// of a deferred handoff. The flag is only consumed when there is somewhere to show it:
-    /// bail before reading it during onboarding or in the approver role, so it is not
-    /// silently thrown away.
+    /// bail before reading it during onboarding, so it is not silently thrown away.
     private func checkPendingUrge() {
-        guard model.didOnboard, model.role == .blocker, !pendingUrge else { return }
+        guard model.didOnboard, !pendingUrge else { return }
         if SharedState.consumePendingUrge() {
             tab = .home
             pendingUrge = true
@@ -76,43 +72,31 @@ struct ContentView: View {
 
     private var mainTabs: some View {
         TabView(selection: $tab) {
-            // Blocking tabs only for people who set up a shield (FR-P2-LINK-005 spirit:
-            // an approver has nothing to block).
-            if model.role == .blocker {
-                HomeView(
-                    needsKey: !model.isKeyPaired,
-                    screenTimeOff: !model.auth.isApproved,
-                    blockedSummary: model.blockedSummaryLine,
-                    activeSetName: model.activeScheduledSetName,
-                    hoursPerDay: model.hoursPerDay,
-                    showGamblingHelp: model.showGamblingHelp,
-                    asksSlipCost: model.asksSlipCost,
-                    onPairKey: { tab = .unlock },
-                    onEnableScreenTime: { Task { await model.reenableScreenTime() } },
-                    onShowBlocked: { tab = .settings; openBlockedItems = true },
-                    showUrge: $pendingUrge
-                )
-                    .tabItem { Label("Home", systemImage: "shield.lefthalf.filled") }
-                    .tag(AppTab.home)
+            HomeView(
+                needsKey: !model.isKeyPaired,
+                screenTimeOff: !model.auth.isApproved,
+                blockedSummary: model.blockedSummaryLine,
+                activeSetName: model.activeScheduledSetName,
+                hoursPerDay: model.hoursPerDay,
+                showGamblingHelp: model.showGamblingHelp,
+                asksSlipCost: model.asksSlipCost,
+                onPairKey: { tab = .unlock },
+                onEnableScreenTime: { Task { await model.reenableScreenTime() } },
+                onShowBlocked: { tab = .settings; openBlockedItems = true },
+                showUrge: $pendingUrge,
+                pro: model.pro
+            )
+                .tabItem { Label("Home", systemImage: "shield.lefthalf.filled") }
+                .tag(AppTab.home)
 
-                UnlockView(
-                    shield: model.shield,
-                    selection: model.selectionStore.load(),
-                    screenTimeOff: !model.auth.isApproved,
-                    commitmentProvider: { model.activeCommitment },
-                    sponsorModeProvider: { model.isSponsorModeActive },
-                    approval: model.approval
-                )
-                .tabItem { Label("Unlock", systemImage: "key.fill") }
-                .tag(AppTab.unlock)
-            }
-
-            // Approvals appears for an approver, or a blocker who also sponsors someone.
-            if model.role == .approver || model.isSponsoringSomeone {
-                ApprovalsView(approval: model.approval)
-                    .tabItem { Label("Approvals", systemImage: "checkmark.shield") }
-                    .tag(AppTab.approvals)
-            }
+            UnlockView(
+                shield: model.shield,
+                selection: model.selectionStore.load(),
+                screenTimeOff: !model.auth.isApproved,
+                commitmentProvider: { model.activeCommitment }
+            )
+            .tabItem { Label("Unlock", systemImage: "key.fill") }
+            .tag(AppTab.unlock)
 
             SettingsView(model: model, openBlockedItems: $openBlockedItems)
                 .tabItem { Label("Settings", systemImage: "gearshape") }

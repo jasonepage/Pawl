@@ -6,10 +6,11 @@
 //  ProStore.swift
 //  Pawl — 2.0 (P1: Pawl Pro subscription)
 //
-//  StoreKit 2 entitlement manager for Pawl Pro. Pro gates the ACCOUNTABILITY layer
-//  (link-your-own-sponsor + tamper alerts); the solo blocking loop, crisis tools, and the
-//  approver side stay free (docs/12 §2). This type is the single source of truth for `isPro`.
-//  AppModel composes it into a `hasAccountability` gate (Pro OR grandfathered) in a later slice.
+//  StoreKit 2 entitlement manager for Pawl Pro. This type is the single source of truth for
+//  `isPro`. 2.3: Pro used to gate the ally (sponsor) layer, which was removed with the backend.
+//  Pro now covers making new scheduled block sets and the weekly report. Blocking, the key,
+//  the wait, the streak and the urge tools stay free, and nothing already blocking is ever
+//  switched off because Pro lapses.
 //
 //  StoreKit 2 APIs used here are stable since iOS 15. Product IDs + prices live in App Store
 //  Connect (and a local Configuration.storekit for testing) — see docs/12 §3–§4. This file
@@ -40,19 +41,12 @@ public final class ProStore {
     /// Last user-facing error from load/purchase/restore (nil when clear).
     public private(set) var lastError: String?
 
-    /// Grandfather flag (docs/12 §2a-2): set by AppModel on first Pro-build launch if an active
-    /// sponsor link already exists → accountability stays free for life. Persisted to the App Group.
-    public var isLegacyFree: Bool {
-        didSet { Self.defaults?.set(isLegacyFree, forKey: Self.legacyKey) }
-    }
-
     // The Transaction.updates listener. ProStore is created once by AppModel and lives for the
     // whole process, and the task holds self weakly (no retain cycle), so there is deliberately
     // no deinit cancellation — that would need main-actor access from a nonisolated deinit.
     private var updatesListener: Task<Void, Never>?
 
     public init() {
-        isLegacyFree = Self.defaults?.bool(forKey: Self.legacyKey) ?? false
         isPro = Self.cachedIsPro()
         // Apply renewals / refunds / revocations / family-sharing changes as they arrive,
         // without requiring a relaunch (docs/12 §6).
@@ -200,22 +194,14 @@ public final class ProStore {
 
     private nonisolated static let appGroup  = "group.io.github.jasonepage.Pawl"
     private nonisolated static let proKey    = "pawl.pro.isPro"
-    private nonisolated static let legacyKey = "pawl.pro.isLegacyFree"
     private nonisolated static var defaults: UserDefaults? { UserDefaults(suiteName: appGroup) }
     private nonisolated static func cachedIsPro() -> Bool { defaults?.bool(forKey: proKey) ?? false }
     private nonisolated static func cacheIsPro(_ value: Bool) { defaults?.set(value, forKey: proKey) }
 
-    // Grandfather evaluation marker (one-time). See AppModel.applyGrandfatherIfNeeded (docs/12 §2a-2).
-    private nonisolated static let evaluatedKey = "pawl.pro.grandfatherEvaluated"
-    public nonisolated static var grandfatherEvaluated: Bool { defaults?.bool(forKey: evaluatedKey) ?? false }
-    public nonisolated static func markGrandfatherEvaluated() { defaults?.set(true, forKey: evaluatedKey) }
-
-    #if DEBUG
-    /// Dev-only: clear grandfather/legacy so the paywall gate can be tested from a non-entitled state.
-    /// Combine with Xcode → StoreKit → Manage Transactions to remove any active subscription.
-    public func debugResetLegacy() {
-        isLegacyFree = false
-        Self.defaults?.set(false, forKey: Self.evaluatedKey)
+    /// 2.3: the 2.0 grandfather (ally features free for life for pre-Pro sponsor links) ended
+    /// with the ally feature. Clears its two App Group flags. Safe to call on every launch.
+    public nonisolated static func retireGrandfatherFlags() {
+        defaults?.removeObject(forKey: "pawl.pro.isLegacyFree")
+        defaults?.removeObject(forKey: "pawl.pro.grandfatherEvaluated")
     }
-    #endif
 }

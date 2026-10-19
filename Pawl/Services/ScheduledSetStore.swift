@@ -8,7 +8,7 @@
 //
 //  Scheduled block sets: iCloud mirror of the App Group copy (so they survive a reinstall),
 //  the pending gated replacement, and the DeviceActivity registrations that wake the
-//  monitor extension when a window opens or closes. Nothing goes to Supabase.
+//  monitor extension when a window opens or closes. Nothing leaves the phone and iCloud.
 //  2.3: the pending replacement is saved and timed by PendingChangeController;
 //  `makePendingStore` names its store and moves a change saved by 2.2 over to it.
 //

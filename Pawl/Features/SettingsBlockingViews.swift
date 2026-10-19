@@ -212,15 +212,11 @@ struct ProtectionInfoView: View {
     var body: some View {
         List {
             Section("How Pawl protects you") {
-                Text("Pawl's shield can't be removed from iOS Settings. Only Pawl can lift it, and only after your physical key plus a 15-minute wait. While Pawl is protecting you it also can't be deleted by long-pressing the icon. Only \u{201C}Remove from Home Screen\u{201D} is allowed, and it keeps running underneath. The one remaining way out is turning off Screen Time in Settings, which removes protection but alerts your ally. The only fully hard lock is an ally-set Screen Time passcode.")
-                    .font(.footnote).foregroundStyle(.secondary)
-            }
-            Section("Your account") {
-                Text("Sign in to link an ally. The blocker works without an account, and signing out never lifts your shield. Manage or delete your account in the Account section of Settings. Deleting removes all your cloud data and can't be undone.")
+                Text("Pawl's shield can't be removed from iOS Settings. Only Pawl can lift it, and only after your physical key plus a 15-minute wait. While Pawl is protecting you it also can't be deleted by long-pressing the icon. Only \u{201C}Remove from Home Screen\u{201D} is allowed, and it keeps running underneath. The one remaining way out is turning off Screen Time in Settings, which removes protection. For a full lock, someone you trust can set a Screen Time passcode for you. That's Hard lock in Settings.")
                     .font(.footnote).foregroundStyle(.secondary)
             }
             Section("Removing Pawl") {
-                Text("While Pawl is protecting you it can't be deleted by long-pressing its icon. That's intentional. To remove it completely:\n\n1.  Open Settings, then Screen Time.\n2.  Turn off Screen Time, or remove Pawl under \u{201C}Apps with Screen Time Access.\u{201D}\n3.  Then delete Pawl from your Home Screen.\n\nTurning off Screen Time removes your protection and notifies your ally.")
+                Text("While Pawl is protecting you it can't be deleted by long-pressing its icon. That's intentional. To remove it completely:\n\n1.  Open Settings, then Screen Time.\n2.  Turn off Screen Time, or remove Pawl under \u{201C}Apps with Screen Time Access.\u{201D}\n3.  Then delete Pawl from your Home Screen.\n\nTurning off Screen Time removes your protection.")
                     .font(.footnote).foregroundStyle(.secondary)
             }
             Section("Get help") {

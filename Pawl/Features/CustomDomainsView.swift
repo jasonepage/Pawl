@@ -7,7 +7,7 @@
 //  Pawl, Features (2.2)
 //
 //  The user's own typed website list. Adding blocks right away. Removing is an unlock
-//  action, the same as removing an app: key, sponsor if linked, then the cooldown, and the
+//  action, the same as removing an app: key, then the cooldown, and the
 //  site stays blocked until the wait ends. There is no quick way out on purpose.
 //
 
@@ -75,7 +75,7 @@ struct CustomDomainsView: View {
         } header: {
             Text("Blocked websites (\(model.customDomains.count))")
         } footer: {
-            Text("Swipe to remove. Removing a site needs your key, your ally if you have one, and the cooling-off wait. It stays blocked until then.")
+            Text("Swipe to remove. Removing a site needs your key and the cooling-off wait. It stays blocked until then.")
         }
     }
 

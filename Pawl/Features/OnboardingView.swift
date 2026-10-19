@@ -12,7 +12,6 @@
 
 import SwiftUI
 import FamilyControls
-import AuthenticationServices
 
 struct OnboardingView: View {
     let model: AppModel
@@ -21,7 +20,6 @@ struct OnboardingView: View {
     @State private var vertical: Vertical = .custom     // set when the person picks a focus
     @State private var pickedFocus: Vertical?            // 2.2: nothing selected until they choose
     @State private var hoursPerDay: Double = 2           // welcome-screen estimate, never stored
-    @State private var codeEntry = ""
     @State private var step = 0
     @State private var selection = FamilyActivitySelection()
     @State private var blockGambling = true     // gambling is the default category (D6)
@@ -42,8 +40,6 @@ struct OnboardingView: View {
         Group {
             if role == nil {
                 rolePicker
-            } else if role == .approver {
-                approverFlow
             } else {
                 blockerFlow
             }
@@ -88,13 +84,6 @@ struct OnboardingView: View {
                 primary("Continue") { if let v = pickedFocus { chooseFocus(v) } }
                     .disabled(pickedFocus == nil)
                     .opacity(pickedFocus == nil ? 0.5 : 1)
-
-                Button { role = .approver } label: {
-                    Text("I'm here to support someone else")
-                        .font(.footnote)
-                        .foregroundStyle(PawlColor.brand)
-                        .frame(maxWidth: .infinity)
-                }
             }
             .padding(20)
         }
@@ -153,59 +142,6 @@ struct OnboardingView: View {
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    // MARK: Approver flow (sign in + invite code, no blocking)
-
-    private var approverFlow: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
-                heading("Approver setup", model.account.isSignedIn ? "Almost done." : "Sign in to approve.")
-                body("You won't block anything on your own phone. You'll approve unlock requests from the person you're supporting, and get alerted if their protection drops.")
-
-                if !model.account.isSignedIn {
-                    SignInWithAppleButton(.signIn) { request in
-                        model.account.configure(request)
-                    } onCompletion: { result in
-                        Task { await model.account.handle(result) }
-                    }
-                    .signInWithAppleButtonStyle(.black)
-                    .frame(height: 50)
-                } else {
-                    body("Enter the invite code they shared with you. You can also add it later in the app.")
-                    TextField("Invite code", text: $codeEntry)
-                        .textInputAutocapitalization(.characters)
-                        .autocorrectionDisabled()
-                        .font(.system(.title3, design: .monospaced).weight(.medium))
-                        .tracking(2)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .frame(maxWidth: .infinity)
-                        .background(Color(uiColor: .tertiarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .strokeBorder(PawlColor.brand.opacity(codeEntry.isEmpty ? 0.0 : 0.6), lineWidth: 1.5)
-                        )
-                    secondary("Link with this code") {
-                        Task { await model.sponsor.redeem(code: codeEntry); codeEntry = "" }
-                    }
-                    .disabled(codeEntry.isEmpty)
-                    if model.sponsor.asSponsor.contains(where: { $0.status == "active" }) {
-                        Text("Linked ✓").font(.headline).foregroundStyle(PawlColor.brand)
-                    }
-                    if let m = model.sponsor.message {
-                        Text(m).font(.footnote).foregroundStyle(.secondary)
-                    }
-                    primary("Done") { model.completeAsApprover() }
-                }
-
-                Button("← Back") { role = nil }
-                    .font(.footnote).foregroundStyle(.secondary)
-            }
-            .padding(20)
-        }
     }
 
     // MARK: Blocker flow (the full setup)
@@ -377,7 +313,7 @@ struct OnboardingView: View {
                     summaryRow("hourglass", "Unlock wait", "15 minutes")
                 }
             }
-            body("From here, lifting the shield needs your key plus the wait. Turning off Screen Time still removes protection and alerts your ally if you have one. The only fully hard lock is an ally-set Screen Time passcode, a later step.")
+            body("From here, lifting the shield needs your key plus the wait. Turning off Screen Time still removes protection. For a full lock, someone you trust can set a Screen Time passcode for you. That's Hard lock in Settings.")
         }
     }
 

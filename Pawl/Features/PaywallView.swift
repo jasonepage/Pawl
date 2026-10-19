@@ -4,9 +4,10 @@
 
 //
 //  PaywallView.swift
-//  Pawl — 2.0 (P1: Pawl Pro subscription)
+//  Pawl — Pawl Pro subscription
 //
-//  The Pawl Pro paywall. Built on StoreKit's declarative `SubscriptionStoreView` so the
+//  The Pawl Pro paywall. 2.3: Pro is scheduled sets and the weekly report (it used to be the
+//  ally features, which were removed with the backend). Built on StoreKit's declarative `SubscriptionStoreView` so the
 //  App-Review-required controls (Restore, Terms, Privacy) come almost for free and the
 //  plans / prices / 7-day intro offer render straight from the StoreKit configuration (locally)
 //  or App Store Connect (production) — no hand-rolled price strings to drift out of date.
@@ -57,19 +58,19 @@ struct PaywallView: View {
                 .foregroundStyle(PawlColor.brand)
             Text("Pawl Pro")
                 .font(.largeTitle.bold())
-            Text("You're not doing this alone.")
+            Text("More ways to shape your blocking.")
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(.secondary)
 
             VStack(alignment: .leading, spacing: 12) {
-                proFeature("person.2.fill", "Link your ally",
-                           "A trusted person approves your unlocks, so the impulsive choice isn't yours alone.")
-                proFeature("bell.badge.fill", "Protection-drop alerts",
-                           "Your ally is alerted the moment your protection is removed.")
+                proFeature("calendar.badge.clock", "Scheduled sets",
+                           "Block a different group of apps and sites during the hours you pick, like work hours or late nights.")
+                proFeature("chart.bar.fill", "Weekly report",
+                           "One card for your week: the days Pawl was on and what it blocked.")
             }
             .padding(.top, 4)
 
-            Text("Blocking, the security key, cooling-off, your streak, the urge tools, and helping someone else stay on track are always free.")
+            Text("Blocking, the security key, the cooling-off wait, your streak and the urge tools are always free. Sets you already made keep working without Pro.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .padding(.top, 4)

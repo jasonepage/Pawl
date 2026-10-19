@@ -8,8 +8,8 @@
 //
 //  The single persistence seam features talk to (SDS §2.1, §2.5; SRS NFR-MAINT-001).
 //  Phase 1 backs this with App Group (local, authoritative at runtime) + CloudKit
-//  (durable mirror). Phase 2 adds a Supabase-backed implementation behind the SAME
-//  protocol — no feature code changes. No custom backend in P1 (FR-PERSIST-004).
+//  (durable mirror). No custom backend (FR-PERSIST-004); 2.3 removed the Supabase-backed
+//  implementation Phase 2 had added behind this same protocol.
 //
 
 import Foundation

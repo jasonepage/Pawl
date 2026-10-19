@@ -118,7 +118,7 @@ struct ShieldSetupView: View {
 
     private var disclosureSection: some View {
         Section {
-            Text("Honest note: Pawl's shield can't be removed from iOS Settings. Only Pawl can. But deleting the app or revoking this access still removes protection until reinstall. The only fully hard lock is an ally-set Screen Time passcode (Phase 3).")
+            Text("Honest note: Pawl's shield can't be removed from iOS Settings. Only Pawl can. But deleting the app or revoking this access still removes protection until reinstall. The only fully hard lock is a Screen Time passcode set by someone you trust. That's Hard lock in Settings.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }

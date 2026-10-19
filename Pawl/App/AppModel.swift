@@ -13,11 +13,11 @@
 
 import Foundation
 import FamilyControls
-import Supabase
 
-/// Who this person is using Pawl as. A blocker sets up the shield for themselves; an
-/// approver only signs in and approves someone else's unlocks (no blocking on their phone).
-enum AppRole: String { case blocker, approver }
+/// Who this person is using Pawl as. 2.3: the approver-only role (someone who only approved
+/// another person's unlocks) was removed with the ally feature, so blocker is the only role.
+/// A saved "approver" is retired at launch by LegacySponsorCleanup.
+enum AppRole: String { case blocker }
 
 @MainActor
 @Observable
@@ -33,63 +33,15 @@ final class AppModel {
     let auth = AuthorizationService()
     let shield = ShieldService()
     let selectionStore = SelectionStore()
-    /// Phase 2: Supabase account (Sign in with Apple). Additive — the solo loop works
-    /// signed out (FR-P2-AUTH-005). Sponsor linking + the repository swap build on this.
-    let account = AuthService()
-    /// Slice 3: invite/redeem a sponsor (FR-P2-LINK-*).
-    let sponsor = SponsorService()
-    /// Slice 4: create/poll/decide sponsor unlock approvals (FR-P2-SPON-*).
-    let approval = UnlockApprovalService()
-    /// 2.0 P1: Pawl Pro entitlement (StoreKit 2). Owned here so it loads at launch;
-    /// `hasAccountability` below is the single gate views should check (docs/12 §5).
+    /// Pawl Pro entitlement (StoreKit 2). Owned here so it loads at launch. 2.3: Pro covers
+    /// making new scheduled sets and the weekly report.
     let pro = ProStore()
-    /// Slice 2: Supabase is canonical for the commitment definition, with iCloud as the
-    /// offline/reinstall cache underneath (FR-P2-SYNC-001/003/005). Same protocol, so
-    /// activate()/load() are unchanged.
-    private let repo: CommitmentRepository =
-        SupabaseCommitmentRepository(cache: CloudCommitmentRepository())
+    /// The commitment lives on the phone and in the user's own iCloud (FR-PERSIST-001..003).
+    /// 2.3: the Supabase layer on top of it was removed with the backend.
+    private let repo: CommitmentRepository = CloudCommitmentRepository()
 
-    /// The active commitment (cache/Supabase reconciled), exposed so the unlock flow can
-    /// attach unlock_requests to it.
+    /// The active commitment, exposed so the unlock flow uses its real durations.
     private(set) var activeCommitment: Commitment?
-
-    /// Sponsor mode is on exactly while an active sponsor link exists (FR-P2-LINK-005).
-    /// 2.1: also true while this phone remembers a sponsor it can't currently confirm (signed
-    /// out, offline, or a different account). Signing out must not skip the sponsor.
-    var isSponsorModeActive: Bool {
-        sponsor.asProtected.contains { $0.status == "active" } || sponsor.rememberedSponsor
-    }
-
-    /// True when this user approves someone else's unlocks (so the Approvals tab is relevant).
-    var isSponsoringSomeone: Bool {
-        sponsor.asSponsor.contains { $0.status == "active" }
-    }
-
-    /// The accountability gate (docs/12 §5): Pro OR grandfathered. The protected-person sponsor
-    /// features check this; the approver side and the crisis tools never do.
-    var hasAccountability: Bool { pro.isPro || pro.isLegacyFree }
-
-    /// Links created before 2.0 shipped predate the paywall, so their owners never chose Pro and
-    /// keep accountability free for life (docs/12 §2a-2). The date check is what makes the flag
-    /// reinstall-proof: the "evaluated" marker lives in the App Group and is wiped by a delete +
-    /// reinstall, so without it a subscriber could link a sponsor, cancel, reinstall, and re-run
-    /// the grandfather. A post-cutoff link can only have been created by an entitled user, so it
-    /// is never grandfathered. Bump only if the public 2.0 release date moves.
-    private static let grandfatherCutoff = ISO8601DateFormatter().date(from: "2026-07-02T00:00:00Z")!
-
-    /// One-time grandfather (docs/12 §2a-2): first Pro-build launch with an active PRE-CUTOFF
-    /// sponsor link → accountability free for life. Runs once, only with authoritative sponsor
-    /// data (signed in + a successful load), and NEVER revokes. Missing created_at fails closed.
-    /// Call after `sponsor.refresh()`.
-    func applyGrandfatherIfNeeded() {
-        guard !ProStore.grandfatherEvaluated else { return }
-        guard account.isSignedIn, sponsor.didLoad else { return }
-        let hasLegacyLink = sponsor.asProtected.contains { link in
-            link.status == "active" && (link.created_at.map { $0 < Self.grandfatherCutoff } ?? false)
-        }
-        if hasLegacyLink { pro.isLegacyFree = true }
-        ProStore.markGrandfatherEvaluated()
-    }
 
     // Friction customization. Tightening (longer cooldown / shorter grace) applies now;
     // loosening waits out the current cooldown so it can't be weakened in the moment.
@@ -114,6 +66,9 @@ final class AppModel {
     var graceSeconds: TimeInterval { activeCommitment?.graceSeconds ?? PawlDefaults.graceDefault }
 
     init() {
+        // 2.3: quietly retire what the removed ally feature left on the phone, before any of
+        // the state below is read. Never touches the shield, the key or the streak.
+        LegacySponsorCleanup.run()
         didOnboard = OnboardingFlag.isComplete()
         role = OnboardingFlag.role()
         vertical = OnboardingFlag.vertical()
@@ -125,8 +80,8 @@ final class AppModel {
         // re-apply runs, so existing users get it too.
         SharedState.ensureWebDefaults(domains: GamblingBlocklist.seedDomains)
         // Re-assert the uninstall block on every launch for an onboarded blocker, so it
-        // survives relaunches and reinstalls (FR-P3-HARD-002). Approvers/not-onboarded are
-        // left deletable.
+        // survives relaunches and reinstalls (FR-P3-HARD-002). A phone that hasn't finished
+        // setup is left deletable.
         if didOnboard && role == .blocker {
             shield.setDeletionBlock(true)
             shield.setClockLock(true)       // 2.1: FR-CLOCK-001, same lifecycle as the deletion block
@@ -163,8 +118,8 @@ final class AppModel {
         }
     }
 
-    /// Number of gambling/crypto sites currently blocked in Safari — the live App Group list
-    /// (seed + any Supabase-fetched domains), not just the bundled seed.
+    /// Number of gambling/crypto sites currently blocked in Safari: the live App Group list (the
+    /// bundled list, plus anything a pre-2.3 version downloaded), not just the bundled list.
     var webBlockCount: Int {
         max(SharedState.webBlockDomains().count, GamblingBlocklist.seedDomains.count)
     }
@@ -275,38 +230,18 @@ final class AppModel {
         }
     }
 
-    /// Finish onboarding as an approver-only user: no Screen Time, no shield, no key, no
-    /// commitment. They just hold a Supabase account and approve someone else's unlocks.
-    func completeAsApprover() {
-        OnboardingFlag.setRole(.approver)
-        role = .approver
-        OnboardingFlag.setComplete()
-        didOnboard = true
-    }
-
-    /// Slice 2: reconcile the active commitment with Supabase and push it up (no-op when
-    /// signed out). Loading through the composite repo writes the locked-wins result back to
-    /// the cache and upserts the `commitments` row. Safe to call on launch and after sign-in.
-    func syncCommitment() async {
+    /// Load the active commitment from the phone and iCloud. Safe to call on every launch.
+    func loadCommitment() async {
         activeCommitment = (try? await repo.loadActiveCommitment())?.commitment
-    }
-
-    /// Tier-1: grow the gambling web blocklist from Supabase on launch (public table, no sign-in),
-    /// falling back to the curated seed. Re-applies the filter immediately if currently shielded.
-    func refreshBlocklist() async {
-        let changed = await BlocklistService.fetchAndStore()
-        if changed && SharedState.phase() == "locked" {
-            shield.apply(selectionStore.load())
-        }
     }
 
     // MARK: - Key-gated blocklist editing (FR-SHIELD-009 / FR-SHIELD-010)
 
     /// Shared gate for any loosening (removing a blocked app, turning off a website category):
-    /// prove the physical key, then — IF a sponsor is linked — get the sponsor's approval, stacked
-    /// before the cooling-off (FR-SHIELD-010, FR-P2-SPON-002/003). Returns true only when cleared
-    /// to start the cooldown; any failure leaves protection in place. Tightening never calls this.
-    private func approveLoosening(kind: String) async -> Bool {
+    /// prove the physical key (FR-SHIELD-010). Returns true only when cleared to start the
+    /// cooldown; any failure leaves protection in place. Tightening never calls this.
+    /// 2.3: the ally approval step that used to follow the key was removed with the backend.
+    private func approveLoosening() async -> Bool {
         guard let paired = keyStore.load() else {
             blockChangeMessage = "Pair your key first to reduce protection."
             return false
@@ -322,32 +257,11 @@ final class AppModel {
             blockChangeMessage = "Key check cancelled. Nothing changed."
             return false
         }
-
-        // In sponsor mode, the sponsor must approve before the cooling-off can even start.
-        // 2.1: with a sponsor but no loaded commitment, fail closed instead of skipping approval.
-        if isSponsorModeActive && activeCommitment == nil {
-            blockChangeMessage = "Couldn't reach your ally. Change cancelled."
-            return false
-        }
-        if isSponsorModeActive, let commitmentID = activeCommitment?.id {
-            blockChangeMessage = "Sent to your ally for approval…"
-            do {
-                let requestID = try await approval.createRequest(commitmentID: commitmentID, kind: kind)
-                switch await approval.pollDecision(requestID: requestID) {
-                case .approved:        break
-                case .denied:          blockChangeMessage = "Your ally denied the change."; return false
-                case .expired, .failed: blockChangeMessage = "No ally response. Change cancelled."; return false
-                }
-            } catch {
-                blockChangeMessage = "Couldn't reach your ally. Change cancelled."
-                return false
-            }
-        }
         return true
     }
 
     /// Apply an edited block selection. Adding targets applies immediately (FR-SHIELD-009).
-    /// Removing a target is a loosening: paired key + (sponsor approval if linked) + cooling-off,
+    /// Removing a target is a loosening: paired key + cooling-off,
     /// and the removed targets stay blocked until it all clears (FR-SHIELD-010, HC-4).
     func requestSelectionChange(_ new: FamilyActivitySelection) async {
         pendingSelection.clear()                             // supersede any in-flight change
@@ -373,8 +287,8 @@ final class AppModel {
         selectionStore.save(union)
         shield.apply(union)
 
-        // Gate the removal: key, then sponsor approval if linked (FR-SHIELD-010, FR-P2-SPON-*).
-        guard await approveLoosening(kind: "remove_app") else { return }
+        // Gate the removal with the key (FR-SHIELD-010).
+        guard await approveLoosening() else { return }
 
         // Cleared → wait out the cooling-off before the removal takes effect.
         let endsAt = Date().addingTimeInterval(cooldownSeconds)
@@ -438,8 +352,8 @@ final class AppModel {
         // Keep everything currently on (plus anything newly turned on) while we gate the turn-off.
         setWebCategories(gambling: gambling || curG, adult: adult || curA)
 
-        // Gate the turn-off: key, then sponsor approval if linked (FR-SHIELD-010, FR-P2-SPON-*).
-        guard await approveLoosening(kind: "disable_category") else { return }
+        // Gate the turn-off with the key (FR-SHIELD-010).
+        guard await approveLoosening() else { return }
 
         let endsAt = Date().addingTimeInterval(cooldownSeconds)
         pendingCategories.begin(WebCategories(gambling: gambling, adult: adult), endsAt: endsAt)
@@ -487,17 +401,14 @@ final class AppModel {
         return added.count
     }
 
-    /// Ask to drop sites from the list. Needs the key, then the sponsor if linked, then the
-    /// cooldown; the sites stay blocked until the wait ends (FR-SHIELD-010, HC-4).
+    /// Ask to drop sites from the list. Needs the key, then the cooldown; the sites stay
+    /// blocked until the wait ends (FR-SHIELD-010, HC-4).
     func requestRemoveCustomDomains(_ domains: [String]) async {
         let targets = Set(domains).intersection(customDomains)
         guard !targets.isEmpty else { return }
         pendingDomains.clear()
 
-        // "disable_category" on purpose: the server (migration 04) and the sponsor's app only
-        // know unlock / remove_app / disable_category, and to the sponsor this is "turn off a
-        // website filter". A new kind would need a migration and an approver-app update.
-        guard await approveLoosening(kind: "disable_category") else { return }
+        guard await approveLoosening() else { return }
 
         let endsAt = Date().addingTimeInterval(cooldownSeconds)
         pendingDomains.begin(Array(targets).sorted(), endsAt: endsAt)
@@ -554,7 +465,7 @@ final class AppModel {
 
 
     /// Save a new or edited set. Tightening applies now; loosening keeps the old set in place,
-    /// then needs the key, the sponsor if linked, and the cooldown before the new one lands.
+    /// then needs the key and the cooldown before the new one lands.
     func saveScheduledSet(_ set: ScheduledSet) async {
         var target = scheduledSets
         if let i = target.firstIndex(where: { $0.id == set.id }) {
@@ -565,6 +476,13 @@ final class AppModel {
                 return
             }
         } else {
+            // 2.3: making a new set is a Pro feature. Sets made before keep running, and
+            // editing or deleting one never needs Pro. The views send people to the paywall
+            // first; this is the backstop.
+            guard pro.isPro else {
+                blockChangeMessage = "New scheduled sets come with Pawl Pro."
+                return
+            }
             guard target.count < ScheduledSet.maxSets else {
                 blockChangeMessage = "You can have up to \(ScheduledSet.maxSets) sets."
                 return
@@ -598,7 +516,7 @@ final class AppModel {
 
     private func gateSetsChange(_ target: [ScheduledSet], what: String) async {
         pendingSetsCtl.clear()
-        guard await approveLoosening(kind: "remove_app") else { return }
+        guard await approveLoosening() else { return }
         let endsAt = Date().addingTimeInterval(cooldownSeconds)
         pendingSetsCtl.begin(target, endsAt: endsAt)
         blockChangeMessage = "\(what) It applies in \(Int(cooldownSeconds / 60)) min."
@@ -647,15 +565,6 @@ final class AppModel {
         activeCommitment = snap.commitment
     }
 
-    /// An approver decides they want Pawl to block gambling on their own phone too. Re-runs
-    /// setup; finishing it (activate) flips them to the blocker role. Their account + sponsor
-    /// links are untouched, so they end up as a blocker who also sponsors. Adding protection
-    /// is always free (FR-SHIELD-009 spirit).
-    func setUpBlocking() {
-        OnboardingFlag.reset()
-        didOnboard = false
-    }
-
     /// Dev only: run onboarding again. Does NOT erase streak/history.
     func resetOnboarding() {
         OnboardingFlag.reset()
@@ -667,19 +576,19 @@ final class AppModel {
         return (s.applicationTokens.count + s.categoryTokens.count, s.webDomainTokens.count)
     }
 
-    // MARK: - Phase 3 hard lock (sponsor passcode attestation — scaffolding)
+    // MARK: - Hard lock (a trusted person sets the Screen Time passcode)
 
     /// Mirrors the iCloud-backed attestation as observed state, so Settings reflects it live when
-    /// it's set or reset. The attestation is sponsor-reported — Pawl can't verify the passcode itself.
+    /// it's set or reset. The attestation is self-reported; Pawl can't verify the passcode itself.
+    /// 2.3: on the phone and iCloud only. The server copy went away with the backend.
     private(set) var hardLockAttested: Bool
     private(set) var hardLockDate: Date?
 
-    /// The sponsor attests they set the device Screen Time passcode and verified it blocks changes.
+    /// The trusted person attests they set the device Screen Time passcode and verified it blocks changes.
     func attestHardLock() {
         HardLock.attest()
         hardLockAttested = true
         hardLockDate = HardLock.attestedDate()
-        Task { await setServerHardLock(true) }
     }
 
     /// Clear the attestation so the hard lock can be set up again (e.g. it was attested by mistake
@@ -690,20 +599,12 @@ final class AppModel {
         HardLock.clear()
         hardLockAttested = false
         hardLockDate = nil
-        Task { await setServerHardLock(false) }
-    }
-
-    /// Record the hard-lock attestation on the server commitment (best-effort; no-op signed out),
-    /// so the linked sponsor sees it and a later tamper can be flagged a breach (FR-P3-HARD-004/005).
-    private func setServerHardLock(_ active: Bool) async {
-        struct P: Encodable { let p_active: Bool }
-        _ = try? await Supa.client.rpc("set_hard_lock", params: P(p_active: active)).execute()
     }
 }
 
-/// Records the sponsor's attestation that the device Screen Time passcode is set + verified
-/// (docs/11_Phase3_Passcode.md). Stored in iCloud so it survives reinstall. Local for now;
-/// server-side attestation (RPC + columns) is a later step. Pawl never holds the passcode.
+/// Records a trusted person's attestation that the device Screen Time passcode is set + verified
+/// (docs/archive/11_Phase3_Passcode.md). Stored in iCloud so it survives reinstall. Pawl never
+/// holds the passcode.
 enum HardLock {
     private static let key = "pawl.hardlock.attestedAt"
 
@@ -738,6 +639,17 @@ enum OnboardingFlag {
     }
     @MainActor static func setRole(_ r: AppRole) {
         CloudStore.shared.set(Data(r.rawValue.utf8), forKey: roleKey)
+    }
+
+    /// 2.3: the approver-only role was removed with the ally feature. Someone who only approved
+    /// for others has nothing set up to block, so they go through setup next launch. Their
+    /// streak and history are untouched. Returns true if a saved approver role was retired.
+    @MainActor @discardableResult static func retireApproverRole() -> Bool {
+        guard let data = CloudStore.shared.data(forKey: roleKey),
+              String(data: data, encoding: .utf8) == "approver" else { return false }
+        setRole(.blocker)
+        reset()
+        return true
     }
 
     @MainActor static func vertical() -> Vertical {

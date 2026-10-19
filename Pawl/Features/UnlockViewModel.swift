@@ -40,29 +40,19 @@ public final class UnlockViewModel {
     private var timerTask: Task<Void, Never>?
     private var keyTimerTask: Task<Void, Never>?
 
-    // Slice 4: sponsor mode + the active commitment are read fresh at each unlock, so linking
-    // a sponsor takes effect without rebuilding the view. The approval round-trip is delegated
-    // to UnlockApprovalService (polling).
+    // The active commitment is read fresh at each unlock, so a duration change takes effect
+    // without rebuilding the view.
     private let commitmentProvider: () -> Commitment?
-    private let sponsorModeProvider: () -> Bool
-    private let approval: UnlockApprovalService?
-    private var activeCommitmentID: UUID?
-    private var pendingRequestID: UUID?
-    private var approvalTask: Task<Void, Never>?
 
     public init(shield: ShieldService,
                 selection: FamilyActivitySelection,
-                commitmentProvider: @escaping () -> Commitment? = { nil },
-                sponsorModeProvider: @escaping () -> Bool = { false },
-                approval: UnlockApprovalService? = nil) {
+                commitmentProvider: @escaping () -> Commitment? = { nil }) {
         self.shield = shield
         self.selection = selection
         self.keyStore = KeyStore()
         self.commitmentProvider = commitmentProvider
-        self.sponsorModeProvider = sponsorModeProvider
-        self.approval = approval
         let c = commitmentProvider() ?? Commitment(startedAt: Date(), updatedAt: Date())
-        self.machine = UnlockMachine(commitment: c, requiresSponsorApproval: sponsorModeProvider())
+        self.machine = UnlockMachine(commitment: c)
         self.pairedCredential = keyStore.load()?.credentialID.base64EncodedString()
         restorePendingKeyChange()   // resume/commit a gated re-pair across launches (FR-NFC-004)
     }
@@ -86,7 +76,7 @@ public final class UnlockViewModel {
             let pairing = keyStore.state()
             // Use the commitment's real cooling-off, not whatever this screen started with.
             if let c = commitmentProvider() {
-                machine = UnlockMachine(commitment: c, requiresSponsorApproval: sponsorModeProvider())
+                machine = UnlockMachine(commitment: c)
             }
             guard pairing != .unavailable else {
                 message = "Pawl can't read its saved key right now. Unlock your phone and try again."
@@ -147,13 +137,9 @@ public final class UnlockViewModel {
     public func beginUnlock() async {
         guard pairedCredential != nil, let pairedKey = keyStore.load() else { message = "Pair a key first."; return }
         message = nil
-        // Pick up the latest sponsor mode + commitment so linking a sponsor takes effect
-        // without rebuilding the view (FR-P2-LINK-005, FR-P2-SPON-002).
-        let commitment = commitmentProvider()
-        activeCommitmentID = commitment?.id
+        // Pick up the latest commitment so its durations apply without rebuilding the view.
         machine = UnlockMachine(
-            commitment: commitment ?? Commitment(startedAt: Date(), updatedAt: Date()),
-            requiresSponsorApproval: sponsorModeProvider()
+            commitment: commitmentProvider() ?? Commitment(startedAt: Date(), updatedAt: Date())
         )
         send(.beginUnlock)
         isBusy = true
@@ -224,12 +210,6 @@ public final class UnlockViewModel {
         }
     }
 
-    /// DEV ONLY: stand in for the sponsor's APNs decision until the backend slice lands.
-    /// Approve → cooling-off begins; deny → stays locked (FR-P2-SPON-003/004).
-    public func devSimulateSponsor(approved: Bool) {
-        send(.sponsorDecision(approved: approved))
-    }
-
     /// The instant the current timed phase ends, for the countdown UI.
     public var phaseEndsAt: Date? {
         switch state {
@@ -249,11 +229,6 @@ public final class UnlockViewModel {
 
     private func apply(_ effect: UnlockEffect) {
         switch effect {
-        case .requestSponsorApproval:
-            message = "Sent to your ally for approval…"
-            requestSponsorApproval()
-        case .cancelSponsorRequest:
-            cancelSponsorApproval()
         case .scheduleCoolingOff(let endsAt):
             // Drives the in-app countdown UI...
             scheduleFire(at: endsAt, event: .coolingOffEnded)
@@ -290,47 +265,6 @@ public final class UnlockViewModel {
             if Task.isCancelled { return }
             self?.send(event)
         }
-    }
-
-    // MARK: - Sponsor approval round-trip (FR-P2-SPON-002..006)
-
-    /// Create the unlock_request and poll for the sponsor's decision, then feed it back into
-    /// the pure machine. Fail-safe: any error / no service → stay locked (HC-4).
-    private func requestSponsorApproval() {
-        guard let approval, let commitmentID = activeCommitmentID else {
-            message = "Couldn't reach ally approval. Staying locked."
-            send(.approvalTimedOut)
-            return
-        }
-        approvalTask?.cancel()
-        approvalTask = Task { [weak self] in
-            guard let self else { return }
-            do {
-                let requestID = try await approval.createRequest(commitmentID: commitmentID)
-                self.pendingRequestID = requestID
-                let decision = await approval.pollDecision(requestID: requestID)
-                if Task.isCancelled { return }
-                switch decision {
-                case .approved: self.send(.sponsorDecision(approved: true))
-                case .denied:   self.send(.sponsorDecision(approved: false))
-                case .expired, .failed: self.send(.approvalTimedOut)
-                }
-                self.pendingRequestID = nil
-            } catch {
-                if !Task.isCancelled {
-                    self.message = error.localizedDescription
-                    self.send(.approvalTimedOut)
-                }
-            }
-        }
-    }
-
-    private func cancelSponsorApproval() {
-        approvalTask?.cancel(); approvalTask = nil
-        if let approval, let requestID = pendingRequestID {
-            Task { try? await approval.cancel(requestID: requestID) }
-        }
-        pendingRequestID = nil
     }
 
     // MARK: - Gated re-pair (FR-NFC-004)

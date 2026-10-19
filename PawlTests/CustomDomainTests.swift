@@ -39,8 +39,14 @@ final class CustomDomainTests: XCTestCase {
         XCTAssertNil(BlocklistService.cleanHostname("exa mple.com"))
     }
 
-    func testNormalizedMergeStillDedupesAndKeepsSeed() {
-        let merged = BlocklistService.normalizedMerge(["WWW.A.com", "a.com", "https://b.com/x"], seed: ["seed.com"])
-        XCTAssertEqual(Set(merged), ["a.com", "b.com", "seed.com"])
+    // 2.3: the gambling list is bundled now (no download), so check what ships: 167 unique,
+    // already-clean hostnames.
+    func testBundledGamblingListIsCleanAndUnique() {
+        let list = GamblingBlocklist.seedDomains
+        XCTAssertEqual(list.count, 167)
+        XCTAssertEqual(Set(list).count, list.count)
+        for domain in list {
+            XCTAssertEqual(BlocklistService.cleanHostname(domain), domain)
+        }
     }
 }

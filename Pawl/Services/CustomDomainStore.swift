@@ -11,9 +11,9 @@
 //      so the monitor extension re-applies the same list on every relock.
 //    • iCloud key-value storage is a mirror so the list survives deleting the app, like the
 //      streak does (docs/07_iCloud_Reinstall_Proofing.md).
-//  Nothing here goes to Supabase. A typed site is the user's business, not the sponsor's.
+//  Nothing here leaves the phone and the user's own iCloud.
 //
-//  Removal is an unlock action (key, sponsor if linked, then cooldown), the same rule as
+//  Removal is an unlock action (key, then cooldown), the same rule as
 //  removing an app or switching off a website category (FR-SHIELD-010). 2.3: the pending
 //  removal is saved and timed by PendingChangeController; `makePendingStore` below names its
 //  store and moves a removal saved by 2.2 over to it.

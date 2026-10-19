@@ -8,7 +8,7 @@
 //
 //  Decides WHEN to ask for a rating. iOS shows the rating sheet at most three times per
 //  year per app and silently drops any extra request, so each ask is spent on a moment the
-//  person earned: a streak milestone, a few resisted urges, a sponsor who just linked.
+//  person earned: a streak milestone or a few resisted urges.
 //  Never on an unlock. Lifting the shield must not feel rewarding.
 //
 //  The views call `shouldAsk` and, on true, SwiftUI's `requestReview` environment action.
@@ -23,7 +23,6 @@ enum ReviewPrompter {
     enum Moment: String {
         case streakMilestone   // the home streak hero hit 7, 30, 60, 90, 180 or 365 days
         case urgeLogged        // a resisted urge was logged (third or later)
-        case sponsorLinked     // the person saw "Linked" with their sponsor for the first time
     }
 
     static let appID = "6783119309"

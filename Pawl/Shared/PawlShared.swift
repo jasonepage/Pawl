@@ -161,8 +161,8 @@ public enum SharedShield {
     /// Verified on-device (2026-06-23, individual Family Controls auth): `true` removes the
     /// "Delete App" option, leaving only "Remove from Home Screen" — the app stays installed
     /// and the shield keeps running. NOT absolute: revoking Screen Time in Settings still wipes
-    /// it (no passcode until the Phase-3 sponsor-set passcode), and that revoke trips the
-    /// heartbeat tamper alert. Lives on the same named store and is intentionally left untouched
+    /// it unless someone the person trusts has set a Screen Time passcode (the hard lock).
+    /// Lives on the same named store and is intentionally left untouched
     /// by apply()/lift() so it persists across grace cycles.
     public nonisolated static func setDeletionBlock(_ on: Bool) {
         ManagedSettingsStore(named: .pawl).application.denyAppRemoval = on ? true : nil

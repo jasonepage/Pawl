@@ -18,6 +18,7 @@ import FamilyControls
 
 struct ScheduledSetsSection: View {
     let model: AppModel
+    @State private var showPaywall = false
 
     var body: some View {
         Section {
@@ -36,10 +37,24 @@ struct ScheduledSetsSection: View {
                 }
             }
             if model.scheduledSets.count < ScheduledSet.maxSets {
-                NavigationLink {
-                    ScheduledSetEditor(model: model, original: nil)
-                } label: {
-                    SettingsRows.label("plus", .orange, "Add a scheduled set")
+                if model.pro.isPro {
+                    NavigationLink {
+                        ScheduledSetEditor(model: model, original: nil)
+                    } label: {
+                        SettingsRows.label("plus", .orange, "Add a scheduled set")
+                    }
+                } else {
+                    // 2.3: making a new set is part of Pawl Pro. Sets already made keep working,
+                    // and editing or deleting them never needs Pro.
+                    Button { showPaywall = true } label: {
+                        HStack {
+                            SettingsRows.label("plus", .orange, "Add a scheduled set")
+                            Spacer(minLength: 8)
+                            Text("Pro").font(.subheadline).foregroundStyle(.secondary)
+                        }
+                    }
+                    .foregroundStyle(.primary)
+                    .sheet(isPresented: $showPaywall) { PaywallView(pro: model.pro) }
                 }
             }
             if let p = model.pendingSets {
@@ -162,7 +177,7 @@ struct ScheduledSetEditor: View {
                 }
             } footer: {
                 if willWait {
-                    Text("This blocks less than before, so it needs your key, your ally if you have one, and the cooling-off wait. The current set stays in effect until then.")
+                    Text("This blocks less than before, so it needs your key and the cooling-off wait. The current set stays in effect until then.")
                 }
             }
         }

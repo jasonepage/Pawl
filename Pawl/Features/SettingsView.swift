@@ -35,31 +35,13 @@ struct SettingsView: View {
                         .listRowSeparator(.hidden)
                 }
 
-                if model.role == .blocker, !model.auth.isApproved {
+                if !model.auth.isApproved {
                     screenTimeOffSection
-                }
-
-                AccountView(auth: model.account, onSignIn: {
-                    Task {
-                        await model.syncCommitment()
-                        await model.sponsor.refresh()
-                    }
-                })
-
-                if model.account.isSignedIn {
-                    SponsorView(sponsor: model.sponsor,
-                                nameMissing: (model.account.displayName ?? "").isEmpty,
-                                hasAccountability: hasPro || model.pro.isLegacyFree,
-                                onUnlock: { showPaywall = true })
                 }
 
                 proSection
 
-                if model.role == .blocker {
-                    blockingSection
-                } else {
-                    approverSection
-                }
+                blockingSection
 
                 helpSection
                 appSection
@@ -81,7 +63,6 @@ struct SettingsView: View {
             .task {
                 await model.pro.refreshEntitlements()
                 syncPro()
-                if model.account.isSignedIn { await model.sponsor.refresh() }
             }
             .onAppear {
                 model.auth.refresh()
@@ -138,7 +119,7 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Pawl Pro (P1)
+    // MARK: - Pawl Pro
 
     private var proSection: some View {
         Section {
@@ -149,18 +130,13 @@ struct SettingsView: View {
             }
             .buttonStyle(.plain)
         } footer: {
-            if !(hasPro || model.pro.isLegacyFree) {
-                Text("An ally who approves your unlocks and hears if your protection drops. Blocking stays free.")
+            if !hasPro {
+                Text("Scheduled sets and the weekly report. Blocking, the key and the wait stay free.")
             }
         }
     }
 
-    private var proStatusText: String {
-        if model.pro.isLegacyFree { return "Free for life" }
-        if hasPro { return "Active" }
-        // Sponsor link but no entitlement = a lapsed subscription (docs/12 §8).
-        return model.sponsor.asProtected.contains { $0.status == "active" } ? "Lapsed" : "Free"
-    }
+    private var proStatusText: String { hasPro ? "Active" : "Free" }
 
     /// Pull the current entitlement into @State so the row re-renders. Pro status can change while
     /// Settings is on screen (right after a purchase), and @State mutation guarantees the update.
@@ -193,18 +169,6 @@ struct SettingsView: View {
     }
 
     private var blockedSummaryText: String { model.blockedSummaryLine }
-
-    private var approverSection: some View {
-        Section {
-            Button {
-                model.setUpBlocking()
-            } label: {
-                SettingsRows.label("shield.lefthalf.filled", .green, "Set up blocking on this phone")
-            }
-        } footer: {
-            Text("You're set up only to approve someone else. You can block things on your own phone too and still be their approver.")
-        }
-    }
 
     // MARK: - Help
 
@@ -256,12 +220,6 @@ struct SettingsView: View {
                 model.shield.setClockLock(false)
             } label: {
                 SettingsRows.label("trash.slash.fill", .red, "Allow deletion (escape)")
-            }
-            Button {
-                model.pro.debugResetLegacy()
-                syncPro()
-            } label: {
-                SettingsRows.label("star.slash.fill", .yellow, "Reset Pro (dev)")
             }
         } header: {
             Text("Developer")

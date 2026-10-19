@@ -9,7 +9,8 @@
 //  A CommitmentRepository backed by iCloud Key-Value storage, so the commitment,
 //  streak, relapse and urge history survive deleting + reinstalling the app
 //  (SRS FR-PERSIST-001/002/003). Same interface as the local repository, so feature
-//  code doesn't change. Phase 2 can swap in CloudKit/Supabase behind the same protocol.
+//  code doesn't change. 2.3: this is the app's only commitment store (the Supabase layer
+//  that once wrapped it was removed).
 //
 
 import Foundation

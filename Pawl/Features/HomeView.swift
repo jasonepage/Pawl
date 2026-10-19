@@ -39,9 +39,12 @@ struct HomeView: View {
     /// A binding rather than local state, because a TabView keeps unselected tabs alive and
     /// this view is not always the one on screen when the flag arrives (FR-SHACT-004).
     var showUrge: Binding<Bool> = .constant(false)
+    /// 2.3: the weekly report is part of Pawl Pro. nil (previews) reads as not Pro.
+    var pro: ProStore? = nil
 
     @State private var vm = HomeViewModel()
     @State private var showRelapseSheet = false
+    @State private var showPaywall = false
     @Environment(\.requestReview) private var requestReview
     @ScaledMetric(relativeTo: .largeTitle) private var heroNumberSize: CGFloat = 76
 
@@ -54,7 +57,13 @@ struct HomeView: View {
                     urgeButton
                     if needsKey { keyNudge }
                     blockedCard
-                    if let week = vm.week { WeekCard(report: week, hoursPerDay: hoursPerDay) }
+                    if let week = vm.week {
+                        if pro?.isPro == true {
+                            WeekCard(report: week, hoursPerDay: hoursPerDay)
+                        } else {
+                            weekProCard
+                        }
+                    }
                     if !vm.history.isEmpty { historyCard }
                     relapseButton
                 }
@@ -69,6 +78,9 @@ struct HomeView: View {
                 guard milestones.contains(days),
                       ReviewPrompter.shouldAsk(.streakMilestone, tag: "\(days)") else { return }
                 askForReview()
+            }
+            .sheet(isPresented: $showPaywall) {
+                if let pro { PaywallView(pro: pro) }
             }
             .sheet(isPresented: $showRelapseSheet) {
                 RelapseSheet(asksCost: asksSlipCost) { note, amount, when in
@@ -96,6 +108,24 @@ struct HomeView: View {
             }
         }
         .tint(PawlColor.brand)
+    }
+
+    /// 2.3: without Pro, the weekly report's spot says what it is and opens the paywall.
+    /// Plain and short: nothing here is locked away from protection.
+    private var weekProCard: some View {
+        PawlCard {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("This week").font(.title3)
+                Text("Your weekly report is part of Pawl Pro. It shows the days Pawl was on and what it blocked.")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button("See Pawl Pro") { showPaywall = true }
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(PawlColor.brand)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 
     /// Shows the system rating sheet after a short pause so it never lands mid-transition.

@@ -4,13 +4,13 @@
 
 //
 //  HardLockView.swift
-//  Pawl — Phase 3 scaffolding (sponsor-set Screen Time passcode)
+//  Pawl — hard lock (a Screen Time passcode set by someone the person trusts)
 //
-//  The guided "guide → test → attest" flow (docs/11_Phase3_Passcode.md). NON-FUNCTIONAL by
-//  necessity: iOS gives no API to set, read, or even detect the Screen Time passcode, so this
-//  walks the sponsor through doing it in Settings, has them verify it in person, and records
-//  their attestation. iOS enforces the lock; Pawl never holds it. Server attestation + the
-//  high-priority tamper escalation are later build steps.
+//  The guided "guide → test → attest" flow (docs/archive/11_Phase3_Passcode.md). NON-FUNCTIONAL
+//  by necessity: iOS gives no API to set, read, or even detect the Screen Time passcode, so this
+//  walks the trusted person through doing it in Settings, has them verify it in person, and
+//  records their attestation on the phone and in iCloud. iOS enforces the lock; Pawl never holds
+//  it. 2.3: the server copy and tamper alerts were removed with the backend.
 //
 
 import SwiftUI
@@ -46,7 +46,7 @@ struct HardLockView: View {
         switch step {
         case 0:
             heading("The hard lock", "The only truly unfakeable tier.")
-            body("Pawl's shield is strong, but a determined person can still delete the app or turn off Screen Time. The one thing that closes those last doors is a Screen Time passcode they don't know, set by you, their ally, in person.")
+            body("Pawl's shield is strong, but a determined person can still delete the app or turn off Screen Time. The one thing that closes those last doors is a Screen Time passcode they don't know, set by you, someone they trust, in person.")
             body("Pawl can't see, set, or recover this passcode. iOS enforces it; you hold it. If it's ever forgotten, only Apple's device-reset process can clear it.")
         case 1:
             heading("1 · Set the passcode", "In the Settings app, not here.")
@@ -64,7 +64,7 @@ struct HardLockView: View {
             body("Do this now, together. Only attest if the Screen Time passcode prompt is the only way through.")
         default:
             heading("3 · Confirm", "You set it and saw it work.")
-            body("You're attesting that you set the Screen Time passcode and verified it blocks changes. Pawl records this as your attestation, not something Pawl can check itself. If protection is ever removed anyway, you'll get a tamper alert.")
+            body("You're attesting that you set the Screen Time passcode and verified it blocks changes. Pawl records this as your attestation, not something Pawl can check itself.")
         }
     }
 
@@ -83,12 +83,12 @@ struct HardLockView: View {
 
     private var attestedState: some View {
         VStack(alignment: .leading, spacing: 12) {
-            heading("Hard lock is on", "Set by an ally.")
+            heading("Hard lock is on", "Set by someone you trust.")
             if let d = attestedDate {
                 Text("Attested \(d.formatted(date: .abbreviated, time: .shortened)).")
                     .font(.subheadline).foregroundStyle(.secondary)
             }
-            body("An ally set the device Screen Time passcode and verified it. iOS enforces it. Pawl can't see or change it. If protection is ever removed, the ally is alerted.")
+            body("Someone you trust set the device Screen Time passcode and verified it. iOS enforces it. Pawl can't see or change it.")
 
             Divider().padding(.vertical, 6)
 

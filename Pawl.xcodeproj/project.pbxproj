@@ -12,7 +12,6 @@
 		BC8410F62FE9D33D00F0888C /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC8410F52FE9D33D00F0888C /* ManagedSettings.framework */; };
 		BC8410F82FE9D33D00F0888C /* ManagedSettingsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC8410F72FE9D33D00F0888C /* ManagedSettingsUI.framework */; };
 		BC8411002FE9D33D00F0888C /* PawlShield.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC8410F42FE9D33D00F0888C /* PawlShield.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		BC8411212FE9F34000F0888C /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = BC8411202FE9F34000F0888C /* Supabase */; };
 		BC8AB0D5304914E90001384D /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC8410F52FE9D33D00F0888C /* ManagedSettings.framework */; };
 		BC8AB0DD304914E90001384D /* PawlShieldAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BC8AB0D4304914E80001384D /* PawlShieldAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BC8B55BD2FF438C500BACE0C /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC8B55BC2FF438C500BACE0C /* StoreKit.framework */; };
@@ -180,7 +179,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BC8411212FE9F34000F0888C /* Supabase in Frameworks */,
 				BC8B55BD2FF438C500BACE0C /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -297,7 +295,6 @@
 			);
 			name = Pawl;
 			packageProductDependencies = (
-				BC8411202FE9F34000F0888C /* Supabase */,
 			);
 			productName = Pawl;
 			productReference = BC84109A2FE9B3D600F0888C /* Pawl.app */;
@@ -407,7 +404,6 @@
 			mainGroup = BC8410912FE9B3D600F0888C;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				BC8411172FE9ED1800F0888C /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BC84109B2FE9B3D600F0888C /* Products */;
@@ -1000,24 +996,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		BC8411172FE9ED1800F0888C /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/supabase-community/supabase-swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.5.1;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		BC8411202FE9F34000F0888C /* Supabase */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BC8411172FE9ED1800F0888C /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Supabase;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BC8410922FE9B3D600F0888C /* Project object */;
 }

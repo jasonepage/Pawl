@@ -8,7 +8,7 @@
 //
 //  Deliberately dead-simple and large-type for the moment of urge and for older users:
 //  one big status hero, one big primary action, short readable copy. All the real logic
-//  (key assertion, cooling-off, grace, sponsor approval, gated re-pair) lives unchanged in
+//  (key assertion, cooling-off, grace, gated re-pair) lives unchanged in
 //  UnlockViewModel — this file is only the presentation (SDS §4.2, §4.3).
 //
 
@@ -24,16 +24,12 @@ struct UnlockView: View {
     init(shield: ShieldService,
          selection: FamilyActivitySelection,
          screenTimeOff: Bool = false,
-         commitmentProvider: @escaping () -> Commitment? = { nil },
-         sponsorModeProvider: @escaping () -> Bool = { false },
-         approval: UnlockApprovalService? = nil) {
+         commitmentProvider: @escaping () -> Commitment? = { nil }) {
         self.screenTimeOff = screenTimeOff
         _vm = State(wrappedValue: UnlockViewModel(
             shield: shield,
             selection: selection,
-            commitmentProvider: commitmentProvider,
-            sponsorModeProvider: sponsorModeProvider,
-            approval: approval
+            commitmentProvider: commitmentProvider
         ))
     }
 
@@ -127,11 +123,6 @@ struct UnlockView: View {
         case .reading:
             helper("Hold your security key to the phone…")
 
-        case .awaitingApproval:
-            helper("Your ally needs to say yes. The wait starts only once they approve.")
-            bigButton("Cancel: keep apps locked", "lock.fill",
-                      bg: PawlColor.cardBg, fg: .primary) { vm.cancel() }
-
         case .coolingOff:
             helper("Apps unlock when the timer reaches zero. Waiting it out is the whole point.")
             bigButton("Cancel: keep apps locked", "lock.fill",
@@ -173,9 +164,6 @@ struct UnlockView: View {
             switch vm.state {
             case .coolingOff, .unshielded:
                 Button("Dev: skip the wait") { vm.devSkipWait() }
-            case .awaitingApproval:
-                Button("Dev: simulate sponsor approve") { vm.devSimulateSponsor(approved: true) }
-                Button("Dev: simulate sponsor deny") { vm.devSimulateSponsor(approved: false) }
             default:
                 EmptyView()
             }
@@ -225,7 +213,7 @@ struct UnlockView: View {
         switch vm.state {
         case .locked: return vm.isPaired ? PawlColor.cleanBg : PawlColor.cardBg
         case .reading: return PawlColor.cardBg
-        case .awaitingApproval, .coolingOff, .unshielded: return PawlColor.urgeBg
+        case .coolingOff, .unshielded: return PawlColor.urgeBg
         }
     }
 
@@ -234,7 +222,7 @@ struct UnlockView: View {
         switch vm.state {
         case .locked: return vm.isPaired ? PawlColor.cleanText : .primary
         case .reading: return .primary
-        case .awaitingApproval, .coolingOff, .unshielded: return PawlColor.urgeText
+        case .coolingOff, .unshielded: return PawlColor.urgeText
         }
     }
 
@@ -243,7 +231,6 @@ struct UnlockView: View {
         switch vm.state {
         case .locked: return vm.isPaired ? "lock.fill" : "key"
         case .reading: return "key.fill"
-        case .awaitingApproval: return "person.2.fill"
         case .coolingOff: return "hourglass"
         case .unshielded: return "lock.open.fill"
         }
@@ -254,7 +241,6 @@ struct UnlockView: View {
         switch vm.state {
         case .locked: return vm.isPaired ? "Apps are blocked" : "Set up your key"
         case .reading: return "Checking your key"
-        case .awaitingApproval: return "Waiting for ally"
         case .coolingOff: return "Unlocking soon"
         case .unshielded: return "Apps unlocked"
         }
