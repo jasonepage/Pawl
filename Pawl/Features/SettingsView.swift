@@ -6,11 +6,12 @@
 //  SettingsView.swift
 //  Pawl, settings
 //
-//  2.3 redesign: four plain groups, in the order people need them.
+//  2.3 redesign: three plain groups, in the order people need them.
 //    1. What's blocked: Apps, Websites, Scheduled sets (each its own page)
 //    2. Unlocking: the key, how long unlocking takes, the hard lock
-//    3. When you're tempted: someone to call, help lines
-//    4. Pawl: Pro, how it works, privacy, the version
+//    3. Pawl: Pro, how it works, privacy, the version
+//  The person to call and the help lines live on the "I'm tempted" screen, where they're used,
+//  not here.
 //  Every row says what it is and how it is set right now in one short line, so nothing needs
 //  a footer to explain it. The brand header stays on top, a little more compact than 2.2.
 //  Behavior is unchanged: every gated action still routes through AppModel (FR-SHIELD-010),
@@ -27,6 +28,9 @@ struct SettingsView: View {
     var onOpenUnlock: () -> Void = {}
 
     @State private var showPaywall = false
+    #if DEBUG
+    @State private var confirmErase = false
+    #endif
     // Mirror of Pro entitlement in local @State so rows re-render reliably on lifecycle events
     // (purchase, sheet close, appear) without relying on cross-object Observation timing.
     @State private var hasPro = false
@@ -46,7 +50,6 @@ struct SettingsView: View {
                 }
                 blockedSection
                 unlockingSection
-                temptedSection
                 pawlSection
 
                 #if DEBUG
@@ -205,35 +208,7 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - 3. When you're tempted
-
-    private var temptedSection: some View {
-        Section {
-            NavigationLink {
-                TrustedContactView()
-            } label: {
-                SettingsRows.detail("person.fill", .pink, "Someone to call", contactLine)
-            }
-            if model.showGamblingHelp {
-                Link(destination: URL(string: "https://www.ncpgambling.org/help-treatment/")!) {
-                    SettingsRows.external("lifepreserver.fill", .teal, "Problem gambling help")
-                }
-            }
-            Link(destination: URL(string: "tel://988")!) {
-                SettingsRows.external("phone.fill", .red, "Crisis support, call 988")
-            }
-        } header: {
-            Text("When you're tempted")
-        }
-    }
-
-    private var contactLine: String {
-        if let name = TrustedContact.name() { return "\(name), one tap from the urge screen" }
-        if TrustedContact.phone() != nil { return "Set, one tap from the urge screen" }
-        return "Add someone to call when you're tempted"
-    }
-
-    // MARK: - 4. Pawl
+    // MARK: - 3. Pawl
 
     private var pawlSection: some View {
         Section {
@@ -275,9 +250,20 @@ struct SettingsView: View {
     private var developerSection: some View {
         Section {
             Button(role: .destructive) {
+                confirmErase = true
+            } label: {
+                SettingsRows.label("trash.fill", .red, "Erase everything")
+            }
+            .confirmationDialog("Erase everything?", isPresented: $confirmErase, titleVisibility: .visible) {
+                Button("Erase and close Pawl", role: .destructive) { model.devEraseEverything() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Removes your key, streak, logs, blocks, sets and settings from this phone and from iCloud (other devices on this Apple Account too), lifts every block, and closes Pawl. Open it again for a fresh start. Test purchases are separate: Xcode, Debug, StoreKit, Manage Transactions.")
+            }
+            Button {
                 model.resetOnboarding()
             } label: {
-                SettingsRows.label("arrow.counterclockwise", .orange, "Start over")
+                SettingsRows.label("arrow.counterclockwise", .orange, "Run setup again (keeps everything)")
             }
             Button {
                 model.shield.setDeletionBlock(false)
@@ -288,7 +274,7 @@ struct SettingsView: View {
         } header: {
             Text("Developer")
         } footer: {
-            Text("DEBUG only. Start over re-runs onboarding (streak kept). Allow deletion re-enables uninstall so you can reinstall a dev build.")
+            Text("Xcode builds only, never in the App Store build. Erase everything is a true fresh start. Run setup again only re-runs setup. Allow deletion re-enables uninstall so you can reinstall a dev build.")
         }
     }
     #endif

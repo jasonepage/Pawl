@@ -127,6 +127,12 @@ struct OnboardingView: View {
         vertical = v
         blockGambling = v.defaultBlockGambling
         blockAdult = v.defaultBlockAdult
+        // 2.3: setup again on a phone that was already protecting can only add. Show a category
+        // that is already on as on (and locked below), instead of an off switch that gets ignored.
+        if model.setupWasAlreadyProtecting {
+            blockGambling = blockGambling || model.gamblingOn
+            blockAdult = blockAdult || model.adultOn
+        }
         role = .blocker
     }
 
@@ -154,18 +160,29 @@ struct OnboardingView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     content
-                    if let message {
-                        Text(message).font(.footnote).foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
                 }
                 .padding(20)
             }
 
-            footer
-                .padding(20)
+            // 2.3: the message sits right above the buttons, not at the bottom of the scroll.
+            // It used to land below the key info card, off screen, so tapping "Pair security
+            // key" on a phone that was already protecting looked like nothing happened.
+            VStack(spacing: 10) {
+                if let message {
+                    Label(message, systemImage: "info.circle")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(12)
+                        .background(PawlColor.cardBg)
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+                footer
+            }
+            .padding(20)
         }
         .familyActivityPicker(isPresented: $isPickerPresented, selection: $selection)
+        .onChange(of: step) { _, _ in message = nil }   // a note belongs to the step it came from
     }
 
     // MARK: Step content
@@ -219,11 +236,14 @@ struct OnboardingView: View {
             heading(categoryStepTitle, categoryStepSubtitle)
             categoryToggle(title: "Gambling sites",
                            subtitle: "Sportsbook, casino, and crypto sites we keep a list of.",
-                           isOn: $blockGambling)
+                           isOn: $blockGambling,
+                           locked: model.setupWasAlreadyProtecting && model.gamblingOn)
             categoryToggle(title: "Adult sites",
                            subtitle: "Turns on Apple's built-in adult-website filter.",
-                           isOn: $blockAdult)
+                           isOn: $blockAdult,
+                           locked: model.setupWasAlreadyProtecting && model.adultOn)
             card {
+              VStack(alignment: .leading, spacing: 0) {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Apps").font(.headline)
@@ -236,6 +256,15 @@ struct OnboardingView: View {
                     Button(selection.applicationTokens.isEmpty ? "Add" : "Edit") { isPickerPresented = true }
                         .buttonStyle(.bordered)
                 }
+                // 2.3: names only. Screen Time can't tell Pawl what's installed or pre-pick apps.
+                if let line = vertical.suggestedAppsLine {
+                    Text(line)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, 6)
+                }
+              }
             }
             card {
                 VStack(alignment: .leading, spacing: 10) {
@@ -256,6 +285,15 @@ struct OnboardingView: View {
                         Button("Add", action: addTypedSite)
                             .buttonStyle(.bordered)
                             .disabled(siteEntry.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
+                    // 2.3: popular sites for this focus, one tap each. Nothing is pre-picked.
+                    if !vertical.suggestedSites.filter({ !model.customDomains.contains($0) }).isEmpty {
+                        Text("Tap to block").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                            .padding(.top, 2)
+                        SiteSuggestionChips(sites: vertical.suggestedSites,
+                                            alreadyAdded: model.customDomains) { site in
+                            model.addCustomDomains(site)
+                        }
                     }
                     if !model.customDomains.isEmpty {
                         Text(model.customDomains.sorted().joined(separator: ", "))
@@ -362,7 +400,7 @@ struct OnboardingView: View {
         case 3:
             VStack(spacing: 10) {
                 if !pairLater {
-                    secondary(keyPaired ? "Re-pair key" : "Pair security key") {
+                    secondary(working ? "Waiting for your key\u{2026}" : (keyPaired ? "Re-pair key" : "Pair security key")) {
                         Task { await pairKey() }
                     }
                     .disabled(working)
@@ -503,13 +541,18 @@ struct OnboardingView: View {
     }
 
     /// A filled, tappable category card with a toggle, matching the app's card style.
-    private func categoryToggle(title: String, subtitle: String, isOn: Binding<Bool>) -> some View {
+    /// `locked`: already on from before, so setup can't turn it off (that needs the key, in
+    /// Settings). Shown on and disabled, with a line saying so.
+    private func categoryToggle(title: String, subtitle: String, isOn: Binding<Bool>,
+                                locked: Bool = false) -> some View {
         Toggle(isOn: isOn) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title).font(.headline)
-                Text(subtitle).font(.caption).foregroundStyle(.secondary)
+                Text(locked ? "Already on. Turning it off needs your key, in Settings." : subtitle)
+                    .font(.caption).foregroundStyle(.secondary)
             }
         }
+        .disabled(locked)
         .tint(PawlColor.brand)
         .padding(14)
         .background(PawlColor.cardBg)
@@ -539,12 +582,15 @@ struct OnboardingView: View {
                     return
                 }
             }
+            // 2.3: say right away what to do, so the tap visibly did something.
+            message = "Plug in your key now. When your iPhone asks, touch the key."
             let newKey = try await security.pairNewKey(displayName: "Pawl key")
             guard keyStore.save(newKey) else {
                 message = "Couldn't save the key. Try again."
                 return
             }
             keyStore.clearPending()
+            message = nil
             keyPaired = true
         } catch {
             message = error.localizedDescription

@@ -64,9 +64,14 @@ struct UnlockView: View {
 
     private var statusHero: some View {
         VStack(spacing: 10) {
-            Image(systemName: heroIcon)
-                .font(.system(size: 50, weight: .semibold))
-                .foregroundStyle(heroFg)
+            if showScreenTimeOff {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 50, weight: .semibold))
+                    .foregroundStyle(heroFg)
+            } else {
+                // 2.3: the Stooped Key. His pose follows the state; tap him and he dances.
+                PawlMascot(pose: PawlMascot.pose(for: vm.state, isPaired: vm.isPaired))
+            }
             Text(heroTitle)
                 .font(.system(.largeTitle, design: .rounded).weight(.bold))
                 .foregroundStyle(heroFg)
@@ -223,16 +228,6 @@ struct UnlockView: View {
         case .locked: return vm.isPaired ? PawlColor.cleanText : .primary
         case .reading: return .primary
         case .coolingOff, .unshielded: return PawlColor.urgeText
-        }
-    }
-
-    private var heroIcon: String {
-        if showScreenTimeOff { return "exclamationmark.triangle.fill" }
-        switch vm.state {
-        case .locked: return vm.isPaired ? "lock.fill" : "key"
-        case .reading: return "key.fill"
-        case .coolingOff: return "hourglass"
-        case .unshielded: return "lock.open.fill"
         }
     }
 

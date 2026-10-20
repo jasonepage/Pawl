@@ -173,6 +173,7 @@ public final class UnlockViewModel {
     public func cancel() {
         timerTask?.cancel(); timerTask = nil
         UnlockScheduler.cancel()
+        UnlockReminders.cancel()      // 2.3: no "apps open" reminder for an unlock that was cancelled
         send(.cancel)
     }
 
@@ -239,6 +240,9 @@ public final class UnlockViewModel {
             // Stay locked instead (HC-4, HC-6).
             do {
                 try UnlockScheduler.scheduleUnlock(coolingOff: machine.coolingOff, grace: machine.grace)
+                // 2.3: heads-up reminders before apps open and before they lock again.
+                let locksAt = endsAt.addingTimeInterval(machine.grace)
+                Task { await UnlockReminders.schedule(opensAt: endsAt, locksAt: locksAt) }
             } catch {
                 timerTask?.cancel(); timerTask = nil
                 send(.cancel)
@@ -251,7 +255,7 @@ public final class UnlockViewModel {
             // screen opened), falling back to the one this screen started with.
             let live = SharedState.loadSelection()
             let liveIsEmpty = live.applicationTokens.isEmpty && live.categoryTokens.isEmpty && live.webDomainTokens.isEmpty
-            shield.apply(liveIsEmpty ? selection : live)
+            shield.relock(liveIsEmpty ? selection : live)   // 2.3: the window is over, end it
         }
     }
 

@@ -101,11 +101,14 @@ public enum SharedState {
         AppGroup.defaults.set(adult, forKey: webAdultKey)
         AppGroup.defaults.set(domains, forKey: webDomainsKey)
     }
-    /// Set the defaults on first run (block gambling sites, adult filter off); on later runs
-    /// keep the user's choices but refresh the domain list in case the seed list changed.
-    public nonisolated static func ensureWebDefaults(domains: [String]) {
+    /// Set the defaults when nothing is saved yet (a fresh install, or a reinstall that wiped
+    /// the App Group); on later runs keep the user's choices but refresh the domain list.
+    /// 2.3: gambling is no longer switched on for everyone. The caller passes true only for an
+    /// onboarded person whose focus is gambling, so a reinstall doesn't drop their protection;
+    /// everyone else starts with nothing on and picks in setup.
+    public nonisolated static func ensureWebDefaults(domains: [String], gamblingByDefault: Bool) {
         if AppGroup.defaults.object(forKey: webEnabledKey) == nil {
-            setWebBlock(enabled: true, adult: false, domains: domains)
+            setWebBlock(enabled: gamblingByDefault, adult: false, domains: domains)
         } else {
             // Keep the cached (possibly remote-fetched) list, but guarantee the curated seed is
             // always present — so the Tier-1 fetch can grow the list without losing it offline.

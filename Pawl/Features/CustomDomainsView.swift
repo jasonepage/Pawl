@@ -21,6 +21,7 @@ struct CustomDomainsView: View {
     var body: some View {
         List {
             addSection
+            suggestionsSection
             if let pending = model.pendingDomainRemoval { pendingSection(pending) }
             listSection
         }
@@ -44,6 +45,22 @@ struct CustomDomainsView: View {
             Text("Add a website")
         } footer: {
             Text("Type or paste one address per line. Blocking starts right away and covers the site in Safari and inside apps.")
+        }
+    }
+
+    /// 2.3: popular sites for the person's focus, one tap each. A chip disappears once added.
+    @ViewBuilder
+    private var suggestionsSection: some View {
+        let sites = model.vertical.suggestedSites
+        if !sites.filter({ !model.customDomains.contains($0) }).isEmpty {
+            Section {
+                SiteSuggestionChips(sites: sites, alreadyAdded: model.customDomains) { site in
+                    model.addCustomDomains(site)
+                }
+                .padding(.vertical, 4)
+            } header: {
+                Text("Tap to block")
+            }
         }
     }
 

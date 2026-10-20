@@ -62,6 +62,10 @@ public final class SecurityKeyService: NSObject {
         case noCredential
         case failed(String)
         case registrationRejected(WebAuthnError)
+        /// 2.3: running in the Simulator, where a USB-C key can never connect.
+        case simulator
+        /// 2.3: the system never answered (no sheet, no error) within the time limit.
+        case noResponse
 
         public var errorDescription: String? {
             switch self {
@@ -71,6 +75,10 @@ public final class SecurityKeyService: NSObject {
                 return "Security key error: \(why)\n(If this mentions the domain/relying party, the Associated Domain isn't set up yet. See the setup doc.)"
             case .registrationRejected(let why):
                 return "That key's pairing response didn't pass the check (\(why)). Nothing was saved. Try again."
+            case .simulator:
+                return "Security keys can't connect to the Simulator. Run Pawl on a real iPhone to pair or use your key."
+            case .noResponse:
+                return "No key answered. Plug the USB-C key in all the way, tap again, and touch the key when your iPhone asks."
             }
         }
     }
@@ -177,6 +185,11 @@ public final class SecurityKeyService: NSObject {
     }
 
     private func perform(_ request: ASAuthorizationRequest) async throws -> RawCredential {
+        #if targetEnvironment(simulator)
+        // 2.3: a USB-C key can't reach the Simulator, and the system may never answer there,
+        // which left the Pair button looking dead. Say so plainly instead.
+        throw SecurityKeyError.simulator
+        #else
         // Only one key request at a time: end any earlier one instead of leaking it.
         finish(.failure(SecurityKeyError.cancelled))
         return try await withCheckedThrowingContinuation { cont in
@@ -186,7 +199,18 @@ public final class SecurityKeyService: NSObject {
             controller.presentationContextProvider = self
             self.controller = controller
             controller.performRequests()
+            // 2.3: if the system never answers (no sheet and no error), stop waiting after a while
+            // so the button comes back with a reason instead of staying stuck.
+            let requestID = ObjectIdentifier(controller)   // Sendable stand-in for the controller
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .seconds(90))
+                guard let self, let current = self.controller,
+                      ObjectIdentifier(current) == requestID else { return }
+                self.finish(.failure(SecurityKeyError.noResponse))
+                current.cancel()
+            }
         }
+        #endif
     }
 
     private func finish(_ result: Result<RawCredential, Error>) {

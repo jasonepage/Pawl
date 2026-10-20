@@ -13,6 +13,8 @@
 
 import Foundation
 import FamilyControls
+import ManagedSettings
+import DeviceActivity
 
 /// Who this person is using Pawl as. 2.3: the approver-only role (someone who only approved
 /// another person's unlocks) was removed with the ally feature, so blocker is the only role.
@@ -76,9 +78,11 @@ final class AppModel {
         hardLockDate = HardLock.attestedDate()
         customDomains = customDomainStore.load()
         scheduledSets = scheduledSetStore.load()
-        // Default web blocking on (gambling sites, no adult filter) before the launch shield
-        // re-apply runs, so existing users get it too.
-        SharedState.ensureWebDefaults(domains: GamblingBlocklist.seedDomains)
+        // Web defaults before the launch shield re-apply runs. 2.3: gambling starts on only for
+        // someone already set up with a gambling focus (a reinstall keeps their protection).
+        // A new person starts with nothing on, so setup shows exactly what they pick.
+        SharedState.ensureWebDefaults(domains: GamblingBlocklist.seedDomains,
+                                      gamblingByDefault: didOnboard && vertical == .gambling)
         // Re-assert the uninstall block on every launch for an onboarded blocker, so it
         // survives relaunches and reinstalls (FR-P3-HARD-002). A phone that hasn't finished
         // setup is left deletable.
@@ -156,7 +160,8 @@ final class AppModel {
     func reenableScreenTime() async {
         await auth.requestAuthorization()
         guard auth.isApproved else { return }
-        SharedState.ensureWebDefaults(domains: GamblingBlocklist.seedDomains)
+        SharedState.ensureWebDefaults(domains: GamblingBlocklist.seedDomains,
+                                      gamblingByDefault: didOnboard && vertical == .gambling)
         shield.apply(selectionStore.load())
         if role == .blocker {
             shield.setDeletionBlock(true)
@@ -576,6 +581,34 @@ final class AppModel {
         OnboardingFlag.reset()
         didOnboard = false
     }
+
+    #if DEBUG
+    /// DEV ONLY (Xcode Debug builds). Erases every piece of Pawl state on this phone and in its
+    /// iCloud copy, lifts every restriction, then closes the app so the next launch is a true
+    /// first run. Never compiled into Release: in the App Store build this would be exactly the
+    /// escape hatch Pawl exists to remove.
+    func devEraseEverything() {
+        // Restrictions first, so nothing stays blocked: shields, website filter, app-deletion
+        // block, the clock lock, and every scheduled window.
+        ManagedSettingsStore(named: .pawl).clearAllSettings()
+        DeviceActivityCenter().stopMonitoring()
+        // The paired key (Keychain), including a re-pair that is waiting.
+        keyStore.clearPending()
+        keyStore.clear()
+        // The iCloud key-value copy: commitment, streak, logs, onboarding flags, sets, typed
+        // sites, the saved selection, the hard lock, the person to call.
+        let kv = NSUbiquitousKeyValueStore.default
+        for key in kv.dictionaryRepresentation.keys { kv.removeObject(forKey: key) }
+        kv.synchronize()
+        // The App Group (shared with the extensions) and the app's own settings: pending waits,
+        // web categories, attempts, Pro cache, review-prompt clock, hours per day.
+        UserDefaults(suiteName: AppGroup.id)?.removePersistentDomain(forName: AppGroup.id)
+        if let bundleID = Bundle.main.bundleIdentifier {
+            UserDefaults.standard.removePersistentDomain(forName: bundleID)
+        }
+        exit(0)
+    }
+    #endif
 
     var blockedSummary: (apps: Int, sites: Int) {
         let s = selectionStore.load()

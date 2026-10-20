@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Concept 5: The Stooped Key. A gently bowed shaft, a slight lean, two eyes and a mustache. -->
+  <g transform="rotate(-7 256 300)">
+    <path fill="#C9A227" fill-rule="nonzero" d="M152 122 A96 96 0 1 1 344 122 A96 96 0 1 1 152 122 Z M270 180 Q317.5 288 310 398 L372 398 L372 424 L338 424 L338 450 L372 450 L372 486 L252 486 Q292 330 226 180 Z"/>
+    <circle cx="216" cy="116" r="15" fill="#1A1714"/>
+    <circle cx="280" cy="116" r="15" fill="#1A1714"/>
+    <path fill="#1A1714" d="M204 160 Q226 136 248 154 Q270 136 292 160 Q270 176 248 166 Q226 176 204 160 Z"/>
+  </g>
+
+</svg>

@@ -34,7 +34,7 @@ struct UrgeView: View {
     @State private var logged = false
     @State private var trustedName = ""
     @State private var trustedPhone = ""
-    @State private var showNoContactHint = false
+    @State private var showContactSheet = false
     @State private var showAllNotes = false
     @Environment(\.openURL) private var openURL
 
@@ -66,12 +66,12 @@ struct UrgeView: View {
                 .tint(PawlColor.brand)
                 .buttonStyle(.bordered)
 
-                if showNoContactHint {
-                    Text("Add someone you trust in Settings, and this button will call them.")
-                        .font(.caption)
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(.secondary)
+                // 2.3: the person to call is set up here, where it's used (it left Settings).
+                Button(trustedPhone.isEmpty ? "Add someone to call" : "Change who to call") {
+                    showContactSheet = true
                 }
+                .font(.caption)
+                .foregroundStyle(.secondary)
 
                 VStack(spacing: 6) {
                     if showGamblingHelp {
@@ -90,9 +90,17 @@ struct UrgeView: View {
         .background(PawlColor.groupedBg)
         .navigationTitle("Tempted")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            trustedName = TrustedContact.name() ?? ""
-            trustedPhone = TrustedContact.phone() ?? ""
+        .onAppear(perform: loadContact)
+        .sheet(isPresented: $showContactSheet, onDismiss: loadContact) {
+            NavigationStack {
+                TrustedContactView()
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") { showContactSheet = false }
+                        }
+                    }
+            }
+            .presentationDetents([.medium])
         }
     }
 
@@ -239,10 +247,16 @@ struct UrgeView: View {
 
     // MARK: Log
 
+    private func loadContact() {
+        trustedName = TrustedContact.name() ?? ""
+        trustedPhone = TrustedContact.phone() ?? ""
+    }
+
+    /// No one set up yet: open the sheet to add them, so the tap still leads somewhere.
     private func callTrustedContact() {
         let cleaned = trustedPhone.filter { $0.isNumber || $0 == "+" }
         guard !cleaned.isEmpty, let url = URL(string: "tel://\(cleaned)") else {
-            withAnimation { showNoContactHint = true }
+            showContactSheet = true
             return
         }
         openURL(url)

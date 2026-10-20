@@ -2,6 +2,43 @@
 
 ## 2.3 (in progress)
 
+- A mascot on the Unlock screen: the Stooped Key, an old key with a bent back and a mustache.
+  He stands guard while apps are blocked, closes his eyes with a small hourglass during the
+  wait, stands up straight and looks away while apps are open, and is a dashed outline until
+  a key is paired. Tap him and he does a short dance (a small nod with Reduce Motion on). No
+  sound or haptics, and it has nothing to do with unlocking. "Screen Time is off" keeps its
+  warning sign. The drawings are vector, so they stay sharp at any size. Two new tests.
+- Suggestions for what to block. In setup and in Settings, Websites, popular sites for your
+  focus are one-tap chips (for example instagram.com and tiktok.com for social media). Nothing
+  is picked for you. Apps show popular names to search for in Apple's list, since Screen Time
+  never tells Pawl which apps are installed and can't pick apps for you. Two new tests.
+- Unlock reminders. When you start an unlock, Pawl sets reminders on your phone: 5 minutes and
+  1 minute before apps open (with a reminder you can still cancel), when they open (with the time
+  they lock again), and 5 minutes, 1 minute and the moment before they lock again. Cancelling
+  the unlock removes them. Permission is asked the first time you start an unlock. They're local
+  to the phone, so there's still no server and no data collected. Two new tests.
+- Fixed: if iOS closed Pawl in the background during an unlock, reopening it wiped the
+  countdown and showed "Apps are blocked", and during the open time it could re-block your apps
+  early. Pawl re-applies your blocks on every launch, and that step used to always mark the state
+  as locked. Now it keeps an unlock in progress: during the wait it keeps blocking and keeps the
+  countdown, during the open time it leaves apps open, and a window that already ended still
+  locks. Four new tests.
+- Unlock timing is easier. A picture shows what happens after your key (the wait, then the
+  open time, then it locks again). Times are one-tap choices from 15 minutes to 2 hours (wait)
+  and 15 minutes to 3 hours (open), with "now" marking your current setting, instead of
+  5-minute steppers. The save button only shows after a change, and says whether it applies
+  now or after your current wait. Same rules as before.
+- Fixed: the gambling site list could turn on by itself. A fresh install or reinstall switched
+  it on before setup, and setup then kept it. Now nothing is on until you pick it, except for
+  someone already set up with a gambling focus, so a reinstall doesn't drop their protection.
+  If setup runs again on a phone that was already protecting you, a category that's already on
+  shows as on and locked, with a line saying turning it off needs your key in Settings.
+- Fixed: tapping "Pair security key" could look like nothing happened. It now says what to do
+  right away, explains why it can't pair (like a phone that was already protecting you) right
+  above the buttons, stops with a clear message in the Simulator, and gives up with a reason if
+  nothing answers within 90 seconds.
+- "When you're tempted" left Settings. The person to call is now added or changed right on the
+  "I'm tempted" screen, which already has the call button and the help lines.
 - More good moments to ask for an App Store rating: a full week with Pawl on every day and no
   slip, right after buying Pro, and right after the hard lock is set up. Logging an urge from
   Home's "I'm tempted" button now counts too (only the block screen path did before). The same

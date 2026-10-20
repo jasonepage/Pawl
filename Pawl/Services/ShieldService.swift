@@ -19,12 +19,51 @@ import ManagedSettings
 public final class ShieldService {
     public init() {}
 
+    /// What re-applying the shield should do, given the unlock window that may be in progress.
+    public enum ApplyAction: Equatable, Sendable {
+        /// No unlock in progress (or a stale one): block and mark the phase locked.
+        case lock
+        /// Waiting out the cooling-off: keep blocking, but keep the countdown (phase stays).
+        case blockKeepCountdown
+        /// Inside the open window after a full unlock: don't re-block. The monitor relocks
+        /// at the window's end with the saved selection.
+        case keepOpen
+    }
+
+    /// 2.3 fix. Pure, so PawlTests covers it. Before this, every apply set the phase to
+    /// "locked", so a relaunch mid-unlock (RecoveryService re-applies on launch) wiped the
+    /// countdown, and during the open window it re-blocked everything early.
+    public nonisolated static func applyAction(phase: String, windowStart: Date?, windowEnd: Date?,
+                                               now: Date) -> ApplyAction {
+        guard phase == "cooling" || phase == "unshielded",
+              let start = windowStart, let end = windowEnd, now < end else { return .lock }
+        return now >= start ? .keepOpen : .blockKeepCountdown
+    }
+
     /// Apply the shield for the given selection (FR-SHIELD-005). Also mirrors the
     /// selection into the App Group so the extension can re-apply it on auto-relock.
+    /// 2.3: respects an unlock in progress (see `applyAction`). Use `relock` to end one.
     public func apply(_ selection: FamilyActivitySelection) {
+        SharedState.saveSelection(selection)
+        switch Self.applyAction(phase: SharedState.phase(), windowStart: SharedState.windowStart(),
+                                windowEnd: SharedState.windowEnd(), now: Date()) {
+        case .keepOpen:
+            return
+        case .blockKeepCountdown:
+            SharedShield.apply(selection)
+        case .lock:
+            SharedShield.apply(selection)
+            SharedState.setPhase("locked")
+        }
+    }
+
+    /// Re-apply the shield and end any unlock window, no matter where it stands. For the
+    /// automatic relock at the end of the open window.
+    public func relock(_ selection: FamilyActivitySelection) {
         SharedState.saveSelection(selection)
         SharedShield.apply(selection)
         SharedState.setPhase("locked")
+        SharedState.clearWindow()
     }
 
     /// Lift the shield — only after a valid tap + full cooling-off (FR-UNLOCK-007).
