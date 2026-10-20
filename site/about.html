@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About Pawl</title>
+<meta name="description" content="Why Pawl unlocks with a physical security key, where the code lives, what the app does not promise, how it handles your data, and where the name comes from.">
+<link rel="canonical" href="https://getpawl.com/about">
+<meta name="theme-color" content="#3c6a14">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pawl">
+<meta property="og:url" content="https://getpawl.com/about">
+<meta property="og:title" content="About Pawl">
+<meta property="og:description" content="Why Pawl unlocks with a physical security key, where the code lives, what the app does not promise, and where the name comes from.">
+<meta property="og:image" content="https://getpawl.com/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/img/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="stylesheet" href="/pawl.css">
+<style>
+  /* nav */
+  .top{position:sticky;top:0;z-index:10;background:var(--green-700);color:var(--on-green)}
+  .top .wrap{display:flex;align-items:center;gap:var(--s-4);height:60px}
+  .top a{color:var(--on-green);text-decoration:none}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;margin-right:auto;letter-spacing:-.01em}
+  .brand img{width:32px;height:32px;border-radius:8px}
+  .links{display:flex;align-items:center;gap:var(--s-5)}
+  .links a{opacity:.9;font-size:var(--fs-0)}
+  .links a:hover{opacity:1;text-decoration:underline}
+  .links .nav-cta{background:var(--on-green);color:var(--green-700);padding:8px 16px;border-radius:var(--r-pill);font-weight:600;opacity:1;text-decoration:none}
+  @media(max-width:640px){.links a:not(.nav-cta){display:none}}
+
+  /* page header */
+  .head{background:var(--brand-gradient);color:var(--on-green);padding:var(--s-7) 0}
+  @media(min-width:860px){.head{padding:var(--s-8) 0}}
+  .head .wrap{display:flex;align-items:flex-end;gap:var(--s-4)}
+  .head img{width:72px;height:72px;flex:none}
+  @media(min-width:860px){.head img{width:96px;height:96px}}
+  .head h1{color:var(--on-green);font-size:var(--fs-4)}
+  .head p{color:#eef4e6;font-size:var(--fs-2);margin-top:var(--s-2);max-width:44ch}
+
+  /* sections shared */
+  section{padding:var(--s-8) 0}
+  section.alt{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .lead{font-size:var(--fs-2);color:var(--muted);max-width:60ch;margin-top:var(--s-2)}
+  .two{display:grid;grid-template-columns:1fr;gap:var(--s-5)}
+  .two>*{min-width:0}
+  @media(min-width:760px){.two{grid-template-columns:1fr 1fr;gap:var(--s-7)}}
+
+  /* the key */
+  .keysec .art{margin-top:var(--s-6);border-radius:var(--r-3);overflow:hidden}
+  .keysec .art img{width:100%;height:auto}
+  .keysec .grid{display:grid;grid-template-columns:1fr;gap:var(--s-5);margin-top:var(--s-6)}
+  @media(min-width:760px){.keysec .grid{grid-template-columns:1fr 1fr 1fr}}
+  .keysec .grid p{margin-top:var(--s-2);font-size:var(--fs-0);color:var(--ink)}
+  .buy{display:grid;grid-template-columns:1fr;gap:var(--s-4);align-items:center;margin-top:var(--s-6)}
+  @media(min-width:760px){.buy{grid-template-columns:280px 1fr;gap:var(--s-5)}}
+  .buy img{width:100%;max-width:280px;height:auto;justify-self:center}
+  .note{margin-top:0;background:var(--green-100);border-radius:var(--r-2);padding:var(--s-4) var(--s-5);font-size:var(--fs-0);color:var(--green-700)}
+
+  /* open source */
+  .repo{display:flex;gap:var(--s-4);align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-2);padding:var(--s-5);margin-top:var(--s-5)}
+  .repo svg{width:40px;height:40px;flex:none;fill:var(--green-700)}
+  .repo>div{min-width:0}
+  .repo h3{overflow-wrap:anywhere}
+  .repo p{font-size:var(--fs-0);color:var(--muted);margin-top:var(--s-1)}
+  .repo a.btn{display:inline-block;margin-top:var(--s-3);background:var(--green-500);color:#fff;text-decoration:none;font-weight:600;padding:10px 16px;border-radius:var(--r-pill);font-size:var(--fs-0)}
+
+  /* limits */
+  .promise{list-style:none;padding:0;margin:var(--s-5) 0 0;display:grid;gap:var(--s-3);max-width:70ch}
+  .promise li{padding:var(--s-4) var(--s-4) var(--s-4) 44px;position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-2);font-size:var(--fs-0)}
+  .promise li::before{content:"";position:absolute;left:16px;top:20px;width:14px;height:14px;border-radius:50%;border:3px solid var(--green-400)}
+  .promise strong{display:block;color:var(--green-700);margin-bottom:2px}
+  .readme{margin-top:var(--s-4);font-size:var(--fs-0);color:var(--muted)}
+
+  /* the name */
+  .name .wrap{display:flex;align-items:center;gap:var(--s-5)}
+  .name img{width:72px;height:72px;flex:none}
+  @media(min-width:760px){.name img{width:96px;height:96px}}
+  .name p{margin-top:var(--s-2);max-width:60ch}
+
+  /* final + footer */
+  .cta-row{margin-top:var(--s-6);display:flex;gap:var(--s-4);align-items:center;flex-wrap:wrap}
+  .badge{display:inline-block;line-height:0}
+  .badge svg{height:56px;width:auto}
+  .final{background:var(--brand-gradient);color:var(--on-green);text-align:center}
+  .final h2{color:#fff}
+  .final .cta-row{justify-content:center}
+  footer{background:var(--green-900);color:var(--on-green-muted);font-size:var(--fs-0)}
+  footer .wrap{padding:var(--s-6) var(--gutter);display:flex;flex-wrap:wrap;gap:var(--s-3) var(--s-5);align-items:center}
+  footer a{color:var(--on-green);text-decoration:none;opacity:.9}
+  footer a:hover{text-decoration:underline}
+  footer .sp{margin-left:auto}
+  footer .help{width:100%;border-top:1px solid rgba(255,255,255,.14);padding-top:var(--s-4);margin-top:var(--s-2);line-height:1.5}
+</style>
+</head>
+<body>
+
+<nav class="top" aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/img/pawl-mark.svg" alt="" width="32" height="32">Pawl</a>
+    <span class="links">
+      <a href="/#how">How it works</a>
+      <a href="/about">About</a>
+      <a href="/support">Support</a>
+      <a class="nav-cta" href="https://apps.apple.com/app/id6783119309">Get Pawl</a>
+    </span>
+  </div>
+</nav>
+
+<header class="head">
+  <div class="wrap">
+    <img src="/img/mascot/pose-locked.svg" alt="" aria-hidden="true" width="96" height="96">
+    <div>
+      <h1>About Pawl</h1>
+      <p>Why the key, where the code lives, what the app does not promise, and where the name comes from.</p>
+    </div>
+  </div>
+</header>
+
+<section id="key" class="keysec">
+  <div class="wrap">
+    <h2>The key is the whole trick</h2>
+    <p class="lead">Most blockers fail at 1am because you can switch them off with one tap. Pawl moves that decision to a small object you have already put out of reach.</p>
+    <div class="art"><img src="/img/key-steps.svg" alt="Three drawings. One: a small security key plugged into the bottom of a phone. Two: the same key left inside a house that is not yours. Three: a moon over a long road between a phone and the house." width="900" height="300"></div>
+    <div class="grid">
+      <div><h3>Plug it in once</h3><p>When you set Pawl up, you plug a USB-C security key into your phone and tap it. Pawl remembers that key and only that key.</p></div>
+      <div><h3>Leave it somewhere else</h3><p>Give it to a friend, put it in your car, or lock it in a drawer at work. The further away it is, the longer the urge has to fade.</p></div>
+      <div><h3>The 1am version of you has to go get it</h3><p>Even when you do get the key, tapping it starts a 15 minute wait. Then the block lifts for a short window (30 minutes by default) and comes back on by itself.</p></div>
+    </div>
+    <div class="buy"><img src="/img/security-key.svg" alt="A drawing of a small green security key with a USB-C plug and a keyring loop" width="320" height="130"><p class="note"><strong>Which key to buy:</strong> any FIDO2 security key with a USB-C plug. Several makers sell them, and they need no app or account. Pawl does not sell keys and does not take a cut.</p></div>
+  </div>
+</section>
+
+<section id="open" class="alt">
+  <div class="wrap two">
+    <div>
+      <h2>Open source</h2>
+      <p class="lead">You should not have to take a blocker's word for it. All of Pawl's code is public, so you or anyone you trust can read exactly what it does.</p>
+    </div>
+    <div>
+      <div class="repo" style="margin-top:0">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        <div>
+          <h3>github.com/jasonepage/Pawl</h3>
+          <p>Licensed under the Mozilla Public License 2.0. Read it, build it yourself, report a problem, or send a fix.</p>
+          <a class="btn" href="https://github.com/jasonepage/Pawl">View the code</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="limits">
+  <div class="wrap">
+    <h2>What it does not promise</h2>
+    <p class="lead">Pawl makes the 1am version of you slow. It does not make anything impossible. The details, in plain words:</p>
+    <ul class="promise">
+      <li><strong>iOS lets the phone's owner turn Screen Time off.</strong> No app can stop that. Pawl notices the next time it runs. For a real lock, someone you trust can set the Screen Time passcode in person and keep it. iOS enforces that passcode, not Pawl.</li>
+      <li><strong>The key check runs on your phone.</strong> Pawl verifies the key's signature, the fresh challenge and the touch flag itself. It does not check that the key is genuine hardware from a known maker, and a key paired before 2.1 is not signature-checked until you pair it again.</li>
+      <li><strong>The clock lock is not yet proven.</strong> Pawl asks Screen Time to require automatic date and time while it is protecting you, so moving the clock forward should not shorten the wait. Whether iOS enforces that for an app like Pawl has not been confirmed on a device yet.</li>
+      <li><strong>No blocklist is complete.</strong> The optional gambling list has 167 domains and the adult filter is Apple's. New sites appear every week. Sites you type in are blocked exactly as typed.</li>
+      <li><strong>A determined person can get around any blocker on a phone they own,</strong> with another phone, a laptop, or a friend's device.</li>
+      <li><strong>The core logic has automated tests,</strong> including the unlock loop, the timing rules and the blocking rules. The screens are tested by hand on real phones.</li>
+      <li><strong>You cannot prove the App Store build came from this exact source.</strong> There are no reproducible builds.</li>
+    </ul>
+    <p class="readme">The full list, including notes for reviewers, is in the <a href="https://github.com/jasonepage/Pawl#what-it-does-not-promise">README</a>.</p>
+  </div>
+</section>
+
+<section id="privacy" class="alt">
+  <div class="wrap two">
+    <div>
+      <h2>Private by design</h2>
+      <p class="lead">Screen Time hands Pawl only anonymous tokens. Pawl never learns which apps or sites you picked.</p>
+    </div>
+    <div>
+      <p>Your streak lives on your phone and in your own iCloud, so it survives deleting the app. No advertising, no tracking, no account and no Pawl server.</p>
+      <p style="margin-top:var(--s-3)"><a href="/privacy">Read the privacy policy</a></p>
+    </div>
+  </div>
+</section>
+
+<section id="name" class="name">
+  <div class="wrap">
+    <img src="/img/mascot/pose-open.svg" alt="" aria-hidden="true" width="96" height="96">
+    <div>
+      <h2>The name</h2>
+      <p>Pawl is named after the ratchet tooth that stops a gear from slipping back. That is the whole idea.</p>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2>Get Pawl</h2>
+    <div class="cta-row">
+      <a class="badge" href="https://apps.apple.com/app/id6783119309" aria-label="Download on the App Store">
+        <svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+          <rect width="120" height="40" rx="6" fill="#000"/>
+          <rect x=".5" y=".5" width="119" height="39" rx="5.5" fill="none" stroke="#a6a6a6"/>
+          <g fill="#fff">
+            <path d="M24.77 20.3a4.95 4.95 0 0 1 2.36-4.15 5.07 5.07 0 0 0-3.99-2.16c-1.68-.18-3.31 1-4.16 1-.87 0-2.19-.98-3.61-.95a5.32 5.32 0 0 0-4.47 2.73c-1.93 3.35-.49 8.27 1.36 10.98.93 1.33 2.01 2.81 3.43 2.75 1.39-.06 1.9-.88 3.58-.88 1.66 0 2.14.88 3.59.85 1.49-.02 2.43-1.33 3.32-2.67a11 11 0 0 0 1.52-3.09 4.78 4.78 0 0 1-2.93-4.41z"/>
+            <path d="M22.04 12.21a4.87 4.87 0 0 0 1.11-3.49 4.96 4.96 0 0 0-3.21 1.66 4.64 4.64 0 0 0-1.14 3.36 4.1 4.1 0 0 0 3.24-1.53z"/>
+            <text x="35" y="15.5" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="7.2" letter-spacing=".1">Download on the</text>
+            <text x="35" y="30" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="15.5" font-weight="600" letter-spacing="-.2">App Store</text>
+          </g>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="/" style="font-weight:600">Pawl</a>
+    <a href="/#how">How it works</a>
+    <a href="/about">About</a>
+    <a href="/support">Support</a>
+    <a href="/privacy">Privacy</a>
+    <a href="https://github.com/jasonepage/Pawl">GitHub</a>
+    <a href="https://apps.apple.com/app/id6783119309">App Store</a>
+    <span class="sp">&copy; 2026 Jason Page</span>
+  </div>
+</footer>
+
+</body>
+</html>
