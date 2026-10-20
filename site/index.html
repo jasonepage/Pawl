@@ -53,6 +53,25 @@
   .cta-row .gh{color:var(--on-green);font-size:var(--fs-0);opacity:.9}
   .micro{margin-top:var(--s-4);font-size:var(--fs-0);color:var(--on-green-muted);max-width:48ch}
 
+  /* mascot: the Stooped Key */
+  .hero-mascot{width:112px;height:112px;margin:0 0 var(--s-3) -22px;transform-origin:50% 100%;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+  @media(min-width:860px){.hero-mascot{width:128px;height:128px;margin-left:-26px}}
+  .hero-mascot.wiggle{animation:mascot-wiggle 1s ease-in-out}
+  @keyframes mascot-wiggle{
+    0%{transform:none}
+    18%{transform:translateY(-7px) rotate(-4deg)}
+    36%{transform:translateY(-9px) rotate(4deg)}
+    54%{transform:translateY(-4px) rotate(-3deg)}
+    72%{transform:translateY(0) rotate(2deg)}
+    88%{transform:rotate(-1deg)}
+    100%{transform:none}
+  }
+  .states{list-style:none;padding:0;margin:var(--s-7) 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-3);text-align:center}
+  .states li{display:flex;flex-direction:column;align-items:center;min-width:0}
+  .states img{width:84px;height:84px}
+  @media(min-width:760px){.states{gap:var(--s-5)}.states img{width:104px;height:104px}}
+  .states span{display:block;margin-top:var(--s-2);font-size:var(--fs-0);color:var(--muted);max-width:20ch;line-height:1.4}
+
   /* phone frame */
   .phone-wrap{display:flex;justify-content:center;align-items:flex-end;padding-top:var(--s-4)}
   @media(min-width:860px){.phone-wrap{padding-top:0}}
@@ -66,8 +85,8 @@
   .screens h2{text-align:center}
   .screens .lead{text-align:center;margin-left:auto;margin-right:auto}
   .shots{display:grid;grid-auto-flow:column;grid-auto-columns:min(72vw,260px);gap:var(--s-4);overflow-x:auto;scroll-snap-type:x mandatory;padding:var(--s-6) var(--gutter) var(--s-4);margin:0 calc(-1*var(--gutter));-webkit-overflow-scrolling:touch;scrollbar-width:thin}
-  @media(min-width:900px){.shots{grid-auto-flow:row;grid-template-columns:repeat(5,1fr);grid-auto-columns:auto;overflow:visible;margin:0;padding:var(--s-6) 0 0}}
-  .shot{scroll-snap-align:center;text-align:center}
+  @media(min-width:900px){.shots{grid-auto-flow:row;grid-template-columns:repeat(6,1fr);grid-auto-columns:auto;overflow:visible;margin:0;padding:var(--s-6) 0 0}}
+  .shot{margin:0;scroll-snap-align:center;text-align:center}
   .shot .frame{aspect-ratio:1179/2556;border-radius:22px;overflow:hidden;background:var(--green-100);border:1px solid var(--line);box-shadow:var(--shadow);position:relative}
   .shot .frame img{width:100%;height:100%;object-fit:cover}
   .shot .frame .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;font-size:13px;color:var(--green-700)}
@@ -142,6 +161,7 @@
 <header class="hero">
   <div class="wrap">
     <div class="hero-copy">
+      <img id="hero-mascot" class="hero-mascot" src="/img/mascot/pose-locked.svg" alt="The Stooped Key, Pawl's mascot: a brass key with a bent back, two eyes and a small mustache." width="128" height="128">
       <span class="kicker"><img src="/img/pawl-mark.svg" alt="" width="22" height="22">Pawl: App Blocker With a Key</span>
       <h1>Block any app. Keep the key out of reach.</h1>
       <p class="sub">Pawl uses Apple Screen Time to block the apps and sites you choose. Nothing on the phone can lift the block. To unblock, you need a physical security key you have left somewhere else, and then a 15 minute wait.</p>
@@ -176,7 +196,7 @@
 <section id="screens" class="screens">
   <div class="wrap">
     <h2>What it looks like</h2>
-    <p class="lead">Five screens from the app. The first four are in the same order as the App Store listing.</p>
+    <p class="lead">Six screens from the app.</p>
     <div class="shots">
       <figure class="shot">
         <div class="frame">
@@ -194,17 +214,24 @@
       </figure>
       <figure class="shot">
         <div class="frame">
-          <picture><source srcset="/img/screens/03-wait.webp" type="image/webp"><img src="/img/screens/03-wait.png" alt="Pawl app screen. Wait It Out. 15 minute cooldown to unblock." width="780" height="1691" loading="lazy" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex'"></picture>
+          <picture><source srcset="/img/screens/04-block.webp" type="image/webp"><img src="/img/screens/04-block.png" alt="Pawl app screen. The key mascot stands in a green box above the words Apps are blocked. Below it a Tap to unlock button, and the line: Using your key starts a 15-minute wait. Apps stay locked until it's over, then re-lock on their own." width="780" height="1691" loading="lazy" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex'"></picture>
+          <div class="ph" style="display:none">04-block.png</div>
+        </div>
+        <figcaption><h3>Block Harder</h3><p>Make unblocking physically harder.</p></figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="frame">
+          <picture><source srcset="/img/screens/03-wait.webp" type="image/webp"><img src="/img/screens/03-wait.png" alt="Pawl app screen. The key mascot with closed eyes and a small hourglass, above Unlocking soon, 14:57 until apps unlock. Below it: Apps unlock when the timer reaches zero. Waiting it out is the whole point. A button reads Cancel: keep apps locked." width="780" height="1691" loading="lazy" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex'"></picture>
           <div class="ph" style="display:none">03-wait.png</div>
         </div>
         <figcaption><h3>Wait It Out</h3><p>15 minute cooldown to unblock.</p></figcaption>
       </figure>
       <figure class="shot">
         <div class="frame">
-          <picture><source srcset="/img/screens/04-block.webp" type="image/webp"><img src="/img/screens/04-block.png" alt="Pawl app screen. Block Harder. Make unblocking physically harder." width="780" height="1691" loading="lazy" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex'"></picture>
-          <div class="ph" style="display:none">04-block.png</div>
+          <picture><source srcset="/img/screens/06-relock.webp" type="image/webp"><img src="/img/screens/06-relock.png" alt="Pawl app screen. The key mascot standing straight, above Apps unlocked, 43:32 until apps re-lock. Below it: Apps re-lock by themselves when the timer ends. There's nothing you need to do." width="780" height="1691" loading="lazy" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex'"></picture>
+          <div class="ph" style="display:none">06-relock.png</div>
         </div>
-        <figcaption><h3>Block Harder</h3><p>Make unblocking physically harder.</p></figcaption>
+        <figcaption><h3>Locks Again</h3><p>Apps re-lock on their own.</p></figcaption>
       </figure>
       <figure class="shot">
         <div class="frame">
@@ -226,6 +253,11 @@
       <div class="step"><span class="n">2</span><h3>Put the key somewhere else</h3><p>Unblocking needs a physical USB-C security key. Leave it at a friend's place, in your car, or anywhere that is not your pocket at 1am.</p></div>
       <div class="step"><span class="n">3</span><h3>Wait it out</h3><p>Even with the key in hand, unblocking starts a 15 minute wait. After a short open window (30 minutes by default), the block comes back on by itself.</p></div>
     </div>
+    <ul class="states" aria-label="The three states, in order">
+      <li><img src="/img/mascot/pose-locked.svg" alt="" aria-hidden="true" width="104" height="104" loading="lazy"><span>Apps blocked</span></li>
+      <li><img src="/img/mascot/pose-waiting.svg" alt="" aria-hidden="true" width="104" height="104" loading="lazy"><span>The 15 minute wait</span></li>
+      <li><img src="/img/mascot/pose-open.svg" alt="" aria-hidden="true" width="104" height="104" loading="lazy"><span>Open for a while, then they lock again</span></li>
+    </ul>
   </div>
 </section>
 
@@ -319,5 +351,21 @@
   </div>
 </footer>
 
+<script>
+  /* A small wiggle when the hero mascot is tapped or clicked. Nothing else. */
+  (function(){
+    var m=document.getElementById('hero-mascot');
+    if(!m)return;
+    var t;
+    m.addEventListener('click',function(){
+      m.classList.remove('wiggle');
+      void m.offsetWidth;
+      m.classList.add('wiggle');
+      clearTimeout(t);
+      t=setTimeout(function(){m.classList.remove('wiggle');},1100);
+    });
+    m.addEventListener('animationend',function(){m.classList.remove('wiggle');});
+  })();
+</script>
 </body>
 </html>

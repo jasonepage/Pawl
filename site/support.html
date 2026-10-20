@@ -44,6 +44,10 @@
   th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
   th{background:var(--green-100)}
   code{background:var(--green-100);padding:1px 6px;border-radius:5px;font-size:14px}
+  .key-q{display:flex;align-items:center;gap:var(--s-3)}
+  .key-q>div{flex:1;min-width:0}
+  .key-q img{flex:none;width:72px;height:72px;margin-top:var(--s-6)}
+  @media(min-width:640px){.key-q{align-items:flex-end;gap:var(--s-6)}.key-q img{width:104px;height:104px;margin:0 0 var(--s-4)}}
   footer{background:var(--green-900);color:var(--on-green-muted);font-size:var(--fs-0)}
   footer .wrap{padding:var(--s-6) var(--gutter);display:flex;flex-wrap:wrap;gap:var(--s-3) var(--s-5);align-items:center}
   footer a{color:var(--on-green);text-decoration:none;opacity:.9}
@@ -100,9 +104,14 @@
   icon. To remove it completely: open <strong>Settings → Screen Time</strong>, turn off Screen Time (or
   remove Pawl under “Apps with Screen Time Access”), then delete Pawl from your Home Screen.</p>
 
-  <h2>What security key do I need?</h2>
-  <p>Any FIDO2 security key with a USB-C plug works. Several makers sell them, and they need no app or account.
-  You buy the key separately; Pawl does not sell keys and does not take a cut.</p>
+  <div class="key-q">
+    <div>
+      <h2>What security key do I need?</h2>
+      <p>Any FIDO2 security key with a USB-C plug works. Several makers sell them, and they need no app or account.
+      You buy the key separately; Pawl does not sell keys and does not take a cut.</p>
+    </div>
+    <img src="/img/mascot/pose-nokey.svg" alt="" aria-hidden="true" width="104" height="104" loading="lazy">
+  </div>
 
   <h2>Is Pawl free?</h2>
   <p>Yes. Blocking, the security key, the cooling-off wait, your streak, and the urge tools are free and stay
