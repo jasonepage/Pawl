@@ -2,6 +2,13 @@
 
 ## 2.3 (in progress)
 
+- Fixed: unlock reminders could still go off after the unlock was cancelled or ended early.
+  Cancelling while the reminders were still being set up (for example while the permission
+  prompt was showing) let them be added anyway. Now a cancel always wins, apps locking early
+  or Pawl finding nothing unlocking drops every reminder still waiting, and if the open time
+  starts at a different moment than planned, the lock reminders move to the real lock time.
+  The normal "Apps are locked again" still shows at the end of a real unlock. Erase everything
+  (developer builds) removes them too. Two new tests.
 - A mascot on the Unlock screen: the Stooped Key, an old key with a bent back and a mustache.
   He stands guard while apps are blocked, closes his eyes with a small hourglass during the
   wait, stands up straight and looks away while apps are open, and is a dashed outline until

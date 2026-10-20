@@ -592,6 +592,7 @@ final class AppModel {
         // block, the clock lock, and every scheduled window.
         ManagedSettingsStore(named: .pawl).clearAllSettings()
         DeviceActivityCenter().stopMonitoring()
+        UnlockReminders.cancel()   // and any unlock reminders still waiting
         // The paired key (Keychain), including a re-pair that is waiting.
         keyStore.clearPending()
         keyStore.clear()

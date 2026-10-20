@@ -189,6 +189,7 @@ public final class UnlockViewModel {
                 scheduleFire(at: end, event: .graceEnded)
             } else {
                 state = .locked
+                Task { await UnlockReminders.clearUpcoming() }   // 2.3: the open time is over
             }
         case "cooling":
             if let start = SharedState.windowStart(), now < start {
@@ -199,6 +200,9 @@ public final class UnlockViewModel {
             }
         default:
             state = .locked
+            // 2.3: nothing is unlocking, so drop any leftover reminders (for example from an
+            // unlock that ended while Pawl was closed in a way the reminders didn't expect).
+            Task { await UnlockReminders.clearUpcoming() }
         }
     }
 
@@ -249,13 +253,18 @@ public final class UnlockViewModel {
                 message = "iOS couldn't schedule the relock, so Pawl stayed locked. Try again."
             }
         case .liftShield:                     shield.lift()
-        case .scheduleGrace(let endsAt):      scheduleFire(at: endsAt, event: .graceEnded)
+        case .scheduleGrace(let endsAt):
+            scheduleFire(at: endsAt, event: .graceEnded)
+            // 2.3: keep the lock reminders on the real lock time (same time in a normal unlock).
+            Task { await UnlockReminders.moveLockReminders(to: endsAt) }
         case .reapplyShield:
             // 2.1: relock with the live shared selection (it includes apps added since this
             // screen opened), falling back to the one this screen started with.
             let live = SharedState.loadSelection()
             let liveIsEmpty = live.applicationTokens.isEmpty && live.categoryTokens.isEmpty && live.webDomainTokens.isEmpty
             shield.relock(liveIsEmpty ? selection : live)   // 2.3: the window is over, end it
+            // 2.3: apps are locked, so no reminder about an open time may still go off.
+            Task { await UnlockReminders.clearUpcoming() }
         }
     }
 
