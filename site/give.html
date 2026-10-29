@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Give a Pawl Kit</title>
+<meta name="description" content="A Pawl Kit is a gift for someone who wants a block they can't undo at 1am: a security key, two Pawl Pro codes and a setup card.">
+<!-- TODO: remove noindex once the price and the payment link are real. The page is also not linked from the menus until then. -->
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://getpawl.com/give">
+<meta name="theme-color" content="#3c6a14">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pawl">
+<meta property="og:url" content="https://getpawl.com/give">
+<meta property="og:title" content="Give a Pawl Kit">
+<meta property="og:description" content="A security key, two Pawl Pro codes and a setup card, for someone who wants a block they can't undo at 1am.">
+<meta property="og:image" content="https://getpawl.com/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/img/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="stylesheet" href="/pawl.css">
+<!--
+  Before this page goes live (TODO list):
+  1. Price: $59 is a placeholder. Confirm it.
+  2. Payment link: https://buy.stripe.com/REPLACE_ME is a placeholder. Paste the real Stripe Payment Link.
+  3. Apple: confirm the developer terms allow charging money for a kit that includes Pro offer codes.
+  4. Offer codes: one-time codes expire at most 6 months after they are made, so make them in small
+     batches as orders come in and print the redeem-by date on the card.
+  5. Pro codes: confirm how long each code gives Pro, whether Pro renews after that, and what the
+     second code is for. Then fill in the "Two Pawl Pro codes" card below.
+  6. Key: pick the key model in the kit and name it in the "A security key" card below.
+  7. support.html says "Pawl does not sell keys and does not take a cut." Change that line the same day.
+  8. privacy.html: add a short section on kit orders (Stripe checkout, name, email, shipping address).
+-->
+<style>
+  .top{position:sticky;top:0;z-index:10;background:var(--green-700);color:var(--on-green)}
+  .top .wrap{display:flex;align-items:center;gap:var(--s-4);height:60px}
+  .top a{color:var(--on-green);text-decoration:none}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;margin-right:auto}
+  .brand img{width:32px;height:32px;border-radius:8px}
+  .top .nav-cta{background:var(--on-green);color:var(--green-700);padding:8px 16px;border-radius:var(--r-pill);font-weight:600;font-size:var(--fs-0)}
+
+  /* hero */
+  .give{background:var(--brand-gradient);color:var(--on-green)}
+  .give .wrap{max-width:960px;padding:var(--s-8) var(--gutter);display:grid;grid-template-columns:1fr;gap:var(--s-6);align-items:center}
+  @media(min-width:760px){.give .wrap{grid-template-columns:1fr auto;gap:var(--s-8)}}
+  .eyebrow{font-size:var(--fs-0);font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--on-green-muted);margin:0 0 var(--s-3)}
+  .give h1{color:var(--on-green);max-width:16ch}
+  .give .lead{font-size:var(--fs-2);color:#eef4e6;margin:var(--s-4) 0 var(--s-6);max-width:36em;line-height:1.55}
+  .buy{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-4) var(--s-5)}
+  .amount{font-size:var(--fs-4);font-weight:700;line-height:1}
+  .amount small{display:block;font-size:var(--fs-0);font-weight:500;color:var(--on-green-muted);margin-top:6px}
+  .cta{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--on-green);color:var(--green-700);
+       font-weight:700;font-size:var(--fs-2);padding:16px 28px;border-radius:var(--r-pill);text-decoration:none;box-shadow:var(--shadow)}
+  .cta:hover{transform:translateY(-1px)}
+  .hint{font-size:var(--fs-0);color:var(--on-green-muted);margin:var(--s-4) 0 0;max-width:34em}
+  .hint a{color:var(--on-green)}
+  .mascot-card{display:none;background:var(--card);border-radius:var(--r-3);padding:var(--s-5);box-shadow:var(--shadow);width:220px;text-align:center}
+  .mascot-card img{width:150px;height:150px;margin:0 auto}
+  .mascot-card p{color:var(--muted);font-size:14px;line-height:1.4;margin:var(--s-2) 0 0}
+  @media(min-width:760px){.mascot-card{display:block}}
+
+  /* sections */
+  section{padding:var(--s-8) 0}
+  section.alt{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .inner{max-width:960px;margin:0 auto;padding:0 var(--gutter)}
+  .sublead{font-size:var(--fs-2);color:var(--muted);max-width:60ch;margin-top:var(--s-2)}
+  .grid3{display:grid;grid-template-columns:1fr;gap:var(--s-4);margin-top:var(--s-6)}
+  @media(min-width:760px){.grid3{grid-template-columns:repeat(3,1fr)}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-2);padding:var(--s-5)}
+  section:not(.alt) .card{background:var(--card)}
+  .card .pic{display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-4)}
+  .card .pic img{width:72px;height:72px;flex:none}
+  .card .n{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--green-500);color:#fff;font-weight:700}
+  .card .icon{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:var(--r-2);background:var(--green-100);color:var(--green-700)}
+  .card .icon svg{width:26px;height:26px}
+  .card h3{margin-top:var(--s-3)}
+  .card .pic + h3{margin-top:0}
+  .card p{margin-top:var(--s-2);font-size:var(--fs-0);color:var(--ink)}
+
+  /* good to know */
+  .terms{list-style:none;padding:0;margin:var(--s-5) 0 0;display:grid;gap:var(--s-3);max-width:760px}
+  .terms li{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--green-500);border-radius:var(--r-2);padding:var(--s-3) var(--s-4)}
+  .terms strong{color:var(--green-700)}
+
+  footer{background:var(--green-900);color:var(--on-green-muted);font-size:var(--fs-0)}
+  footer .wrap{padding:var(--s-6) var(--gutter);display:flex;flex-wrap:wrap;gap:var(--s-3) var(--s-5);align-items:center}
+  footer a{color:var(--on-green);text-decoration:none;opacity:.9}
+  footer a:hover{text-decoration:underline}
+  footer .sp{margin-left:auto}
+</style>
+</head>
+<body>
+
+<nav class="top" aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/img/pawl-mark.svg" alt="" width="32" height="32">Pawl</a>
+    <a class="nav-cta" href="https://apps.apple.com/app/id6783119309">Get Pawl</a>
+  </div>
+</nav>
+
+<header class="give">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">Give Pawl</p>
+      <h1>Give someone a block they can't undo at 1am</h1>
+      <p class="lead">A Pawl Kit has what a partner, friend or family member needs to start: the security key that unlocks Pawl, two Pawl Pro codes, and a card that walks them through setup.</p>
+
+      <div class="buy">
+        <!-- TODO: $59 is a placeholder price. Confirm it before this page goes live. -->
+        <p class="amount">$59<small>One payment. No account.</small></p>
+        <!-- TODO: replace REPLACE_ME with the real Stripe Payment Link. -->
+        <a class="cta" href="https://buy.stripe.com/REPLACE_ME">Buy a Pawl Kit</a>
+      </div>
+      <p class="hint">Checkout is on Stripe, where you enter the address to ship to. Pawl itself is free on the <a href="https://apps.apple.com/app/id6783119309">App Store</a>. The kit adds the key and Pro.</p>
+    </div>
+    <div class="mascot-card">
+      <img src="/img/mascot/pose-locked.svg" alt="The Stooped Key, Pawl's mascot: a brass key with a bent back, two eyes and a small mustache." width="150" height="150">
+      <p>The key is what unlocks Pawl. Nothing on the phone can.</p>
+    </div>
+  </div>
+</header>
+
+<section class="alt">
+  <div class="inner">
+    <h2>What's in the kit</h2>
+    <div class="grid3">
+      <div class="card">
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="14" rx="3"/><path d="M10 16v4h4v-4"/><circle cx="12" cy="8" r="2"/></svg></span>
+        <h3>A security key</h3>
+        <!-- TODO: name the key model in the kit once it is chosen. -->
+        <p>A USB-C FIDO2 key, the kind Pawl needs to unlock. It needs no app and no account. Pawl remembers this key and only this key.</p>
+      </div>
+      <div class="card">
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4Z"/><path d="M14 6v12" stroke-dasharray="2 2"/></svg></span>
+        <h3>Two Pawl Pro codes</h3>
+        <!-- TODO: say how long each code gives Pro, whether Pro renews after that, and what the second code is for. -->
+        <p>Pro adds scheduled sets, which block a different group of apps and sites during the hours you pick, and the full weekly report. Codes are redeemed in Apple's App Store. Use each one by the date printed on the card.</p>
+      </div>
+      <div class="card">
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/></svg></span>
+        <h3>A setup card</h3>
+        <p>Short steps to install Pawl, pick what to block, and pair the key. It also lists good places to keep the key, like with someone across town or in a time lock box.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="inner">
+    <h2>How it works</h2>
+    <div class="grid3">
+      <div class="card">
+        <div class="pic"><img src="/img/mascot/pose-nokey.svg" alt="" aria-hidden="true" width="72" height="72"><span class="n">1</span></div>
+        <h3>Order the kit</h3>
+        <p>Pay once on Stripe and enter where to send it. There is no Pawl account to make.</p>
+      </div>
+      <div class="card">
+        <div class="pic"><img src="/img/mascot/pose-open.svg" alt="" aria-hidden="true" width="72" height="72"><span class="n">2</span></div>
+        <h3>Hand it over</h3>
+        <p>Give the kit to the person it's for. They install Pawl free from the App Store, follow the card, and pair the key once.</p>
+      </div>
+      <div class="card">
+        <div class="pic"><img src="/img/mascot/pose-locked.svg" alt="" aria-hidden="true" width="72" height="72"><span class="n">3</span></div>
+        <h3>Decide who keeps the key</h3>
+        <p>After setup, the key goes somewhere hard to reach. That can be with you. Whoever holds the key decides when Pawl can loosen, and even then there is a 15 minute wait.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="inner">
+    <h2>Good to know</h2>
+    <ul class="terms">
+      <li><strong>It works best when they ask for it.</strong> They choose what to block. Pawl is not a way to watch someone: it has no server and sends nothing to you.</li>
+      <li><strong>It adds friction, not a wall.</strong> The owner of a phone can still turn Screen Time off. Pawl makes the 1am choice slow. It does not make it impossible. <a href="/about#limits">What Pawl does not promise</a></li>
+      <li><strong>Phones it works with.</strong> iPhone or iPad on iOS 18 or later, with a USB-C port. That means iPhone 15 or newer.</li>
+      <!-- TODO: add a matching kit-orders section to privacy.html before going live. -->
+      <li><strong>What we keep.</strong> Stripe handles the payment. We use the name, email and shipping address from checkout only to send the kit and answer questions about your order.</li>
+      <li><strong>Questions.</strong> Email <a href="mailto:support@getpawl.com">support@getpawl.com</a>.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="/" style="font-weight:600">Pawl</a>
+    <a href="/about">About</a>
+    <a href="/support">Support</a>
+    <a href="/privacy">Privacy</a>
+    <a href="https://github.com/jasonepage/Pawl">GitHub</a>
+    <a href="https://apps.apple.com/app/id6783119309">App Store</a>
+    <span class="sp">&copy; 2026 Jason Page</span>
+  </div>
+</footer>
+
+</body>
+</html>
