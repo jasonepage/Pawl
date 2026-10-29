@@ -40,7 +40,8 @@ website category, removing a typed site, loosening or deleting a scheduled set.
 
 ## 3. Decisions for Jason
 
-Each has a recommendation. Nothing gets built until these are picked.
+**Decided 2026-10-28:** Jason picked D1 = replace and D3 = no new product. D2, D4, D5 and D6
+use the recommended choices. Nothing gets built until Jason approves building.
 
 | # | Question | Recommended | Other choice |
 |---|---|---|---|
@@ -51,8 +52,7 @@ Each has a recommendation. Nothing gets built until these are picked.
 | D5 | What does the ally see? | **Only the minimum:** who is asking, "unlock" or "block less," and the time. | Also show the streak. Not recommended: it turns a yes or no into a judgment. |
 | D6 | How many allies? | **One** in 2.4. | Two or more. More sharing and more screens to build. |
 
-The rest of this plan assumes the recommended choices. If D1 goes the other way, section 4.4
-flips (see the note there).
+The rest of this plan uses these decisions.
 
 ## 4. How it works
 
