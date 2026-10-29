@@ -21,6 +21,8 @@ public final class HomeViewModel {
     /// 2.2: the last seven days as plain counts (WeekCard). nil until the first refresh.
     public private(set) var week: WeeklyReport?
     public private(set) var commitment: Commitment?
+    /// 2.4: when the key was paired. The streak and the week start here. nil means no key yet.
+    public private(set) var keyPairedAt: Date?
 
     private let repo: CommitmentRepository
 
@@ -35,6 +37,7 @@ public final class HomeViewModel {
     public func load() async {
         if let snap = try? await repo.loadActiveCommitment() {
             commitment = snap.commitment
+            keyPairedAt = snap.keyPairing?.pairedAt
         } else {
             let c = Commitment(startedAt: Date(), updatedAt: Date())
             let snap = CommitmentSnapshot(
@@ -50,11 +53,13 @@ public final class HomeViewModel {
 
     public func refresh() async {
         guard let c = commitment else { return }
+        if let snap = try? await repo.loadActiveCommitment() { keyPairedAt = snap.keyPairing?.pairedAt }
+        let trackedSince = max(c.startedAt, keyPairedAt ?? .distantPast)
         relapses = (try? await repo.relapses(for: c.id)) ?? []
         urges = (try? await repo.urges(for: c.id)) ?? []
         let unlocks = (try? await repo.unlocks(for: c.id)) ?? []
         week = WeeklyReport.make(
-            commitmentStart: c.startedAt,
+            commitmentStart: trackedSince,
             relapses: relapses.map(\.occurredAt),
             urges: urges.map(\.occurredAt),
             attempts: SharedState.blockAttemptStamps(),
@@ -65,8 +70,10 @@ public final class HomeViewModel {
         )
         cleanDays = Streak.cleanDays(
             commitmentStart: c.startedAt,
+            keyPairedAt: keyPairedAt,
             lastRelapse: relapses.first?.occurredAt,   // sorted newest-first
-            now: Date()
+            now: Date(),
+            requireKey: true
         )
     }
 

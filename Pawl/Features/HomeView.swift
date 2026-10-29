@@ -197,7 +197,12 @@ struct HomeView: View {
             .frame(width: 200, height: 200)
             .padding(.top, 4)
 
-            if let m = hitMilestone {
+            if vm.keyPairedAt == nil {
+                Text("Your count starts the day you pair a key.")
+                    .font(.subheadline)
+                    .foregroundStyle(PawlColor.cleanText)
+                    .opacity(0.85)
+            } else if let m = hitMilestone {
                 Label("\(m)-day milestone reached", systemImage: "rosette")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(PawlColor.cleanText)

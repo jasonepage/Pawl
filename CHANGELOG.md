@@ -2,6 +2,10 @@
 
 ## 2.4 (in progress)
 
+- The streak starts the day you pair a key, not the day you installed Pawl. With no key paired
+  the home screen shows 0 days and says the count starts when you pair one. A relapse still
+  resets it. The week card counts from the same day. Before this, the count ran from the first
+  launch, so a phone that never paired a key could show months on track.
 - New mascot and app icon: Pawl, an old brass key wearing cat ears, with heavy lids and a
   handlebar mustache. He is drawn in code now (`Pawl/Theme/PawlMascot.swift`, outline in
   `PawlMascotArt.swift`), so he moves: asleep on the job while apps are locked, half-lidded

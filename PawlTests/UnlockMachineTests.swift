@@ -112,6 +112,19 @@ final class StreakAndReconcileTests: XCTestCase {
         XCTAssertEqual(Streak.cleanDays(commitmentStart: start, lastRelapse: nil, now: now, calendar: cal), 5)
     }
 
+    // 2.4: the count starts when the key is paired, and there is no count without one.
+    func test_cleanDays_startsAtKeyPairing() {
+        let cal = Calendar(identifier: .gregorian)
+        let start = Date(timeIntervalSince1970: 0)
+        let paired = start.addingTimeInterval(100 * 86_400)
+        let now = start.addingTimeInterval(119 * 86_400)
+        XCTAssertEqual(Streak.cleanDays(commitmentStart: start, keyPairedAt: paired, lastRelapse: nil, now: now, calendar: cal, requireKey: true), 19)
+        XCTAssertEqual(Streak.cleanDays(commitmentStart: start, keyPairedAt: nil, lastRelapse: nil, now: now, calendar: cal, requireKey: true), 0)
+        // A relapse after pairing still wins.
+        let relapse = start.addingTimeInterval(115 * 86_400)
+        XCTAssertEqual(Streak.cleanDays(commitmentStart: start, keyPairedAt: paired, lastRelapse: relapse, now: now, calendar: cal, requireKey: true), 4)
+    }
+
     // FR-PERSIST-003: a stale unlocked remote must not override a local active shield.
     func test_reconcile_lockedWins() {
         let now = Date(timeIntervalSince1970: 1000)

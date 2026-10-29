@@ -12,15 +12,20 @@
 import Foundation
 
 public enum Streak {
-    /// Whole days since the later of the commitment start or the most recent relapse.
-    /// (FR-STREAK-001 / 003). Returns 0 on the day of start or relapse.
+    /// Whole days since the latest of the commitment start, the day the key was paired, or the
+    /// most recent relapse (FR-STREAK-001 / 003). Returns 0 on the day of start or relapse.
+    /// 2.4: with no key paired there is no count. Pawl cannot claim days on track before the
+    /// key exists, because nothing was locked.
     public static func cleanDays(
         commitmentStart: Date,
+        keyPairedAt: Date? = nil,
         lastRelapse: Date?,
         now: Date,
-        calendar: Calendar = .current
+        calendar: Calendar = .current,
+        requireKey: Bool = false
     ) -> Int {
-        let anchor = max(commitmentStart, lastRelapse ?? .distantPast)
+        if requireKey && keyPairedAt == nil { return 0 }
+        let anchor = max(commitmentStart, keyPairedAt ?? .distantPast, lastRelapse ?? .distantPast)
         // Count by calendar day boundaries, not raw 24h, so "since yesterday" reads correctly.
         let startDay = calendar.startOfDay(for: anchor)
         let nowDay = calendar.startOfDay(for: now)
