@@ -1,6 +1,11 @@
 # Changelog
 
-## 2.3 (in progress)
+## 2.4 (in progress)
+
+- Version 2.4, build 14 (app and all three extensions). Planned: ally approvals over iCloud,
+  see `docs/18_Ally_Approvals_Plan.md`.
+
+## 2.3
 
 - Fixed: unlock reminders could still go off after the unlock was cancelled or ended early.
   Cancelling while the reminders were still being set up (for example while the permission
