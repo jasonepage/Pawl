@@ -4,16 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Give a Pawl Kit</title>
-<meta name="description" content="A Pawl Kit is a gift for someone who wants a block they can't undo at 1am: a security key, two Pawl Pro codes and a setup card.">
-<!-- TODO: remove noindex once the price and the payment link are real. The page is also not linked from the menus until then. -->
-<meta name="robots" content="noindex">
+<meta name="description" content="A Pawl Kit is a gift for someone who wants a block they can't undo at 1am: a Yubico security key and a setup card.">
 <link rel="canonical" href="https://getpawl.com/give">
 <meta name="theme-color" content="#3c6a14">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Pawl">
 <meta property="og:url" content="https://getpawl.com/give">
 <meta property="og:title" content="Give a Pawl Kit">
-<meta property="og:description" content="A security key, two Pawl Pro codes and a setup card, for someone who wants a block they can't undo at 1am.">
+<meta property="og:description" content="A Yubico security key and a setup card, for someone who wants a block they can't undo at 1am.">
 <meta property="og:image" content="https://getpawl.com/img/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -21,18 +19,11 @@
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
 <link rel="stylesheet" href="/pawl.css">
 <!--
-  Before this page goes live (TODO list):
-  1. Done: price is $59, matching the live Stripe product.
-  2. Done: the buy button uses the live Stripe Payment Link.
-  2b. Refund rule: add one line to "Good to know" once it is decided (Stripe may ask for it).
-  3. Apple: confirm the developer terms allow charging money for a kit that includes Pro offer codes.
-  4. Offer codes: one-time codes expire at most 6 months after they are made, so make them in small
-     batches as orders come in and print the redeem-by date on the card.
-  5. Pro codes: confirm how long each code gives Pro, whether Pro renews after that, and what the
-     second code is for. Then fill in the "Two Pawl Pro codes" card below.
-  6. Key: pick the key model in the kit and name it in the "A security key" card below.
-  7. support.html says "Pawl does not sell keys and does not take a cut." Change that line the same day.
-  8. privacy.html: add a short section on kit orders (Stripe checkout, name, email, shipping address).
+  The Pawl Kit has NO Pro codes on purpose. Apple's Developer Program License Agreement,
+  Schedule 2, section 3.13(c): "You shall not sell the Offer Codes or accept any form of payment,
+  trade-in-kind, or other compensation in connection with the distribution of the Offer Codes."
+  Do not add Pro codes to anything that is paid for. Free codes (like /claim) are fine.
+  Price and payment link must match the live Stripe product "Pawl Kit". Change them together.
 -->
 <style>
   .top{position:sticky;top:0;z-index:10;background:var(--green-700);color:var(--on-green)}
@@ -106,7 +97,7 @@
     <div>
       <p class="eyebrow">Give Pawl</p>
       <h1>Give someone a block they can't undo at 1am</h1>
-      <p class="lead">A Pawl Kit has what a partner, friend or family member needs to start: the security key that unlocks Pawl, two Pawl Pro codes, and a card that walks them through setup.</p>
+      <p class="lead">A Pawl Kit has what a partner, friend or family member needs to start: the security key that unlocks Pawl, and a card that walks them through setup.</p>
 
       <div class="buy">
         <!-- Price matches the live Stripe product "Pawl Kit" ($59.00 USD). Change both together. -->
@@ -114,7 +105,7 @@
         <!-- Live Stripe Payment Link for the Pawl Kit (US shipping address collected at checkout). -->
         <a class="cta" href="https://buy.stripe.com/5kQbIU8uJc9XblX1YgenS00">Buy a Pawl Kit</a>
       </div>
-      <p class="hint">Checkout is on Stripe, where you enter the address to ship to. Pawl itself is free on the <a href="https://apps.apple.com/app/id6783119309">App Store</a>. The kit adds the key and Pro.</p>
+      <p class="hint">Checkout is on Stripe, where you enter the address to ship to. Pawl itself is free on the <a href="https://apps.apple.com/app/id6783119309">App Store</a>. The kit adds the key and the setup card.</p>
     </div>
     <div class="mascot-card">
       <img src="/img/mascot/pose-locked.svg" alt="The Stooped Key, Pawl's mascot: a brass key with a bent back, two eyes and a small mustache." width="150" height="150">
@@ -130,14 +121,12 @@
       <div class="card">
         <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="14" rx="3"/><path d="M10 16v4h4v-4"/><circle cx="12" cy="8" r="2"/></svg></span>
         <h3>A security key</h3>
-        <!-- TODO: name the key model in the kit once it is chosen. -->
-        <p>A USB-C FIDO2 key, the kind Pawl needs to unlock. It needs no app and no account. Pawl remembers this key and only this key.</p>
+        <p>A Yubico Security Key C NFC: a USB-C FIDO2 key, the kind Pawl needs to unlock. It needs no app and no account. Pawl remembers this key and only this key.</p>
       </div>
       <div class="card">
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4Z"/><path d="M14 6v12" stroke-dasharray="2 2"/></svg></span>
-        <h3>Two Pawl Pro codes</h3>
-        <!-- TODO: say how long each code gives Pro, whether Pro renews after that, and what the second code is for. -->
-        <p>Pro adds scheduled sets, which block a different group of apps and sites during the hours you pick, and the full weekly report. Codes are redeemed in Apple's App Store. Use each one by the date printed on the card.</p>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg></span>
+        <h3>The Pawl app, free</h3>
+        <p>Blocking, the key, the wait and the streak are free. Pawl Pro is optional and adds scheduled sets and the full weekly report, with a 7-day free trial on the yearly plan in the app.</p>
       </div>
       <div class="card">
         <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/></svg></span>
@@ -178,8 +167,9 @@
       <li><strong>It works best when they ask for it.</strong> They choose what to block. Pawl is not a way to watch someone: it has no server and sends nothing to you.</li>
       <li><strong>It adds friction, not a wall.</strong> The owner of a phone can still turn Screen Time off. Pawl makes the 1am choice slow. It does not make it impossible. <a href="/about#limits">What Pawl does not promise</a></li>
       <li><strong>Phones it works with.</strong> iPhone or iPad on iOS 18 or later, with a USB-C port. That means iPhone 15 or newer.</li>
-      <!-- TODO: add a matching kit-orders section to privacy.html before going live. -->
-      <li><strong>What we keep.</strong> Stripe handles the payment. We use the name, email and shipping address from checkout only to send the kit and answer questions about your order.</li>
+      <li><strong>Shipping.</strong> US addresses only for now. Kits ship within 3 business days.</li>
+      <li><strong>Refunds.</strong> Full refund within 30 days if the key is unopened. If the key arrives broken, we send a new one free. Email <a href="mailto:support@getpawl.com">support@getpawl.com</a>.</li>
+      <li><strong>What we keep.</strong> Stripe handles the payment. We use the name, email and shipping address from checkout only to send the kit and answer questions about your order. <a href="/privacy">Privacy policy</a></li>
       <li><strong>Questions.</strong> Email <a href="mailto:support@getpawl.com">support@getpawl.com</a>.</li>
     </ul>
   </div>
