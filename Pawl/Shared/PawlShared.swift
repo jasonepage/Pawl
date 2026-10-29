@@ -297,7 +297,8 @@ public extension SharedShield {
 // evaluates.
 
 /// One scheduled set. Pure Foundation so the extensions and the tests can use it.
-public struct ScheduledSet: Codable, Equatable, Identifiable, Sendable {
+/// nonisolated: value type with no UI, so it can be read from any actor.
+nonisolated public struct ScheduledSet: Codable, Equatable, Identifiable, Sendable {
     public var id: UUID
     public var name: String
     /// JSON-encoded FamilyActivitySelection (opaque Screen Time tokens).

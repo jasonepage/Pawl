@@ -10,6 +10,10 @@
 //  fade), the person's own notes from past moments, their numbers, then the log, a call
 //  button and help lines. Never offers an unblock control (FR-URGE-003).
 //
+//  2.4: "I resisted" moved to the end of the wait, where it is true. The form is chips first
+//  (how strong, what set it off), typing last, and saves a draft without counting anything.
+//  The wait and the draft survive leaving the screen. No zero is shown at the top.
+//
 
 import SwiftUI
 
@@ -27,11 +31,22 @@ struct UrgeView: View {
 
     private static let waitSeconds: TimeInterval = 10 * 60
 
-    @State private var waitEndsAt: Date?
-    @State private var intensity = 5.0
-    @State private var trigger = ""
-    @State private var note = ""
+    // 2.4: the wait and the draft live in UserDefaults so leaving the screen loses nothing.
+    @AppStorage("urge.waitEndsAt") private var waitEndsAtStamp: Double = 0
+    @AppStorage("urge.intensity") private var intensity: Int = 0        // 0 = not picked
+    @AppStorage("urge.trigger") private var trigger = ""
+    @AppStorage("urge.note") private var note = ""
+    @State private var otherTrigger = false
+    @State private var saved = false
     @State private var logged = false
+
+    private var waitEndsAt: Date? {
+        get { waitEndsAtStamp > 0 ? Date(timeIntervalSince1970: waitEndsAtStamp) : nil }
+        nonmutating set { waitEndsAtStamp = newValue?.timeIntervalSince1970 ?? 0 }
+    }
+
+    private static let triggers = ["bored", "stressed", "lonely", "late night", "a notification", "saw an ad"]
+    private static let strengths: [(label: String, value: Int)] = [("Mild", 3), ("Strong", 6), ("Overwhelming", 9)]
     @State private var trustedName = ""
     @State private var trustedPhone = ""
     @State private var showContactSheet = false
@@ -45,17 +60,7 @@ struct UrgeView: View {
                 numbersLine
                 if !pastNotes.isEmpty { ownWordsCard }
 
-                if logged {
-                    VStack(spacing: 8) {
-                        PawlMascot(pose: .resisted, size: 96)
-                        Label("Logged. That took strength.", systemImage: "checkmark.seal.fill")
-                            .font(.headline)
-                            .foregroundStyle(PawlColor.cleanText)
-                    }
-                    .padding(.vertical, 8)
-                } else {
-                    logCard
-                }
+                if !logged { logCard }
 
                 Button {
                     callTrustedContact()
@@ -91,6 +96,15 @@ struct UrgeView: View {
             .padding(20)
         }
         .background(PawlColor.groupedBg)
+        .scrollDismissesKeyboard(.interactively)
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Done") {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
+            }
+        }
         .navigationTitle("Tempted")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear(perform: loadContact)
@@ -111,7 +125,18 @@ struct UrgeView: View {
 
     private var waitCard: some View {
         VStack(spacing: 14) {
-            if let endsAt = waitEndsAt {
+            if logged {
+                PawlMascot(pose: .resisted, size: 110)
+                Text("Logged. That took strength.")
+                    .font(.system(.title2, design: .rounded).weight(.bold))
+                    .foregroundStyle(PawlColor.cleanText)
+                Text("Future you will read what you wrote.")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                Button("Another ten minutes") { startWait() }
+                    .buttonStyle(PawlBigButtonStyle(background: PawlColor.cleanBg, foreground: PawlColor.cleanText))
+            } else if let endsAt = waitEndsAt {
                 TimelineView(.periodic(from: .now, by: 1)) { context in
                     let remaining = max(0, endsAt.timeIntervalSince(context.date))
                     if remaining > 0 {
@@ -141,10 +166,13 @@ struct UrgeView: View {
                             Text("Ten minutes. You stayed.")
                                 .font(.system(.title2, design: .rounded).weight(.bold))
                                 .foregroundStyle(PawlColor.cleanText)
-                            Text("If it's still there, start another ten. It is weaker than it was.")
+                            Text("That counts. If it's still there, start another ten. It is weaker than it was.")
                                 .font(.body)
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)
+                            // 2.4: "I resisted" lives here, after the wait, where it is true.
+                            Button { logResisted() } label: { Text("I resisted") }
+                                .buttonStyle(PawlBigButtonStyle(background: PawlColor.urgeBg, foreground: PawlColor.urgeText))
                             Button("Another ten minutes") { startWait() }
                                 .buttonStyle(PawlBigButtonStyle(background: PawlColor.cleanBg, foreground: PawlColor.cleanText))
                         }
@@ -179,6 +207,16 @@ struct UrgeView: View {
 
     private func startWait() {
         waitEndsAt = Date().addingTimeInterval(Self.waitSeconds)
+        logged = false
+    }
+
+    /// The urge is counted here, once, with whatever was written. Then the draft is cleared.
+    private func logResisted() {
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        onLog(intensity == 0 ? nil : intensity, trigger, note)
+        withAnimation { logged = true }
+        waitEndsAt = nil   // counted once; coming back later starts fresh
+        intensity = 0; trigger = ""; note = ""; saved = false; otherTrigger = false
     }
 
     private func countdown(_ remaining: TimeInterval) -> String {
@@ -191,7 +229,9 @@ struct UrgeView: View {
     private var numbersLine: some View {
         VStack(spacing: 6) {
             HStack(spacing: 18) {
-                stat("\(streakDays)", streakDays == 1 ? "day on track" : "days on track")
+                if streakDays > 0 {   // 2.4: a zero here helps no one
+                    stat("\(streakDays)", streakDays == 1 ? "day on track" : "days on track")
+                }
                 if rodeOutCount > 0 {
                     stat("\(rodeOutCount)", rodeOutCount == 1 ? "time resisted" : "times resisted")
                 }
@@ -268,34 +308,73 @@ struct UrgeView: View {
         PawlCard {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Write it down").font(.headline)
-                Text("Future you will read this next time you're tempted.")
+                Text("Optional. Future you will read this next time you're tempted.")
                     .font(.caption).foregroundStyle(.secondary)
 
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("How strong is it?  \(Int(intensity))/10")
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("How strong is it?")
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(.secondary)
-                    Slider(value: $intensity, in: 1...10, step: 1)
-                        .tint(PawlColor.brand)
-                    HStack {
-                        Text("Mild"); Spacer(); Text("Overwhelming")
+                    HStack(spacing: 8) {
+                        ForEach(Self.strengths, id: \.value) { s in
+                            chip(s.label, on: intensity == s.value) { intensity = intensity == s.value ? 0 : s.value }
+                        }
                     }
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
                 }
 
-                PawlField("What set it off?", prompt: "bored, stressed, a notification", text: $trigger)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("What set it off?")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.secondary)
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 8)], alignment: .leading, spacing: 8) {
+                        ForEach(Self.triggers, id: \.self) { t in
+                            chip(t, on: trigger == t) { trigger = trigger == t ? "" : t; otherTrigger = false }
+                        }
+                        chip("something else", on: otherTrigger) {
+                            otherTrigger.toggle()
+                            if otherTrigger, Self.triggers.contains(trigger) { trigger = "" }
+                        }
+                    }
+                    if otherTrigger || (!trigger.isEmpty && !Self.triggers.contains(trigger)) {
+                        PawlField("", prompt: "what set it off", text: $trigger)
+                    }
+                }
+
                 PawlField("What would you tell yourself right now?", prompt: "a note to future you", text: $note, multiline: true)
 
-                Button {
-                    onLog(Int(intensity), trigger, note)
-                    withAnimation { logged = true }
-                } label: {
-                    Text("I resisted")
+                if saved {
+                    Label("Saved. Now wait it out.", systemImage: "checkmark.circle.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(PawlColor.cleanText)
+                } else {
+                    Button {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        withAnimation { saved = true }
+                        if waitEndsAt == nil { startWait() }
+                    } label: {
+                        Text("Save this")
+                    }
+                    .buttonStyle(PawlBigButtonStyle(background: PawlColor.urgeBg, foreground: PawlColor.urgeText))
                 }
-                .buttonStyle(PawlBigButtonStyle(background: PawlColor.urgeBg, foreground: PawlColor.urgeText))
             }
         }
+    }
+
+    private func chip(_ label: String, on: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(label)
+                .font(.subheadline.weight(on ? .semibold : .regular))
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+                .background(on ? PawlColor.urgeBg : Color(uiColor: .tertiarySystemGroupedBackground))
+                .foregroundStyle(on ? PawlColor.urgeText : .primary)
+                .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(on ? .isSelected : [])
     }
 }
 

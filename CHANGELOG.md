@@ -2,6 +2,13 @@
 
 ## 2.4 (in progress)
 
+- Tough-moment screen: "I resisted" moved to the end of the ten-minute wait, where it is
+  true, with Pawl's swipe. The form is chips first (Mild, Strong, Overwhelming; bored,
+  stressed, lonely, late night, a notification, saw an ad, something else), typing last, and
+  "Save this" keeps a draft without counting anything. Saving starts the wait if it is not
+  running. The wait and the draft survive leaving the screen. No zero shows at the top. A Done
+  button sits above the keyboard, and the save and the count each give a small haptic.
+- Build warnings: `ScheduledSet` and the reminder id strings are nonisolated.
 - The streak starts the day you pair a key, not the day you installed Pawl. With no key paired
   the home screen shows 0 days and says the count starts when you pair one. A relapse still
   resets it. The week card counts from the same day. Before this, the count ran from the first

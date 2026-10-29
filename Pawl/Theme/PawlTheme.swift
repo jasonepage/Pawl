@@ -95,9 +95,11 @@ public struct PawlField: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.secondary)
+            if !title.isEmpty {
+                Text(title)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.secondary)
+            }
             Group {
                 if multiline {
                     TextField(prompt, text: $text, axis: .vertical).lineLimit(2...4)

@@ -28,9 +28,10 @@ import UserNotifications
 
 @MainActor
 enum UnlockReminders {
-    private static let idPrefix = "pawl.unlock."
-    private static let openIDs = ["open5", "open1", "open0"].map { idPrefix + $0 }
-    private static let lockIDs = ["lock5", "lock1", "lock0"].map { idPrefix + $0 }
+    // nonisolated: plain strings, read from static initializers and nonisolated helpers.
+    nonisolated private static let idPrefix = "pawl.unlock."
+    nonisolated private static let openIDs = ["open5", "open1", "open0"].map { idPrefix + $0 }
+    nonisolated private static let lockIDs = ["lock5", "lock1", "lock0"].map { idPrefix + $0 }
     private static var allIDs: [String] { openIDs + lockIDs }
 
     /// Reminders due this close to now are left alone when clearing, so the one that matches
