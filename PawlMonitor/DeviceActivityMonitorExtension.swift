@@ -42,6 +42,12 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
             return
         }
         guard activity == .pawlUnlock else { return }
+        // 2.4: "Until I lock it". iOS made this window end after 15 minutes, but the person
+        // chose to keep apps open until they tap Lock now in Pawl. Leave the shield down.
+        if SharedState.openUntilLocked() {
+            SharedState.setPhase("unshielded")
+            return
+        }
         SharedShield.apply(SharedState.loadSelection())
         SharedState.setPhase("locked")
         SharedState.clearWindow()

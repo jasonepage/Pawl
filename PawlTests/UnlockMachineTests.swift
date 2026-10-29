@@ -78,10 +78,12 @@ final class UnlockMachineTests: XCTestCase {
         XCTAssertTrue(effects.isEmpty)
     }
 
-    // FR-UNLOCK-004: cooling-off can never be constructed below the 15-min floor.
+    // FR-UNLOCK-004: cooling-off is clamped to its floor and ceiling. 2.4: the floor is 0
+    // ("No wait"), so a 1 minute wait is kept and only negative values are raised.
     func test_coolingOffFloorEnforced() {
-        let m = UnlockMachine(coolingOff: 60, grace: 900) // request 1 min
-        XCTAssertEqual(m.coolingOff, PawlDefaults.coolingOffFloor)
+        XCTAssertEqual(UnlockMachine(coolingOff: 60, grace: 900).coolingOff, 60)
+        XCTAssertEqual(UnlockMachine(coolingOff: -5, grace: 900).coolingOff, PawlDefaults.coolingOffFloor)
+        XCTAssertEqual(UnlockMachine(coolingOff: 48 * 3600, grace: 900).coolingOff, PawlDefaults.coolingOffCeiling)
     }
 
     // 2.3: the ally (sponsor) approval step was removed. A valid tap always goes straight to

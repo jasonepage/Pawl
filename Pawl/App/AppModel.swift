@@ -298,7 +298,8 @@ final class AppModel {
         // Cleared → wait out the cooling-off before the removal takes effect.
         let endsAt = Date().addingTimeInterval(cooldownSeconds)
         pendingSelection.begin(new, endsAt: endsAt)
-        blockChangeMessage = "Removal starts in \(Int(cooldownSeconds / 60)) min. They stay blocked until then."
+        blockChangeMessage = cooldownSeconds <= 0 ? "Removed."   // 2.4: no wait applies at once
+            : "Removal starts \(DurationText.startsIn(waitSeconds: cooldownSeconds)). They stay blocked until then."
     }
 
     func cancelSelectionChange() {
@@ -362,7 +363,8 @@ final class AppModel {
 
         let endsAt = Date().addingTimeInterval(cooldownSeconds)
         pendingCategories.begin(WebCategories(gambling: gambling, adult: adult), endsAt: endsAt)
-        blockChangeMessage = "Turning that off starts in \(Int(cooldownSeconds / 60)) min. It stays on until then."
+        blockChangeMessage = cooldownSeconds <= 0 ? "Turned off."
+            : "Turning that off starts \(DurationText.startsIn(waitSeconds: cooldownSeconds)). It stays on until then."
     }
 
     func cancelCategoryChange() {
@@ -417,9 +419,10 @@ final class AppModel {
 
         let endsAt = Date().addingTimeInterval(cooldownSeconds)
         pendingDomains.begin(Array(targets).sorted(), endsAt: endsAt)
-        blockChangeMessage = targets.count == 1
-            ? "Removal starts in \(Int(cooldownSeconds / 60)) min. The site stays blocked until then."
-            : "Removal starts in \(Int(cooldownSeconds / 60)) min. The sites stay blocked until then."
+        blockChangeMessage = cooldownSeconds <= 0 ? "Removed."   // 2.4: no wait applies at once
+            : targets.count == 1
+            ? "Removal starts \(DurationText.startsIn(waitSeconds: cooldownSeconds)). The site stays blocked until then."
+            : "Removal starts \(DurationText.startsIn(waitSeconds: cooldownSeconds)). The sites stay blocked until then."
     }
 
     func cancelDomainRemoval() {
@@ -530,7 +533,8 @@ final class AppModel {
         guard await approveLoosening() else { return }
         let endsAt = Date().addingTimeInterval(cooldownSeconds)
         pendingSetsCtl.begin(target, endsAt: endsAt)
-        blockChangeMessage = "\(what) It applies in \(Int(cooldownSeconds / 60)) min."
+        blockChangeMessage = cooldownSeconds <= 0 ? "Saved."
+            : "\(what) It applies \(DurationText.startsIn(waitSeconds: cooldownSeconds))."
     }
 
     private func applySets(_ sets: [ScheduledSet]) {
@@ -546,7 +550,9 @@ final class AppModel {
     func requestDurations(cooldown: TimeInterval, grace: TimeInterval) async {
         let cd = PawlDefaults.clampCoolingOff(cooldown)
         let gr = PawlDefaults.clampGrace(grace)
-        let isTighten = cd >= cooldownSeconds && gr <= graceSeconds
+        // 2.4: compare open times by length, with "Until I lock it" as the longest of all.
+        let isTighten = cd >= cooldownSeconds
+            && PawlDefaults.openLength(gr) <= PawlDefaults.openLength(graceSeconds)
         if isTighten {
             cancelPendingDurations()                       // supersede any pending loosening
             await applyDurations(cooldown: cd, grace: gr)

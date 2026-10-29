@@ -88,6 +88,11 @@ struct UnlockView: View {
                         .font(.title3)
                         .foregroundStyle(heroFg)
                 }
+            } else if vm.isOpenUntilLocked {
+                Text("They stay open until you tap Lock now.")   // 2.4: no timer to show
+                    .font(.title3)
+                    .foregroundStyle(heroFg)
+                    .multilineTextAlignment(.center)
             } else if showScreenTimeOff {
                 Text("Pawl can't block anything until it's turned back on in Settings.")
                     .font(.body)
@@ -115,7 +120,7 @@ struct UnlockView: View {
                     Task { await vm.beginUnlock() }
                 }
                 .disabled(vm.isBusy)
-                helper("Using your key starts a 15-minute wait. Apps stay locked until it's over, then re-lock on their own.")
+                helper(vm.unlockHelpText)   // 2.4: follows the saved wait and open time
             } else {
                 bigButton("Pair your security key", "key.fill",
                           bg: PawlColor.cleanBg, fg: PawlColor.cleanText) {
@@ -134,7 +139,14 @@ struct UnlockView: View {
                       bg: PawlColor.cardBg, fg: .primary) { vm.cancel() }
 
         case .unshielded:
-            helper("Apps re-lock by themselves when the timer ends. There's nothing you need to do.")
+            // 2.4: Lock now ends the open time early. With "Until I lock it" it's the only way.
+            if vm.isOpenUntilLocked {
+                helper("Apps stay open until you lock them. Nothing locks them for you.")
+            } else {
+                helper("Apps re-lock by themselves when the timer ends. You can also lock them now.")
+            }
+            bigButton("Lock now", "lock.fill",
+                      bg: PawlColor.cleanBg, fg: PawlColor.cleanText) { vm.lockNow() }
         }
     }
 
@@ -251,6 +263,10 @@ struct UnlockView: View {
 
     private func countdown(to endsAt: Date) -> String {
         let remaining = max(0, Int(endsAt.timeIntervalSinceNow))
+        // 2.4: custom times can run for hours, so show h:mm:ss past an hour.
+        if remaining >= 3600 {
+            return String(format: "%d:%02d:%02d", remaining / 3600, (remaining % 3600) / 60, remaining % 60)
+        }
         return String(format: "%d:%02d", remaining / 60, remaining % 60)
     }
 }

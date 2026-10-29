@@ -34,7 +34,9 @@ public final class ShieldService {
     /// "locked", so a relaunch mid-unlock (RecoveryService re-applies on launch) wiped the
     /// countdown, and during the open window it re-blocked everything early.
     public nonisolated static func applyAction(phase: String, windowStart: Date?, windowEnd: Date?,
-                                               now: Date) -> ApplyAction {
+                                               now: Date, openUntilLocked: Bool = false) -> ApplyAction {
+        // 2.4: "Until I lock it" stays open past the window's end, until Lock now.
+        if openUntilLocked && phase == "unshielded" { return .keepOpen }
         guard phase == "cooling" || phase == "unshielded",
               let start = windowStart, let end = windowEnd, now < end else { return .lock }
         return now >= start ? .keepOpen : .blockKeepCountdown
@@ -46,7 +48,8 @@ public final class ShieldService {
     public func apply(_ selection: FamilyActivitySelection) {
         SharedState.saveSelection(selection)
         switch Self.applyAction(phase: SharedState.phase(), windowStart: SharedState.windowStart(),
-                                windowEnd: SharedState.windowEnd(), now: Date()) {
+                                windowEnd: SharedState.windowEnd(), now: Date(),
+                                openUntilLocked: SharedState.openUntilLocked()) {
         case .keepOpen:
             return
         case .blockKeepCountdown:
@@ -64,6 +67,7 @@ public final class ShieldService {
         SharedShield.apply(selection)
         SharedState.setPhase("locked")
         SharedState.clearWindow()
+        SharedState.setOpenUntilLocked(false)   // 2.4: Lock now ends "Until I lock it"
     }
 
     /// Lift the shield — only after a valid tap + full cooling-off (FR-UNLOCK-007).

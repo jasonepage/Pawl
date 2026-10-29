@@ -95,15 +95,18 @@ public final class UnlockViewModel {
                 pairedCredential = encoded
                 message = "Paired ✓ Now lock the key away: give it to an ally or a timebox, out of reach."
             } else {
-                let endsAt = Date().addingTimeInterval(machine.coolingOff)
+                // 2.4: a new key always waits at least the default 15 minutes, even with "No
+                // wait". Re-pairing doesn't need the old key, so without this, anyone holding the
+                // phone and any security key could make it "the key" and unlock at once.
+                let wait = max(machine.coolingOff, PawlDefaults.coolingOffDefault)
+                let endsAt = Date().addingTimeInterval(wait)
                 guard keyStore.savePending(newKey, endsAt: endsAt) else {
                     message = "Couldn't save the new key. Your current key is unchanged."
                     return
                 }
                 pendingKeyEndsAt = endsAt
                 scheduleKeyCommit(at: endsAt)
-                let mins = Int(machine.coolingOff / 60)
-                message = "New key registered. It becomes your key in \(mins) min. Your current key still works until then. Cancel to keep your current key."
+                message = "New key registered. It becomes your key \(DurationText.startsIn(waitSeconds: wait)). Your current key still works until then. Cancel to keep your current key."
             }
         } catch {
             message = error.localizedDescription
@@ -169,6 +172,28 @@ public final class UnlockViewModel {
         }
     }
 
+    /// 2.4: Lock now. Ends the open time early (or ends "Until I lock it"). Blocking more is
+    /// always allowed, so there is no key and no wait.
+    public func lockNow() {
+        guard case .unshielded = state else { return }
+        timerTask?.cancel(); timerTask = nil
+        UnlockScheduler.cancel()      // stop the OS window so it can't lift or relock later
+        send(.lockNow)                // reapplyShield: relock with the live selection, clear reminders
+    }
+
+    /// 2.4: the line under "Tap to unlock", from the saved wait and open time.
+    public var unlockHelpText: String {
+        let c = commitmentProvider()
+        return DurationText.unlockHelp(waitSeconds: c?.coolingOffSeconds ?? PawlDefaults.coolingOffDefault,
+                                       openSeconds: c?.graceSeconds ?? PawlDefaults.graceDefault)
+    }
+
+    /// 2.4: apps are open with "Until I lock it", so no timer will lock them.
+    public var isOpenUntilLocked: Bool {
+        if case .unshielded(let endsAt) = state { return endsAt == .distantFuture }
+        return false
+    }
+
     /// Cancel during cooling-off keeps the shield active (FR-UNLOCK-005).
     public func cancel() {
         timerTask?.cancel(); timerTask = nil
@@ -184,7 +209,9 @@ public final class UnlockViewModel {
         let now = Date()
         switch SharedState.phase() {
         case "unshielded":
-            if let end = SharedState.windowEnd(), now < end {
+            if SharedState.openUntilLocked() {
+                state = .unshielded(graceEndsAt: .distantFuture)   // 2.4: open until Lock now
+            } else if let end = SharedState.windowEnd(), now < end {
                 state = .unshielded(graceEndsAt: end)
                 scheduleFire(at: end, event: .graceEnded)
             } else {
@@ -193,6 +220,13 @@ public final class UnlockViewModel {
             }
         case "cooling":
             if let start = SharedState.windowStart(), now < start {
+                // 2.4: finish this unlock with the open time it was scheduled with, not today's
+                // setting (a looser timing may have landed during the wait). The OS window and
+                // the "Until I lock it" flag were fixed when the wait started.
+                let scheduledOpen = SharedState.openUntilLocked()
+                    ? PawlDefaults.openUntilLocked
+                    : max(PawlDefaults.graceFloor, (SharedState.windowEnd() ?? start).timeIntervalSince(start))
+                machine = UnlockMachine(coolingOff: machine.coolingOff, grace: scheduledOpen)
                 state = .coolingOff(endsAt: start)
                 scheduleFire(at: start, event: .coolingOffEnded)
             } else {
@@ -219,7 +253,7 @@ public final class UnlockViewModel {
     public var phaseEndsAt: Date? {
         switch state {
         case .coolingOff(let endsAt): return endsAt
-        case .unshielded(let endsAt): return endsAt
+        case .unshielded(let endsAt): return endsAt == .distantFuture ? nil : endsAt   // 2.4
         default: return nil
         }
     }
@@ -245,7 +279,9 @@ public final class UnlockViewModel {
             do {
                 try UnlockScheduler.scheduleUnlock(coolingOff: machine.coolingOff, grace: machine.grace)
                 // 2.3: heads-up reminders before apps open and before they lock again.
-                let locksAt = endsAt.addingTimeInterval(machine.grace)
+                // 2.4: "Until I lock it" has no lock time, so no lock reminders.
+                let locksAt: Date? = PawlDefaults.isUntilLocked(machine.grace)
+                    ? nil : endsAt.addingTimeInterval(machine.grace)
                 Task { await UnlockReminders.schedule(opensAt: endsAt, locksAt: locksAt) }
             } catch {
                 timerTask?.cancel(); timerTask = nil
@@ -256,7 +292,12 @@ public final class UnlockViewModel {
         case .scheduleGrace(let endsAt):
             scheduleFire(at: endsAt, event: .graceEnded)
             // 2.3: keep the lock reminders on the real lock time (same time in a normal unlock).
-            Task { await UnlockReminders.moveLockReminders(to: endsAt) }
+            // 2.4: not with no wait. The open time starts right after the tap, while schedule()
+            // may still be waiting on the permission prompt; moving now would cancel that first
+            // set. schedule() already put the lock reminders at this same time.
+            if machine.coolingOff > 0 {
+                Task { await UnlockReminders.moveLockReminders(to: endsAt) }
+            }
         case .reapplyShield:
             // 2.1: relock with the live shared selection (it includes apps added since this
             // screen opened), falling back to the one this screen started with.
@@ -270,6 +311,9 @@ public final class UnlockViewModel {
 
     private func scheduleFire(at endsAt: Date, event: UnlockEvent) {
         timerTask?.cancel()
+        // 2.4: never set a timer for "Until I lock it" (.distantFuture). Its nanoseconds would
+        // not fit in a UInt64. Nothing should ask for one; this is the backstop.
+        guard endsAt.timeIntervalSinceNow < 7 * 24 * 60 * 60 else { timerTask = nil; return }
         timerTask = Task { [weak self] in
             let delay = endsAt.timeIntervalSinceNow
             if delay > 0 {

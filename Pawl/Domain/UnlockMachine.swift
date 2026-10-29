@@ -37,6 +37,7 @@ public enum UnlockEvent: Equatable, Sendable {
     case cancel                           // user backs out (FR-UNLOCK-005)
     case coolingOffEnded                  // DeviceActivity boundary (FR-UNLOCK-007)
     case graceEnded                       // DeviceActivity boundary (FR-UNLOCK-008/009)
+    case lockNow                          // 2.4: the person ends the open time early (blocks more)
 }
 
 // MARK: - Effects (interpreted by the iOS layer)
@@ -57,8 +58,8 @@ public struct UnlockMachine: Sendable {
     public let grace: TimeInterval
 
     public init(coolingOff: TimeInterval, grace: TimeInterval) {
-        // Enforce the floor here too, so the machine can never be constructed
-        // with a sub-floor cooling-off (FR-UNLOCK-004).
+        // Enforce the floor and ceiling here too (FR-UNLOCK-004). 2.4: the floor is 0 ("No
+        // wait"), so this now only stops negative or over-ceiling values.
         self.init(coolingOff: coolingOff, grace: grace, clampFloor: true)
     }
 
@@ -94,12 +95,21 @@ public struct UnlockMachine: Sendable {
             return (.locked, [])
 
         // Only after the full wait does the shield lift, then grace starts (FR-UNLOCK-007/008).
+        // 2.4: with "Until I lock it" there is no timer to start. The open state carries
+        // `.distantFuture` as its end, and only `lockNow` ends it.
         case (.coolingOff, .coolingOffEnded):
+            if PawlDefaults.isUntilLocked(grace) {
+                return (.unshielded(graceEndsAt: .distantFuture), [.liftShield])
+            }
             let graceEndsAt = now.addingTimeInterval(grace)
             return (.unshielded(graceEndsAt: graceEndsAt), [.liftShield, .scheduleGrace(endsAt: graceEndsAt)])
 
         // Grace over → auto-relock without user action (FR-UNLOCK-008/009).
         case (.unshielded, .graceEnded):
+            return (.locked, [.reapplyShield])
+
+        // 2.4: Lock now. Ending the open time early blocks more, so it is always allowed.
+        case (.unshielded, .lockNow):
             return (.locked, [.reapplyShield])
 
         default:

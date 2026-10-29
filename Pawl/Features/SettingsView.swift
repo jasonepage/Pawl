@@ -190,7 +190,8 @@ struct SettingsView: View {
                 FrictionView(model: model)
             } label: {
                 SettingsRows.detail("hourglass", .teal, "Unlock timing",
-                                    "\(Int(model.cooldownSeconds / 60)) min wait, then open for \(Int(model.graceSeconds / 60)) min")
+                                    DurationText.summary(waitSeconds: model.cooldownSeconds,
+                                                         openSeconds: model.graceSeconds))
             }
             NavigationLink {
                 HardLockView(onAttest: { model.attestHardLock() },

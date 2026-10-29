@@ -50,9 +50,13 @@ enum UnlockReminders {
 
     /// The reminders for an unlock whose wait ends at `opensAt` and whose open time ends at
     /// `locksAt`. Only ones still in the future, at least 30 seconds out. Pure, so it's tested.
-    nonisolated static func plan(opensAt: Date, locksAt: Date, now: Date,
+    /// 2.4: `locksAt` is nil for "Until I lock it". Nothing locks on a timer then, so there are
+    /// no lock reminders, and the "open" reminder says how to lock.
+    nonisolated static func plan(opensAt: Date, locksAt: Date?, now: Date,
                                  timeText: (Date) -> String) -> [Reminder] {
-        let all = [
+        let openBody = locksAt.map { "They lock again at \(timeText($0))." }
+            ?? "They stay open until you tap Lock now in Pawl."
+        var all = [
             Reminder(id: idPrefix + "open5", at: opensAt.addingTimeInterval(-5 * 60),
                      title: "Apps open in 5 minutes",
                      body: "You can still cancel in Pawl and keep them locked."),
@@ -61,7 +65,10 @@ enum UnlockReminders {
                      body: "Still time to cancel and keep them locked."),
             Reminder(id: idPrefix + "open0", at: opensAt,
                      title: "Your apps are open",
-                     body: "They lock again at \(timeText(locksAt))."),
+                     body: openBody),
+        ]
+        guard let locksAt else { return all.filter { $0.at.timeIntervalSince(now) >= 30 } }
+        all += [
             Reminder(id: idPrefix + "lock5", at: locksAt.addingTimeInterval(-5 * 60),
                      title: "Apps lock again in 5 minutes",
                      body: "Wrap up what you're doing."),
@@ -88,7 +95,8 @@ enum UnlockReminders {
     }
 
     /// Schedule reminders for an unlock that just started. Replaces any earlier set.
-    static func schedule(opensAt: Date, locksAt: Date) async {
+    /// `locksAt` is nil for "Until I lock it" (2.4).
+    static func schedule(opensAt: Date, locksAt: Date?) async {
         generation += 1
         let mine = generation
         let center = UNUserNotificationCenter.current()

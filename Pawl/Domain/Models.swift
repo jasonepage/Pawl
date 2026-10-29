@@ -18,10 +18,14 @@ import Foundation
 // MARK: - Tunables / defaults (SRS §3.4)
 
 public enum PawlDefaults {
-    /// Mandatory cooling-off floor: tap + wait before the shield lifts (FR-UNLOCK-003/004).
-    public static let coolingOffFloor: TimeInterval = 15 * 60        // 15 minutes
-    /// Default cooling-off duration (user may raise, never lower below the floor).
+    /// Cooling-off floor (FR-UNLOCK-003/004). 2.4: lowered from 15 minutes to 0, because Jason
+    /// chose to offer "No wait" (the key alone opens apps). Choosing a shorter wait is still a
+    /// loosening, so it waits out the current wait first (AppModel.requestDurations).
+    public static let coolingOffFloor: TimeInterval = 0
+    /// Default cooling-off duration. New people still start with 15 minutes.
     public static let coolingOffDefault: TimeInterval = 15 * 60
+    /// 2.4: ceiling for a custom wait.
+    public static let coolingOffCeiling: TimeInterval = 24 * 60 * 60  // 24 hours
     /// Bounded grace window after the shield lifts, before auto-relock (FR-UNLOCK-008).
     /// Kept modest — long enough to be usable, short enough to limit damage. Also stays at or above
     /// the ~15-min DeviceActivity window minimum so the durable auto-relock fires reliably.
@@ -31,18 +35,32 @@ public enum PawlDefaults {
     /// DeviceActivity window shorter than 15 minutes. Below that, the OS-owned auto-relock was
     /// never scheduled and the shield only came back when Pawl was opened again.
     public static let graceFloor: TimeInterval = 15 * 60             // 15 minutes
-    /// Ceiling on the grace window (Decision D6). Generous enough for a real distraction-app
-    /// session (e.g. a longer TikTok window), bounded so it can never be "open all evening."
-    /// Default stays short (graceDefault); lengthening toward this cap is a gated loosening.
-    public static let graceCeiling: TimeInterval = 3 * 60 * 60       // 3 hours
+    /// Ceiling on a timed grace window (Decision D6). 2.4: raised from 3 hours to 12 for custom
+    /// open times. Default stays short (graceDefault); lengthening is a gated loosening.
+    public static let graceCeiling: TimeInterval = 12 * 60 * 60      // 12 hours
 
-    /// Clamp a requested cooling-off duration to the enforced floor (FR-UNLOCK-004).
-    public static func clampCoolingOff(_ requested: TimeInterval) -> TimeInterval {
-        max(requested, coolingOffFloor)
+    /// 2.4: "Until I lock it." Apps stay open until the person taps Lock now; nothing relocks
+    /// them on a timer. Stored as 0 in `graceSeconds`, a value no timed window can have
+    /// (timed windows are at least `graceFloor`), so saved data keeps its shape.
+    public static let openUntilLocked: TimeInterval = 0
+
+    public static func isUntilLocked(_ grace: TimeInterval) -> Bool { grace == openUntilLocked }
+
+    /// How long apps stay open, for comparing two settings. "Until I lock it" is the loosest
+    /// setting of all, so it counts as forever.
+    public static func openLength(_ grace: TimeInterval) -> TimeInterval {
+        isUntilLocked(grace) ? .infinity : grace
     }
-    /// Clamp a requested grace window between its floor and ceiling (Decision D6).
+
+    /// Clamp a requested cooling-off duration between its floor and ceiling (FR-UNLOCK-004).
+    public static func clampCoolingOff(_ requested: TimeInterval) -> TimeInterval {
+        min(max(requested, coolingOffFloor), coolingOffCeiling)
+    }
+    /// Clamp a requested grace window between its floor and ceiling (Decision D6), keeping
+    /// "Until I lock it" as it is.
     public static func clampGrace(_ requested: TimeInterval) -> TimeInterval {
-        min(max(requested, graceFloor), graceCeiling)
+        if isUntilLocked(requested) { return openUntilLocked }
+        return min(max(requested, graceFloor), graceCeiling)
     }
 }
 

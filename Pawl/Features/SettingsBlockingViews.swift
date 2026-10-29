@@ -204,34 +204,43 @@ struct WebsitesBlockSection: View {
 /// one-tap choices instead of 5-minute steppers. "now" marks the saved value. The save button
 /// only appears once something changed, and says when the change takes effect. Behavior is
 /// unchanged: stricter applies now, looser waits out the current wait (AppModel.requestDurations).
+///
+/// 2.4: "No wait" (0 minutes), "Until I lock it" (open time 0, PawlDefaults.openUntilLocked),
+/// and a Custom time for each. Minutes are the unit here, with 0 meaning those two choices.
 struct FrictionView: View {
     let model: AppModel
 
     @State private var waitMin = 15
     @State private var openMin = 30
     @State private var savedNote: String?
+    @State private var customFor: TimeKind?
 
-    private static let waitChoices = [15, 20, 30, 45, 60, 90, 120]
-    private static let openChoices = [15, 30, 45, 60, 90, 120, 180]
+    private static let waitChoices = [0, 15, 20, 30, 45, 60, 90, 120]
+    private static let openChoices = [15, 30, 45, 60, 90, 120, 180, 0]
 
-    private var currentWait: Int { Int(model.cooldownSeconds / 60) }
-    private var currentOpen: Int { Int(model.graceSeconds / 60) }
+    private var currentWait: Int { Int((model.cooldownSeconds / 60).rounded()) }
+    private var currentOpen: Int { Int((model.graceSeconds / 60).rounded()) }
     private var changed: Bool { waitMin != currentWait || openMin != currentOpen }
-    /// Same rule as AppModel: a longer (or equal) wait and a shorter (or equal) open time.
-    private var isStricter: Bool { waitMin >= currentWait && openMin <= currentOpen }
+    /// Same rule as AppModel: a longer (or equal) wait and a shorter (or equal) open time, where
+    /// "Until I lock it" counts as the longest open time of all.
+    private var isStricter: Bool { waitMin >= currentWait && Self.openRank(openMin) <= Self.openRank(currentOpen) }
+
+    private static func openRank(_ minutes: Int) -> Int { minutes == 0 ? Int.max : minutes }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 timeline
-                choiceCard(title: "Wait before unlocking",
+                choiceCard(.wait, title: "Wait before unlocking",
                            detail: "After your key, nothing opens until this ends.",
-                           choices: options(Self.waitChoices, current: currentWait),
+                           choices: options(Self.waitChoices, current: currentWait, picked: waitMin, kind: .wait),
                            selection: $waitMin, current: currentWait)
-                choiceCard(title: "Then open for",
-                           detail: "After this, Pawl locks again by itself.",
-                           choices: options(Self.openChoices, current: currentOpen),
+                choiceCard(.open, title: "Then open for",
+                           detail: openMin == 0 ? "Apps stay open until you tap Lock now."
+                                                : "After this, Pawl locks again by itself.",
+                           choices: options(Self.openChoices, current: currentOpen, picked: openMin, kind: .open),
                            selection: $openMin, current: currentOpen)
+                if waitMin == 0 || openMin == 0 { cautionCard }
                 if let pending = model.pendingDurations { pendingCard(pending) }
                 if changed { saveButton }
                 if let savedNote {
@@ -253,6 +262,12 @@ struct FrictionView: View {
             waitMin = currentWait
             openMin = currentOpen
         }
+        .sheet(item: $customFor) { kind in
+            CustomTimeSheet(kind: kind, startMinutes: kind == .wait ? max(waitMin, 5) : max(openMin, 15)) { minutes in
+                if kind == .wait { waitMin = minutes } else { openMin = minutes }
+                savedNote = nil
+            }
+        }
     }
 
     // MARK: Picture
@@ -265,25 +280,41 @@ struct FrictionView: View {
                     let spacing: CGFloat = 6
                     let icon: CGFloat = 32
                     let bars = max(0, geo.size.width - icon * 2 - spacing * 3)
-                    let share = Double(waitMin) / Double(max(1, waitMin + openMin))
-                    let waitWidth = bars < 140 ? bars / 2 : min(max(bars * share, 70), bars - 70)
+                    let showWait = waitMin > 0
+                    let untilLocked = openMin == 0
+                    let share = untilLocked ? 0.5 : Double(waitMin) / Double(max(1, waitMin + openMin))
+                    let waitWidth: CGFloat = !showWait ? 0
+                        : (bars < 140 ? bars / 2 : min(max(bars * share, 70), bars - 70))
                     HStack(spacing: spacing) {
                         stepIcon("key.fill", PawlColor.brand)
-                        segment("\(minutesText(waitMin)) wait", bg: PawlColor.urgeBg, fg: PawlColor.urgeText)
-                            .frame(width: waitWidth)
-                        segment("\(minutesText(openMin)) open", bg: PawlColor.cleanBg, fg: PawlColor.cleanText)
-                            .frame(width: max(0, bars - waitWidth))
-                        stepIcon("lock.fill", .secondary)
+                        if showWait {
+                            segment("\(DurationText.short(minutes: waitMin)) wait", bg: PawlColor.urgeBg, fg: PawlColor.urgeText)
+                                .frame(width: waitWidth)
+                        }
+                        segment(untilLocked ? "open until you lock" : "\(DurationText.short(minutes: openMin)) open",
+                                bg: PawlColor.cleanBg, fg: PawlColor.cleanText)
+                            .frame(width: showWait ? max(0, bars - waitWidth) : bars + spacing)
+                        stepIcon(untilLocked ? "hand.tap.fill" : "lock.fill", .secondary)
                     }
                 }
                 .frame(height: 36)
-                Text("Your key, then a \(minutesText(waitMin)) wait, then apps open for \(minutesText(openMin)), then they lock again on their own.")
+                Text(timelineSentence)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
         .accessibilityElement(children: .combine)
+    }
+
+    private var timelineSentence: String {
+        let open = DurationText.short(minutes: openMin)
+        switch (waitMin == 0, openMin == 0) {
+        case (true, true):   return "Your key opens apps right away, and they stay open until you tap Lock now."
+        case (true, false):  return "Your key opens apps right away for \(open), then they lock again on their own."
+        case (false, true):  return "Your key, then a \(DurationText.short(minutes: waitMin)) wait, then apps stay open until you tap Lock now."
+        case (false, false): return "Your key, then a \(DurationText.short(minutes: waitMin)) wait, then apps open for \(open), then they lock again on their own."
+        }
     }
 
     private func stepIcon(_ symbol: String, _ color: Color) -> some View {
@@ -308,11 +339,19 @@ struct FrictionView: View {
 
     // MARK: Choices
 
-    private func options(_ list: [Int], current: Int) -> [Int] {
-        Array(Set(list + [current])).sorted()
+    /// The preset list plus the saved value and the picked one (a custom time shows as its own
+    /// button). "Until I lock it" (0) sorts last in the open list; "No wait" (0) first in the wait list.
+    private func options(_ list: [Int], current: Int, picked: Int, kind: TimeKind) -> [Int] {
+        let all = Array(Set(list + [current, picked]))
+        return kind == .open ? all.sorted { Self.openRank($0) < Self.openRank($1) } : all.sorted()
     }
 
-    private func choiceCard(title: String, detail: String, choices: [Int],
+    private func label(_ minutes: Int, _ kind: TimeKind) -> String {
+        kind == .wait ? DurationText.wait(seconds: Double(minutes) * 60)
+                      : DurationText.open(seconds: Double(minutes) * 60)
+    }
+
+    private func choiceCard(_ kind: TimeKind, title: String, detail: String, choices: [Int],
                             selection: Binding<Int>, current: Int) -> some View {
         PawlCard {
             VStack(alignment: .leading, spacing: 12) {
@@ -327,36 +366,63 @@ struct FrictionView: View {
                             selection.wrappedValue = minutes
                             savedNote = nil
                         } label: {
-                            VStack(spacing: 1) {
-                                Text(minutesText(minutes))
-                                    .font(.subheadline.weight(.semibold))
-                                    .monospacedDigit()
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
-                                if minutes == current {
-                                    Text("now").font(.caption2)
-                                }
-                            }
-                            .frame(maxWidth: .infinity, minHeight: 50)
-                            .background(picked ? PawlColor.brand : PawlColor.groupedBg)
-                            .foregroundStyle(picked ? Color.white : Color.primary)
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            tile(label(minutes, kind), sub: minutes == current ? "now" : nil, picked: picked)
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel(minutes == current ? "\(minutesText(minutes)), current" : minutesText(minutes))
+                        .accessibilityLabel(minutes == current ? "\(label(minutes, kind)), current" : label(minutes, kind))
                         .accessibilityAddTraits(picked ? .isSelected : [])
                     }
+                    Button {
+                        customFor = kind
+                    } label: {
+                        tile("Custom", sub: nil, picked: false, symbol: "slider.horizontal.3")
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(kind == .wait ? "Custom wait" : "Custom open time")
                 }
             }
         }
     }
 
-    /// "15 min", "1 hr", "1.5 hr", "2 hr".
-    private func minutesText(_ minutes: Int) -> String {
-        if minutes < 60 { return "\(minutes) min" }
-        if minutes % 60 == 0 { return "\(minutes / 60) hr" }
-        if minutes % 30 == 0 { return "\(minutes / 60).5 hr" }
-        return "\(minutes / 60) hr \(minutes % 60) min"
+    private func tile(_ text: String, sub: String?, picked: Bool, symbol: String? = nil) -> some View {
+        VStack(spacing: 1) {
+            if let symbol {
+                Image(systemName: symbol).font(.caption.weight(.semibold))
+            }
+            Text(text)
+                .font(.subheadline.weight(.semibold))
+                .monospacedDigit()
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.75)
+            if let sub {
+                Text(sub).font(.caption2)
+            }
+        }
+        .padding(.horizontal, 4)
+        .frame(maxWidth: .infinity, minHeight: 50)
+        .background(picked ? PawlColor.brand : PawlColor.groupedBg)
+        .foregroundStyle(picked ? Color.white : Color.primary)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    /// Plain words about what the two open-ended choices mean. Not a warning siren.
+    private var cautionCard: some View {
+        PawlCard {
+            VStack(alignment: .leading, spacing: 8) {
+                if waitMin == 0 {
+                    Label("No wait means your key opens apps the moment you use it. Where you keep the key is then your only protection.",
+                          systemImage: "key.fill")
+                }
+                if openMin == 0 {
+                    Label("Until I lock it means nothing locks your apps again until you tap Lock now on the Unlock tab.",
+                          systemImage: "hand.tap.fill")
+                }
+            }
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+        }
     }
 
     // MARK: Save and pending
@@ -365,7 +431,7 @@ struct FrictionView: View {
         Button {
             let stricter = isStricter
             let note = stricter ? "Saved. It applies now."
-                                : "Saved. The new timing starts in \(minutesText(currentWait))."
+                                : "Saved. The new timing starts \(DurationText.startsIn(waitSeconds: model.cooldownSeconds))."
             Task {
                 await model.requestDurations(cooldown: Double(waitMin) * 60, grace: Double(openMin) * 60)
                 // Show what is in effect now. A looser change waits in the card above.
@@ -374,7 +440,7 @@ struct FrictionView: View {
                 savedNote = note
             }
         } label: {
-            Text(isStricter ? "Save. Applies now" : "Save. Starts in \(minutesText(currentWait))")
+            Text(isStricter ? "Save. Applies now" : "Save. Starts \(DurationText.startsIn(waitSeconds: model.cooldownSeconds))")
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(PawlBigButtonStyle(background: PawlColor.brand, foreground: .white))
@@ -385,7 +451,7 @@ struct FrictionView: View {
             VStack(alignment: .leading, spacing: 10) {
                 Label("Looser timing on the way", systemImage: "hourglass")
                     .font(.headline)
-                Text("\(minutesText(Int(pending.cooldown / 60))) wait, then open for \(minutesText(Int(pending.grace / 60))).")
+                Text(DurationText.summary(waitSeconds: pending.cooldown, openSeconds: pending.grace) + ".")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 TimelineView(.periodic(from: .now, by: 1)) { _ in
@@ -398,6 +464,77 @@ struct FrictionView: View {
                     .foregroundStyle(PawlColor.brand)
             }
         }
+    }
+}
+
+/// 2.4: which of the two times a Custom picker is for.
+enum TimeKind: Int, Identifiable {
+    case wait, open
+    var id: Int { rawValue }
+}
+
+/// 2.4: pick any time with hour and minute wheels. A wait can be 1 min to 24 hr ("No wait" has
+/// its own button). An open time can be 15 min to 12 hr; iOS won't run a relock timer shorter
+/// than 15 minutes (PawlDefaults.graceFloor).
+struct CustomTimeSheet: View {
+    let kind: TimeKind
+    let onDone: (Int) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var hours: Int
+    @State private var minutes: Int
+
+    init(kind: TimeKind, startMinutes: Int, onDone: @escaping (Int) -> Void) {
+        self.kind = kind
+        self.onDone = onDone
+        _hours = State(initialValue: startMinutes / 60)
+        _minutes = State(initialValue: startMinutes % 60)
+    }
+
+    private var total: Int { hours * 60 + minutes }
+    private var range: ClosedRange<Int> {
+        kind == .wait ? 1...Int(PawlDefaults.coolingOffCeiling / 60)
+                      : Int(PawlDefaults.graceFloor / 60)...Int(PawlDefaults.graceCeiling / 60)
+    }
+    private var valid: Bool { range.contains(total) }
+    private var hint: String {
+        kind == .wait ? "Pick from 1 min to 24 hr."
+                      : "Pick from 15 min to 12 hr. iOS needs at least 15 minutes to lock apps again."
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 12) {
+                HStack(spacing: 0) {
+                    Picker("Hours", selection: $hours) {
+                        ForEach(0...(range.upperBound / 60), id: \.self) { Text("\($0) hr").tag($0) }
+                    }
+                    .pickerStyle(.wheel)
+                    Picker("Minutes", selection: $minutes) {
+                        ForEach(0..<60, id: \.self) { Text("\($0) min").tag($0) }
+                    }
+                    .pickerStyle(.wheel)
+                }
+                Text(valid ? DurationText.short(minutes: total) : hint)
+                    .font(.headline)
+                    .foregroundStyle(valid ? Color.primary : PawlColor.dangerText)
+                    .multilineTextAlignment(.center)
+                Spacer(minLength: 0)
+            }
+            .padding()
+            .navigationTitle(kind == .wait ? "Custom wait" : "Custom open time")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Use") { onDone(total); dismiss() }
+                        .disabled(!valid)
+                }
+            }
+        }
+        .presentationDetents([.medium])
     }
 }
 
@@ -448,7 +585,7 @@ struct ProtectionInfoView: View {
     var body: some View {
         List {
             Section("How Pawl protects you") {
-                Text("Pawl's shield can't be removed from iOS Settings. Only Pawl can lift it, and only after your physical key plus a 15-minute wait. While Pawl is protecting you it also can't be deleted by long-pressing the icon. Only \u{201C}Remove from Home Screen\u{201D} is allowed, and it keeps running underneath. The one remaining way out is turning off Screen Time in Settings, which removes protection. For a full lock, someone you trust can set a Screen Time passcode for you. That's Hard lock in Settings.")
+                Text("Pawl's shield can't be removed from iOS Settings. Only Pawl can lift it, and only after your physical key plus the wait you chose. While Pawl is protecting you it also can't be deleted by long-pressing the icon. Only \u{201C}Remove from Home Screen\u{201D} is allowed, and it keeps running underneath. The one remaining way out is turning off Screen Time in Settings, which removes protection. For a full lock, someone you trust can set a Screen Time passcode for you. That's Hard lock in Settings.")
                     .font(.footnote).foregroundStyle(.secondary)
             }
             Section("Removing Pawl") {

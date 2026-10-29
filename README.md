@@ -38,8 +38,8 @@ Pawl is built for.
 Pawl blocks any apps and websites you pick, using Apple's Screen Time. There
 is no way to lift the block from the phone alone. To lift it you need a physical FIDO2 security key (a YubiKey, for example) that you
 plugged in once and then put somewhere hard to reach: a friend's house, your
-car, a drawer at work. Even with the key, you wait fifteen minutes before
-anything opens, and the block comes back on by itself.
+car, a drawer at work. Even with the key, you wait (fifteen minutes unless you
+change it) before anything opens, and the block comes back on by itself.
 
 A real example: it is 1am and you open the app you told yourself you were
 done with. You see Pawl's block screen. The key is at your sister's place
@@ -117,10 +117,13 @@ Read this before you trust it with anything.
 
 3. **The shield goes on.** While a commitment is active, Pawl also turns on
    Screen Time's "block app deletion", so you cannot delete Pawl to get out.
-4. **When you want out,** you tap the key, then wait out a 15 minute cooling
-   off period. You can make the wait longer at any time. Making it shorter is
-   itself delayed. After the grace window (30 minutes by default) the shield
-   comes back on by itself.
+4. **When you want out,** you tap the key, then wait out the cooling off
+   period (15 minutes to start). After the open time (30 minutes to start) the
+   shield comes back on by itself. Since 2.4 you choose both: any wait from none
+   to 24 hours, and any open time from 15 minutes to 12 hours, or "until I lock
+   it". Stricter choices apply at once. Looser ones (a shorter wait, a longer
+   open time) only apply after your current wait, so there is no shortcut in
+   the moment.
 5. **The key is the accountability.** Give it to someone you trust, like your
    sister across town. Whoever holds the key decides when Pawl can loosen.
    They don't install anything and nobody makes an account.

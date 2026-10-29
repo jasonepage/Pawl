@@ -87,6 +87,19 @@ public enum SharedState {
         AppGroup.defaults.removeObject(forKey: winEndKey)
     }
 
+    /// 2.4: "Until I lock it" is on for the unlock in progress. iOS needs every window to end,
+    /// so the window still ends after 15 minutes, but the monitor leaves apps open when it sees
+    /// this. Only Lock now (ShieldService.relock) or a cancel (UnlockScheduler.cancel) clears it.
+    private nonisolated static let untilLockedKey = "pawl.unlock.openUntilLocked"
+
+    public nonisolated static func setOpenUntilLocked(_ on: Bool) {
+        if on { AppGroup.defaults.set(true, forKey: untilLockedKey) }
+        else { AppGroup.defaults.removeObject(forKey: untilLockedKey) }
+    }
+    public nonisolated static func openUntilLocked() -> Bool {
+        AppGroup.defaults.bool(forKey: untilLockedKey)
+    }
+
     // Web blocking config, shared so the extension re-applies it on relock. `enabled` =
     // block the gambling/crypto domain list; `adult` = also turn on Apple's adult filter.
     private nonisolated static let webEnabledKey = "pawl.web.enabled"

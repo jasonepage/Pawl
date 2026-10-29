@@ -2,8 +2,29 @@
 
 ## 2.4 (in progress)
 
-- Version 2.4, build 14 (app and all three extensions). Planned: ally approvals over iCloud,
-  see `docs/18_Ally_Approvals_Plan.md`.
+- Version 2.4, build 14 (app and all three extensions). The ally approvals plan
+  (`docs/18_Ally_Approvals_Plan.md`) is parked: the physical key already does that job.
+- Unlock timing has more choices. Wait before unlocking: No wait, 15 min to 2 hr, or Custom
+  (1 minute to 24 hours). Then open for: 15 min to 3 hr, Custom (15 minutes to 12 hours), or
+  Until I lock it. Same rule as before: a longer wait or a shorter open time applies right away,
+  and a shorter wait or a longer open time (No wait and Until I lock it included) waits out your
+  current wait first. Open times stay at least 15 minutes because iOS won't run a relock timer
+  shorter than that.
+- Lock now. While apps are open, the Unlock tab has a Lock now button that locks them right
+  away. With Until I lock it, that is the only thing that locks them: the screen and the "apps
+  are open" reminder say so, and there are no lock reminders. Behind the scenes iOS still gets a
+  15 minute window, and the monitor leaves apps open at its end instead of relocking.
+- With No wait, Pawl opens apps itself as soon as the key checks out, and the iOS window that
+  owns the relock starts a minute later but still ends at the time shown.
+- Pairing a new key always waits at least 15 minutes, even with No wait. Re-pairing doesn't need
+  the old key, so without this anyone holding the phone and any security key could make it
+  "the key" and unlock at once.
+- Reopening Pawl during a wait finishes that unlock with the open time it started with, even if
+  a timing change landed in between.
+- Messages after a change that blocks less say "Removed" or "Saved" when there is no wait,
+  instead of "starts in 0 min". Countdowns show hours past an hour. The Settings row and the
+  line under Tap to unlock describe the saved timing.
+- Tests: TimingOptionsTests (13 new), and the floor test now expects a floor of 0.
 
 ## 2.3
 
