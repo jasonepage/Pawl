@@ -93,8 +93,22 @@ The owner can write to their own zone, so a "yes" record alone is not proof. So:
 This uses the same idea as the key check in `WebAuthnVerifier.swift`: the phone verifies a
 signature against a key it saved when you paired.
 
+6. At pairing, the owner's phone also checks that the `AllyLink` record was created by a
+   different Apple Account than its own (CloudKit's `creatorUserRecordID` on the record must
+   match the share participant who accepted, and must not be the owner). This stops the
+   shipped app from pairing the owner's own iPad, signed in to the same Apple Account, as
+   the ally.
+7. The signed message starts with a fixed label, `pawl-ally-decision-v1`, so a signature
+   made for this purpose can never be reused for anything else.
+8. Each request is used once. The owner's phone deletes the request as soon as it accepts a
+   decision, so the same yes cannot be replayed later.
+
 What this does not stop: a jailbroken phone, or someone building Pawl themselves in Debug.
-The README already says that about the key check, and the same sentence applies here.
+The README already says that about the key check, and the same sentence applies here. It
+also cannot stop someone from making a second Apple Account and naming themselves as their
+own ally. That is the same as keeping the physical key in your own pocket. Adding an ally is
+a loosening (section 4.4), so it takes the key and the full wait, which keeps it from being a
+1am decision.
 
 ### 4.4 Adding and removing an ally (the asymmetry rule)
 
