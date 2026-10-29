@@ -54,7 +54,8 @@ public final class HomeViewModel {
     public func refresh() async {
         guard let c = commitment else { return }
         if let snap = try? await repo.loadActiveCommitment() { keyPairedAt = snap.keyPairing?.pairedAt }
-        let trackedSince = max(c.startedAt, keyPairedAt ?? .distantPast)
+        // No key yet: nothing was ever locked, so the week shows no days on and the count is 0.
+        let trackedSince = keyPairedAt.map { max(c.startedAt, $0) } ?? .distantFuture
         relapses = (try? await repo.relapses(for: c.id)) ?? []
         urges = (try? await repo.urges(for: c.id)) ?? []
         let unlocks = (try? await repo.unlocks(for: c.id)) ?? []

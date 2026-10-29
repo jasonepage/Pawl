@@ -75,6 +75,7 @@ struct WeekCard: View {
     private var onLine: String {
         let n = report.daysProtected
         if n >= 7 { return "Pawl was on all 7 days" }
+        if n == 0 { return "No days on yet" }
         return n == 1 ? "Pawl was on for 1 day" : "Pawl was on for \(n) days"
     }
 
