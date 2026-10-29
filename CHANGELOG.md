@@ -2,6 +2,16 @@
 
 ## 2.4 (in progress)
 
+- New mascot and app icon: Pawl, an old brass key wearing cat ears, with heavy lids and a
+  handlebar mustache. He is drawn in code now (`Pawl/Theme/PawlMascot.swift`, outline in
+  `PawlMascotArt.swift`), so he moves: asleep on the job while apps are locked, half-lidded
+  with an hourglass during the wait, hands the key over while apps are open, a dashed outline
+  until a key is paired. Tap him and a paw floats in and bats an app away. On the urge screen he
+  waits with you and swipes when you ride it out. A small Pawl sits over the streak with a halo
+  on milestone days. Reduce Motion keeps only the blinks. The app icon is his face on green with
+  dark and tinted variants; the site, favicons, link preview and the setup card use him too.
+  Design files and the reference drawing live in `design/mascot-v2/`.
+
 - Version 2.4, build 14 (app and all three extensions). The ally approvals plan
   (`docs/18_Ally_Approvals_Plan.md`) is parked: the physical key already does that job.
 - Unlock timing has more choices. Wait before unlocking: No wait, 15 min to 2 hr, or Custom

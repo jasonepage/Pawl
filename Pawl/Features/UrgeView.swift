@@ -46,10 +46,13 @@ struct UrgeView: View {
                 if !pastNotes.isEmpty { ownWordsCard }
 
                 if logged {
-                    Label("Logged. That took strength.", systemImage: "checkmark.seal.fill")
-                        .font(.headline)
-                        .foregroundStyle(PawlColor.cleanText)
-                        .padding(.vertical, 8)
+                    VStack(spacing: 8) {
+                        PawlMascot(pose: .resisted, size: 96)
+                        Label("Logged. That took strength.", systemImage: "checkmark.seal.fill")
+                            .font(.headline)
+                            .foregroundStyle(PawlColor.cleanText)
+                    }
+                    .padding(.vertical, 8)
                 } else {
                     logCard
                 }
@@ -126,6 +129,7 @@ struct UrgeView: View {
                                 .foregroundStyle(PawlColor.cleanText)
                             }
                             .frame(width: 180, height: 180)
+                            PawlMascot(pose: .waiting, size: 84)   // 2.4: he waits it out with you
                             Text("Urges peak and fade on their own, usually in 10 to 20 minutes. All you have to do is nothing.")
                                 .font(.body)
                                 .foregroundStyle(.secondary)
@@ -133,9 +137,7 @@ struct UrgeView: View {
                         }
                     } else {
                         VStack(spacing: 14) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: 56))
-                                .foregroundStyle(PawlColor.brand)
+                            PawlMascot(pose: .resisted, size: 110)   // 2.4: the swipe. You batted it away.
                             Text("Ten minutes. You stayed.")
                                 .font(.system(.title2, design: .rounded).weight(.bold))
                                 .foregroundStyle(PawlColor.cleanText)

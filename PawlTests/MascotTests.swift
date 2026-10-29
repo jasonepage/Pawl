@@ -3,7 +3,6 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import XCTest
-import UIKit
 @testable import Pawl
 
 final class MascotTests: XCTestCase {
@@ -18,13 +17,16 @@ final class MascotTests: XCTestCase {
         XCTAssertEqual(PawlMascot.pose(for: .reading, isPaired: false), .noKey)
         XCTAssertEqual(PawlMascot.pose(for: .coolingOff(endsAt: soon), isPaired: true), .waiting)
         XCTAssertEqual(PawlMascot.pose(for: .unshielded(graceEndsAt: soon), isPaired: true), .open)
+        XCTAssertEqual(PawlMascot.pose(for: .unshielded(graceEndsAt: soon), isPaired: false), .open)
     }
 
-    // Every pose's drawing is in the asset catalog, so the hero is never blank.
-    @MainActor
-    func test_everyPoseHasAnImage() {
-        for pose in [PawlMascot.Pose.locked, .waiting, .open, .noKey] {
-            XCTAssertNotNil(UIImage(named: pose.assetName), pose.assetName)
+    // 2.4: he is drawn in code. The traced outline has to be there and closed, so the hero is
+    // never blank. Every polygon needs at least three points.
+    func test_artIsPresent() {
+        for polys in [PawlMascotArt.body, PawlMascotArt.innerEars, PawlMascotArt.stemDark, PawlMascotArt.mustache] {
+            XCTAssertFalse(polys.isEmpty)
+            for poly in polys { XCTAssertGreaterThanOrEqual(poly.count, 3) }
         }
+        XCTAssertEqual(PawlMascotArt.innerEars.count, 2)
     }
 }

@@ -69,7 +69,7 @@ struct UnlockView: View {
                     .font(.system(size: 50, weight: .semibold))
                     .foregroundStyle(heroFg)
             } else {
-                // 2.3: the Stooped Key. His pose follows the state; tap him and he dances.
+                // 2.4: Pawl, the old cat key. His pose follows the state; tap him and he swipes.
                 PawlMascot(pose: PawlMascot.pose(for: vm.state, isPaired: vm.isPaired))
             }
             Text(heroTitle)

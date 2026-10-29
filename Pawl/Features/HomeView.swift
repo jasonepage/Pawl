@@ -178,6 +178,8 @@ struct HomeView: View {
 
     private var streakHero: some View {
         VStack(spacing: 16) {
+            // 2.4: Pawl keeps you company. A halo on a milestone day; tap him for the swipe.
+            PawlMascot(pose: .idle, size: 72, halo: hitMilestone != nil)
             ZStack {
                 PawlRing(progress: ringProgress, color: ringColor, track: ringColor.opacity(0.18))
                 VStack(spacing: 2) {
