@@ -254,6 +254,7 @@ public final class UnlockViewModel {
         switch state {
         case .coolingOff(let endsAt): return endsAt
         case .unshielded(let endsAt): return endsAt == .distantFuture ? nil : endsAt   // 2.4
+        case .awaitingAlly(_, let expiresAt): return expiresAt                           // 2.5
         default: return nil
         }
     }
@@ -298,6 +299,13 @@ public final class UnlockViewModel {
             if machine.coolingOff > 0 {
                 Task { await UnlockReminders.moveLockReminders(to: endsAt) }
             }
+        // 2.5: ally approvals. The in-app expiry timer lives here. Writing and deleting the
+        // Request record in iCloud is step 2 of docs/18 and is wired in then; until that step
+        // these effects only run the timer, so the state can never be stuck open.
+        case .sendAllyRequest(_, let expiresAt):
+            scheduleFire(at: expiresAt, event: .allyExpired)
+        case .withdrawAllyRequest:
+            timerTask?.cancel(); timerTask = nil
         case .reapplyShield:
             // 2.1: relock with the live shared selection (it includes apps added since this
             // screen opened), falling back to the one this screen started with.

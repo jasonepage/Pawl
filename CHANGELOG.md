@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.5 (in progress)
+
+Ally approvals, a Pawl Pro feature. The person who holds your key can say yes from their own
+phone instead of handing the key over. Plan: `docs/18_Ally_Approvals_Plan.md`. Built one step at
+a time; each step is listed here when it lands.
+
+- Step 0, the unlock loop. `UnlockMachine` has a new state, `awaitingAlly`, and three new
+  events: ask the ally, the ally's decision, and the request expiring. A valid yes starts the
+  same wait a key tap starts; nothing is ever lifted on a decision. A no, a bad signature, a
+  wrong request, a late answer, expiry or cancel all go back to locked and withdraw the
+  request. Reaching for the key while a request is open withdraws the request and reads the
+  key, so the physical key always works. A request stays open 30 minutes. Fourteen new tests in
+  `PawlTests/AllyUnlockMachineTests.swift`; the nine original loop tests are unchanged. The
+  Unlock screen shows a plain "Asking your ally" state with a cancel button so the new state is
+  never blank, and Pawl waits in that state. No iCloud code yet.
+
 ## 2.4 (in progress)
 
 - Home no longer pitches Pawl Pro. The week card shows the free part and one small "Full report"

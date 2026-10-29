@@ -18,6 +18,7 @@ final class MascotTests: XCTestCase {
         XCTAssertEqual(PawlMascot.pose(for: .coolingOff(endsAt: soon), isPaired: true), .waiting)
         XCTAssertEqual(PawlMascot.pose(for: .unshielded(graceEndsAt: soon), isPaired: true), .open)
         XCTAssertEqual(PawlMascot.pose(for: .unshielded(graceEndsAt: soon), isPaired: false), .open)
+        XCTAssertEqual(PawlMascot.pose(for: .awaitingAlly(requestID: UUID(), expiresAt: soon), isPaired: true), .waiting)   // 2.5
     }
 
     // 2.4: he is drawn in code. The traced outline has to be there and closed, so the hero is

@@ -133,6 +133,13 @@ struct UnlockView: View {
         case .reading:
             helper("Hold your security key to the phone…")
 
+        case .awaitingAlly:
+            // 2.5: a request is open with the ally. Apps stay blocked. Step 4 gives this
+            // its own screen; this is the minimum so the state is never blank.
+            helper("Waiting for your ally. Apps stay blocked until they answer.")
+            bigButton("Cancel: keep apps locked", "lock.fill",
+                      bg: PawlColor.cardBg, fg: .primary) { vm.cancel() }
+
         case .coolingOff:
             helper("Apps unlock when the timer reaches zero. Waiting it out is the whole point.")
             bigButton("Cancel: keep apps locked", "lock.fill",
@@ -229,7 +236,7 @@ struct UnlockView: View {
         if showScreenTimeOff { return PawlColor.dangerText.opacity(0.15) }
         switch vm.state {
         case .locked: return vm.isPaired ? PawlColor.cleanBg : PawlColor.cardBg
-        case .reading: return PawlColor.cardBg
+        case .reading, .awaitingAlly: return PawlColor.cardBg
         case .coolingOff, .unshielded: return PawlColor.urgeBg
         }
     }
@@ -238,7 +245,7 @@ struct UnlockView: View {
         if showScreenTimeOff { return PawlColor.dangerText }
         switch vm.state {
         case .locked: return vm.isPaired ? PawlColor.cleanText : .primary
-        case .reading: return .primary
+        case .reading, .awaitingAlly: return .primary
         case .coolingOff, .unshielded: return PawlColor.urgeText
         }
     }
@@ -248,6 +255,7 @@ struct UnlockView: View {
         switch vm.state {
         case .locked: return vm.isPaired ? "Apps are blocked" : "Set up your key"
         case .reading: return "Checking your key"
+        case .awaitingAlly: return "Asking your ally"      // 2.5
         case .coolingOff: return "Unlocking soon"
         case .unshielded: return "Apps unlocked"
         }
@@ -257,6 +265,7 @@ struct UnlockView: View {
         switch vm.state {
         case .coolingOff: return "until apps unlock"
         case .unshielded: return "until apps re-lock"
+        case .awaitingAlly: return "until the request expires"   // 2.5
         default: return nil
         }
     }

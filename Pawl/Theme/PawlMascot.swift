@@ -32,7 +32,7 @@ struct PawlMascot: View {
     static func pose(for state: UnlockState, isPaired: Bool) -> Pose {
         switch state {
         case .locked, .reading: return isPaired ? .locked : .noKey
-        case .coolingOff: return .waiting
+        case .coolingOff, .awaitingAlly: return .waiting   // 2.5: he waits with you for the ally too
         case .unshielded: return .open
         }
     }
