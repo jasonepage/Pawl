@@ -27,7 +27,8 @@ struct WeekCard: View {
     let report: WeeklyReport
     /// Setup answer, hours a day that went to the habit. 0 when unknown.
     var hoursPerDay: Double = 0
-    /// The full report is part of Pawl Pro; the header and day strip are free.
+    /// The full report is part of Pawl Pro; the header and day strip are free. Free users see
+    /// one small link, not a pitch (2.4).
     var isPro: Bool = false
     /// The newest note the person wrote on an urge this week, if any.
     var latestNote: String? = nil
@@ -251,21 +252,17 @@ struct WeekCard: View {
 
     // MARK: Without Pro
 
+    /// 2.4: no pitch on Home. One quiet link; the paywall shows only if they tap it.
     private var proPreview: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("See your whole week")
-                .font(.subheadline.weight(.semibold))
-            Text("Hours back, blocked attempts, the time of day that's hardest, and your own words. Part of Pawl Pro.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-            Button("See Pawl Pro", action: onGetPro)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(PawlColor.brand)
+        Button(action: onGetPro) {
+            HStack(spacing: 4) {
+                Text("Full report")
+                Image(systemName: "chevron.right").font(.caption2.weight(.semibold))
+            }
+            .font(.footnote.weight(.medium))
+            .foregroundStyle(.secondary)
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(PawlColor.groupedBg)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .buttonStyle(.plain)
+        .accessibilityHint("Part of Pawl Pro")
     }
 }

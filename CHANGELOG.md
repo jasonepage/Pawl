@@ -2,6 +2,8 @@
 
 ## 2.4 (in progress)
 
+- Home no longer pitches Pawl Pro. The week card shows the free part and one small "Full report"
+  link; the paywall appears only when someone taps that or tries to add a scheduled set.
 - Tough-moment screen: "I resisted" moved to the end of the ten-minute wait, where it is
   true, with Pawl's swipe. The form is chips first (Mild, Strong, Overwhelming; bored,
   stressed, lonely, late night, a notification, saw an ad, something else), typing last, and
