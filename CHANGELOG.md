@@ -15,6 +15,7 @@ a time; each step is listed here when it lands.
   `PawlTests/AllyUnlockMachineTests.swift`; the nine original loop tests are unchanged. The
   Unlock screen shows a plain "Asking your ally" state with a cancel button so the new state is
   never blank, and Pawl waits in that state. No iCloud code yet.
+- The Settings tab header shows Pawl, like the app icon, instead of the old shield drawing.
 
 ## 2.4 (in progress)
 

@@ -82,20 +82,13 @@ struct SettingsView: View {
 
     private var brandHeader: some View {
         VStack(spacing: 8) {
+            // 2.5: the header shows Pawl himself, like the app icon, not the old shield.
             ZStack {
                 RoundedRectangle(cornerRadius: 17, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color(red: 0.30, green: 0.50, blue: 0.11),
-                                     Color(red: 0.17, green: 0.33, blue: 0.05)],
-                            startPoint: .topLeading, endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(Color(red: 0.22, green: 0.40, blue: 0.09))
                     .frame(width: 64, height: 64)
                     .shadow(color: PawlColor.brand.opacity(0.45), radius: 12, y: 4)
-                Image(systemName: "lock.shield.fill")
-                    .font(.system(size: 30, weight: .semibold))
-                    .foregroundStyle(.white)
+                PawlMascot(pose: .idle, size: 50)
             }
             Text("Pawl")
                 .font(.system(size: 28, weight: .bold, design: .rounded))
