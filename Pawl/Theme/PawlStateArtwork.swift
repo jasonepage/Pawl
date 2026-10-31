@@ -109,53 +109,10 @@ struct PawlOpenArtwork: View {
     }
 }
 
-/// A small Home-card cameo that never displaces progress or status information.
-struct PawlHomeCameo: View {
-    var size: CGFloat = 60
-
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var eyesClosed = false
-
-    var body: some View {
-        ZStack {
-            art("PawlHomeCameo")
-            art("PawlHomeCameoBlink")
-                .opacity(eyesClosed ? 1 : 0)
-        }
-        .frame(width: size, height: size)
-        .task(id: reduceMotion) { await runBlinkLoop() }
-        .accessibilityHidden(true)
-    }
-
-    private func art(_ name: String) -> some View {
-        Image(name)
-            .resizable()
-            .scaledToFit()
-    }
-
-    @MainActor
-    private func runBlinkLoop() async {
-        eyesClosed = false
-        guard !reduceMotion else { return }
-
-        do {
-            while !Task.isCancelled {
-                try await Task.sleep(for: .seconds(4.8))
-                withAnimation(.linear(duration: 0.08)) { eyesClosed = true }
-                try await Task.sleep(for: .seconds(0.14))
-                withAnimation(.linear(duration: 0.10)) { eyesClosed = false }
-            }
-        } catch {
-            // Navigation and Reduce Motion changes cancel decorative motion.
-        }
-    }
-}
-
 #Preview("State art") {
     VStack(spacing: 20) {
         PawlReadingArtwork()
         PawlOpenArtwork()
-        PawlHomeCameo(size: 64)
     }
     .padding(28)
     .background(PawlColor.hardwareBg)

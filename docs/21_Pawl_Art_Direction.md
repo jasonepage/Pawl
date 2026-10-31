@@ -210,9 +210,8 @@ The streak or current progress is the visual hero. Pawl is optional, not a persi
 pet. `I'm tempted` is warm and easy to find without reading as a destructive or
 emergency action. No unlock action appears here.
 
-The protected-state Home card may show the 58-point `PawlHomeCameo` in unused corner
-space. It blinks rarely, takes no input, disappears when protection is off or no key is
-paired, and never enters the progress ring.
+Home ships without character art. A corner cameo read as a pasted-on sticker, while a
+centered cat competed with the progress number. The ring remains the sole visual hero.
 
 The first cat-heavy style frame is archived at
 `design/pawl-cat-v3/styleframes/home.png`; it is not a production reference.

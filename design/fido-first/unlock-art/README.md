@@ -84,10 +84,10 @@ Built-in image generation, `stylized-concept` plus `precise-object-edit`:
 
 ## Home cameo
 
-`home-cameo-v1.png` and `home-cameo-blink-v1.png` are a tiny protected-state cameo,
-not a new hero. `PawlHomeCameo` places it in unused card space at 58 points and performs
-one slow blink about every five seconds. It is hidden when protection is off or no key is
-paired, and Reduce Motion holds the open-eye frame.
+`home-cameo-v1.png` and `home-cameo-blink-v1.png` are archived explorations and are not
+shown in the app. In the card corner the cat read like a pasted-on sticker; in the center
+it competed with the progress number. Home therefore ships without character art so the
+ring remains the sole visual hero.
 
 Built-in image generation, `stylized-concept` plus `precise-object-edit`:
 
