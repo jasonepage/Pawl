@@ -29,7 +29,8 @@ a time; each step is listed here when it lands.
   `Pawl/Services/AllyStore.swift` keeps the ally's public key on the owner's phone and the
   Secure Enclave signing key on the ally's phone, in the Keychain, this device only. Needs the
   Xcode capabilities in `docs/20_Ally_Xcode_Checklist.md`. Not wired to any screen yet.
-- The Settings tab header shows Pawl, like the app icon, instead of the old shield drawing.
+- New app icon: a green security key with a paw print. The same logo now sits over the streak on
+  Home and in the Settings header, in place of the brass cat key. The key is the product.
 
 ## 2.4 (in progress)
 

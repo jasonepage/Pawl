@@ -200,3 +200,19 @@ public struct PawlArt: View {
         .accessibilityHidden(true)
     }
 }
+
+
+/// 2.5: the app icon (a green security key with a paw print) as an in-app tile, rounded
+/// like a home screen icon. Used on Home and the Settings header in place of the old mascot.
+struct PawlLogoTile: View {
+    var size: CGFloat = 72
+    var body: some View {
+        Image("PawlLogo")
+            .resizable()
+            .scaledToFill()
+            .frame(width: size, height: size)
+            .clipShape(RoundedRectangle(cornerRadius: size * 0.2237, style: .continuous))
+            .shadow(color: PawlColor.brand.opacity(0.35), radius: size * 0.15, y: size * 0.05)
+            .accessibilityHidden(true)
+    }
+}
