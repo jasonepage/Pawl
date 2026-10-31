@@ -93,6 +93,7 @@ struct ContentView: View {
                 shield: model.shield,
                 selection: model.selectionStore.load(),
                 screenTimeOff: !model.auth.isApproved,
+                model: model,
                 commitmentProvider: { model.activeCommitment }
             )
             .tabItem { Label("Unlock", systemImage: "key.fill") }

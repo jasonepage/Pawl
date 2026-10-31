@@ -21,11 +21,17 @@ struct UnlockView: View {
     /// state says. The hero must say that instead of "Apps are blocked".
     var screenTimeOff: Bool = false
 
+    /// 2.5: the timing card opens the Unlock timing editor, which needs the app model. nil in
+    /// the developer setup flow, where the card is simply not shown.
+    var model: AppModel? = nil
+
     init(shield: ShieldService,
          selection: FamilyActivitySelection,
          screenTimeOff: Bool = false,
+         model: AppModel? = nil,
          commitmentProvider: @escaping () -> Commitment? = { nil }) {
         self.screenTimeOff = screenTimeOff
+        self.model = model
         _vm = State(wrappedValue: UnlockViewModel(
             shield: shield,
             selection: selection,
@@ -38,6 +44,9 @@ struct UnlockView: View {
             ScrollView {
                 VStack(spacing: 22) {
                     statusHero
+                    if isLocked, vm.isPaired, !showScreenTimeOff, let model {
+                        timingCard(model)
+                    }
                     actionArea
                     if let message = vm.message {
                         Text(message)
@@ -115,6 +124,51 @@ struct UnlockView: View {
         } else {
             PawlMascot(pose: PawlMascot.pose(for: vm.state, isPaired: vm.isPaired))
         }
+    }
+
+    // MARK: - Timing card (2.5)
+
+    /// The wait and the open time, side by side, in the space under the hero. Tap it to change
+    /// them (the same editor as Settings, with the same rule: stricter applies now, looser
+    /// waits out your current wait).
+    private func timingCard(_ model: AppModel) -> some View {
+        NavigationLink {
+            FrictionView(model: model)
+        } label: {
+            HStack(spacing: 0) {
+                timingStat(DurationText.wait(seconds: model.cooldownSeconds), "wait")
+                Rectangle().fill(Color.primary.opacity(0.1)).frame(width: 1).padding(.vertical, 10)
+                timingStat(DurationText.open(seconds: model.graceSeconds), "open")
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 18)
+            .background(PawlColor.cardBg)
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .overlay(alignment: .topTrailing) {
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+                    .padding(12)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(DurationText.summary(waitSeconds: model.cooldownSeconds, openSeconds: model.graceSeconds) + ". Tap to change.")
+    }
+
+    private func timingStat(_ value: String, _ label: String) -> some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.system(value.count > 8 ? .title3 : .largeTitle, design: .rounded).weight(.bold))
+                .minimumScaleFactor(0.6)
+                .lineLimit(1)
+                .foregroundStyle(.primary)
+            Text(label)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 8)
     }
 
     // MARK: - Primary action (one clear thing to do, per state)
