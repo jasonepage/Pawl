@@ -4,7 +4,7 @@
 
 //
 //  AllyCloud.swift
-//  Pawl: iOS integration layer (2.5, docs/18 sections 4.1, 4.2, 4.4)
+//  Pawl: iOS integration layer (2.4, docs/18 sections 4.1, 4.2, 4.4)
 //
 //  Everything ally approvals do in iCloud, and nothing else does. There is no Pawl server:
 //  this talks to Apple's CloudKit, inside the owner's own iCloud. The developer cannot read it.

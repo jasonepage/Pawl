@@ -6,7 +6,7 @@
 //  AllyDecisionVerifierTests.swift
 //  PawlTests: domain core
 //
-//  2.5 ally approvals, step 1 of docs/18. Made-up keys play the ally's Secure Enclave key.
+//  2.4 ally approvals, step 1 of docs/18. Made-up keys play the ally's Secure Enclave key.
 //  Cases the plan asks for: good yes, good no, wrong key, wrong nonce, expired, replayed.
 //
 

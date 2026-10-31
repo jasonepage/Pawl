@@ -40,7 +40,7 @@ public final class UnlockViewModel {
     private var timerTask: Task<Void, Never>?
     private var keyTimerTask: Task<Void, Never>?
 
-    // 2.5: ally approvals (docs/18). The open request, its polling loop, and the push listener.
+    // 2.4: ally approvals (docs/18). The open request, its polling loop, and the push listener.
     // Nothing here can lift the shield: a verified yes only ever sends `.allyDecision`, and
     // the machine turns that into the same cooling-off a key tap starts.
     private var openAllyRequest: AllyRequest?
@@ -53,7 +53,7 @@ public final class UnlockViewModel {
     // The active commitment is read fresh at each unlock, so a duration change takes effect
     // without rebuilding the view.
     private let commitmentProvider: () -> Commitment?
-    /// 2.5: the iCloud snapshot, read at pairing to tell "never had a key" from "had one, this
+    /// 2.4: the iCloud snapshot, read at pairing to tell "never had a key" from "had one, this
     /// phone lost it", and written once so the streak knows the pairing day.
     private let repo: CommitmentRepository = CloudCommitmentRepository()
 
@@ -98,7 +98,7 @@ public final class UnlockViewModel {
             let newKey = try await security.pairNewKey(displayName: "Pawl key")
             let encoded = newKey.credentialID.base64EncodedString()
 
-            // 2.5: a first pairing is free when this commitment has never had a key, even with
+            // 2.4: a first pairing is free when this commitment has never had a key, even with
             // blocks already on: there was no escrow to get around, and the person is stuck
             // otherwise. The snapshot in iCloud remembers the first pairing, so a phone with
             // blocks synced but no key (new phone, the Keychain does not sync) still waits like a
@@ -154,7 +154,7 @@ public final class UnlockViewModel {
         message = "Key removed (dev). Pair again to test the first-pair flow."
     }
 
-    // MARK: - Ally approvals (2.5)
+    // MARK: - Ally approvals (2.4)
 
     /// Ask the ally instead of tapping the key. The caller (the view) has already checked Pro.
     /// Opens a 30 minute request. The answer arrives by push or by polling; see checkAllyDecision.
@@ -335,7 +335,7 @@ public final class UnlockViewModel {
         switch state {
         case .coolingOff(let endsAt): return endsAt
         case .unshielded(let endsAt): return endsAt == .distantFuture ? nil : endsAt   // 2.4
-        case .awaitingAlly(_, let expiresAt): return expiresAt                           // 2.5
+        case .awaitingAlly(_, let expiresAt): return expiresAt                           // 2.4
         default: return nil
         }
     }
@@ -380,7 +380,7 @@ public final class UnlockViewModel {
             if machine.coolingOff > 0 {
                 Task { await UnlockReminders.moveLockReminders(to: endsAt) }
             }
-        // 2.5: ally approvals. The in-app expiry timer lives here. Writing and deleting the
+        // 2.4: ally approvals. The in-app expiry timer lives here. Writing and deleting the
         // Request record in iCloud is step 2 of docs/18 and is wired in then; until that step
         // these effects only run the timer, so the state can never be stuck open.
         case .sendAllyRequest(let requestID, let expiresAt):
@@ -467,7 +467,7 @@ public final class UnlockViewModel {
         Task { await recordFirstPairing() }
     }
 
-    /// 2.5: note the day a key was first paired in the iCloud snapshot. The streak and the week
+    /// 2.4: note the day a key was first paired in the iCloud snapshot. The streak and the week
     /// card count from here (2.4 read this but nothing wrote it, so the home count stayed at 0).
     /// Written once; a re-pair keeps the original day. No credential goes to iCloud: the
     /// credential ID stays in the Keychain on this phone, as the README says.

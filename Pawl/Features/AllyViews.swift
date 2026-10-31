@@ -4,7 +4,7 @@
 
 //
 //  AllyViews.swift
-//  Pawl: ally approvals screens (2.5, docs/18 sections 4.4, 4.7, 6)
+//  Pawl: ally approvals screens (2.4, docs/18 sections 4.4, 4.7, 6)
 //
 //  Four screens:
 //    AllyPage       the owner's page in Settings: invite, confirm with the key, remove

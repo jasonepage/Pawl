@@ -6,7 +6,7 @@
 //  AllyUnlockMachineTests.swift
 //  PawlTests: domain core
 //
-//  2.5 ally approvals, step 0 of docs/18. These pin the one rule that matters: an ally's yes
+//  2.4 ally approvals, step 0 of docs/18. These pin the one rule that matters: an ally's yes
 //  is another way to START the wait, never a way past it. The shield never drops here.
 //  The nine original UnlockMachineTests must still pass unchanged.
 //

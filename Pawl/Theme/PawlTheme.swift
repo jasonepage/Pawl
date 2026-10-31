@@ -202,7 +202,7 @@ public struct PawlArt: View {
 }
 
 
-/// 2.5: the app icon (a green security key with a paw print) as an in-app tile, rounded
+/// 2.4: the app icon (a green security key with a paw print) as an in-app tile, rounded
 /// like a home screen icon. Used on Home and the Settings header in place of the old mascot.
 struct PawlLogoTile: View {
     var size: CGFloat = 72
@@ -218,7 +218,7 @@ struct PawlLogoTile: View {
 }
 
 
-/// 2.5: a plain state glyph where the old drawn mascot used to sit. The painted art from
+/// 2.4: a plain state glyph where the old drawn mascot used to sit. The painted art from
 /// design/fido-first covers the locked and no-key states; every other state gets one symbol.
 struct PawlStateGlyph: View {
     let symbol: String

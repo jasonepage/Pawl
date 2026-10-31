@@ -4,7 +4,7 @@
 
 //
 //  AllyDecisionVerifier.swift
-//  Pawl: domain core (2.5, docs/18 section 4.3)
+//  Pawl: domain core (2.4, docs/18 section 4.3)
 //
 //  How the owner's phone knows a "yes" really came from the ally.
 //

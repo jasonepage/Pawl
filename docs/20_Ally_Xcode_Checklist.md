@@ -1,4 +1,4 @@
-# 20. Ally approvals: Xcode checklist (2.5, step 2)
+# 20. Ally approvals: Xcode checklist (2.4, step 2)
 
 Do these once, on the **Pawl** app target only. Never on PawlShield, PawlShieldAction or
 PawlMonitor: the extensions get no iCloud and no network.

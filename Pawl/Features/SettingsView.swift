@@ -82,7 +82,7 @@ struct SettingsView: View {
 
     private var brandHeader: some View {
         VStack(spacing: 8) {
-            // 2.5: the header shows the app icon, the security key with the paw.
+            // 2.4: the header shows the app icon, the security key with the paw.
             PawlLogoTile(size: 72)
             Text("Pawl")
                 .font(.system(size: 28, weight: .bold, design: .rounded))
@@ -227,7 +227,7 @@ struct SettingsView: View {
         }
     }
 
-    /// 2.5: one line for the Ally row.
+    /// 2.4: one line for the Ally row.
     private var allyLine: String {
         if let p = model.allyPairing { return "\(p.name) can say yes from their phone." }
         if let pending = model.pendingAlly { return "\(pending.name) becomes your ally soon." }

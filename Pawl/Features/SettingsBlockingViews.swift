@@ -435,7 +435,7 @@ struct FrictionView: View {
                 // Show what is in effect now. A looser change waits in the card above.
                 waitMin = currentWait
                 openMin = currentOpen
-                // 2.5: a looser change needs the key first, so the note comes from the model
+                // 2.4: a looser change needs the key first, so the note comes from the model
                 // ("Saved. It applies in 15 min." or "Key check cancelled. Nothing changed.").
                 savedNote = stricter ? "Saved. It applies now." : model.blockChangeMessage
             }

@@ -176,6 +176,25 @@ This is the core loop and the feature that wins the 1am fight. The state machine
 
 ---
 
+### 3.9 Ally approvals (2.4, Pawl Pro; design in docs/18)
+
+An ally is one person the user chooses who can say yes from their own phone in place of a key tap. Decision D1 (docs/18): the yes **replaces** the key tap. It never replaces the wait.
+
+- **FR-ALLY-001 [P1]** The system shall support at most one ally per commitment. The ally pays nothing and needs no Pro; the owner's Pro must be active to invite an ally or to ask one.
+- **FR-ALLY-002 [P1]** Pairing shall use Apple CloudKit zone sharing inside the owner's own iCloud. There shall be no Pawl server and no Pawl account. The three extensions (shield, shield action, monitor) shall contain no network code.
+- **FR-ALLY-003 [P1]** Asking an ally shall open a request that stays open for 30 minutes. While a request is open the shield shall stay applied. The request shall carry only its id, its kind (`unlock` or `blockLess`), its times and a random nonce; never app names, sites, slips, urges, notes or streak values.
+- **FR-ALLY-004 [P1]** A decision shall be accepted only if it names the open request, its ES256 signature over the fixed label `pawl-ally-decision-v1`, the request id, the nonce, the answer and the expiry verifies against the ally public key saved in the owner's Keychain at pairing, it was signed and read before expiry, and it says yes. An accepted yes shall start exactly the same cooling-off a key tap starts (FR-UNLOCK-003) and shall never lift the shield directly.
+- **FR-ALLY-005 [P1]** A no, a failed signature check, a decision for another request, a late decision, expiry, or cancel shall return the loop to locked, withdraw the request, and change nothing.
+- **FR-ALLY-006 [P1]** Each request shall be usable once. The owner's phone shall delete the request on the first accepted decision, so a decision cannot be replayed (FR-UNLOCK-010 applies).
+- **FR-ALLY-007 [P1]** The physical key shall always work. Beginning a key tap while a request is open shall withdraw the request and proceed as a normal key unlock.
+- **FR-ALLY-008 [P1]** Adding an ally is a loosening: it shall require the key (or, if an ally is already active, an ally yes) and the current cooling-off before the ally becomes active. Removing an ally, and the ally leaving, shall apply at once with no key (HC-4 asymmetry).
+- **FR-ALLY-009 [P1]** Every other loosening (FR-SHIELD-010 removals, category turn-offs, typed site removals, set loosenings, a looser timing) shall offer "use my key" or "ask my ally" when an ally is active, and shall otherwise behave as before.
+- **FR-ALLY-010 [P1]** At pairing the owner's phone shall verify that the ally's record was created by a share participant other than the owner's own Apple Account.
+- **FR-ALLY-011 [P1]** The ally's signing key shall live in that phone's Secure Enclave and require user presence (biometric or passcode) for every signature. The private half shall never leave the phone.
+- **FR-ALLY-012 [P1]** The ally shall see only who is asking, the kind of request and its time. Push notifications to the ally shall carry no detail beyond that someone is asking. The ally shall not be able to block, unblock, or change any setting.
+- **FR-ALLY-013 [P1]** If Pro lapses, the ask option shall disappear and the key shall keep working; nothing that blocks shall turn off.
+- **FR-ALLY-014 [P1]** Copy shall be plain and respectful ("wants to unlock"), never judgmental, and shall use the role name `ally`.
+
 ## 4. External interface requirements
 
 ### 4.1 User interfaces
@@ -332,6 +351,7 @@ This is the core loop and the feature that wins the 1am fight. The state machine
 | Shield setup | FR-SHIELD-001..010 | P1 | HC-1, HC-4, HC-6 |
 | NFC key pairing | FR-NFC-001..006 | P1 | HC-5, HC-7, HC-4 |
 | Unlock + cooling-off | FR-UNLOCK-001..012 | P1 | HC-4, HC-5, HC-6 |
+| Ally approvals (2.4) | FR-ALLY-001..014 | P1 | HC-4, HC-6 |
 | Streak & relapse | FR-STREAK-001..006 | P1 | — |
 | Urge / panic | FR-URGE-001..005 | P1 | HC-4 (philosophy) |
 | Reinstall-proofing | FR-PERSIST-001..006 | P1 | HC-4, HC-6 |

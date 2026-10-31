@@ -108,7 +108,7 @@ final class AppModel {
         pendingDurationsCtl.apply = { [weak self] pair in
             await self?.applyDurations(cooldown: pair.cooldown, grace: pair.grace)
         }
-        // 2.5: adding an ally is a loosening. After the key tap and the wait, this makes it real.
+        // 2.4: adding an ally is a loosening. After the key tap and the wait, this makes it real.
         pendingAllyCtl.apply = { [weak self] pairing in
             guard let self else { return }
             AllyStore.shared.savePairing(pairing)
@@ -211,7 +211,7 @@ final class AppModel {
             selectionTokenData: try? JSONEncoder().encode(selection),
             updatedAt: now
         )
-        // 2.5: keep the pairing day if there is one; set it now if a key was paired during setup
+        // 2.4: keep the pairing day if there is one; set it now if a key was paired during setup
         // (the streak counts from it, and an instant first pair is only allowed before it exists).
         let keyPairing = existingSnapshot?.keyPairing
             ?? (keyStore.load() != nil ? KeyPairing(commitmentID: commitment.id, tagUID: "", pairedAt: now) : nil)
@@ -262,7 +262,7 @@ final class AppModel {
     /// cooldown; any failure leaves protection in place. Tightening never calls this.
     /// 2.3: the ally approval step that used to follow the key was removed with the backend.
     private func approveLoosening() async -> Bool {
-        // 2.5: with an active ally (and Pro), the person picks: key or ally. The prompt is a
+        // 2.4: with an active ally (and Pro), the person picks: key or ally. The prompt is a
         // dialog in ContentView; it answers through chooseLoosen. Dismissing it is a no.
         if let pairing = allyPairing, pro.isPro {
             loosenPrompt = true
@@ -571,7 +571,7 @@ final class AppModel {
         if SharedState.phase() == "locked" { shield.apply(selectionStore.load()) }
     }
 
-    // MARK: - Ally approvals (2.5, docs/18)
+    // MARK: - Ally approvals (2.4, docs/18)
 
     /// The owner's one ally, mirrored from the Keychain so views update. nil: no ally.
     private(set) var allyPairing: AllyPairing?
@@ -707,7 +707,7 @@ final class AppModel {
             cancelPendingDurations()                       // supersede any pending loosening
             await applyDurations(cooldown: cd, grace: gr)
         } else {
-            // 2.5 SECURITY FIX: a looser wait or open time is a loosening like any other, so it
+            // 2.4 SECURITY FIX: a looser wait or open time is a loosening like any other, so it
             // takes the key tap first, then the current wait (FR-UNLOCK-004). Before this, only
             // the wait applied: with no key in hand, "No wait" could be set from Settings and
             // would land 15 minutes later, making every unlock after it instant.

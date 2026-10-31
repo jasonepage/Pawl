@@ -17,7 +17,7 @@
 //  2.3: the sponsor approval step (Phase 2) was removed with the backend. The physical key
 //  is the only gate before the cooling-off, so whoever holds the key is the accountability.
 //
-//  2.5: ally approvals (docs/18, decision D1 = replace). An ally's signed yes is a second way
+//  2.4: ally approvals (docs/18, decision D1 = replace). An ally's signed yes is a second way
 //  to pass the gate: key tap OR ally yes, then the same wait. The machine never skips the
 //  wait and never lifts the shield on a decision. Checking the signature is not this file's
 //  job (see AllyDecisionVerifier.swift); the app layer passes the result in as `valid`.
@@ -32,7 +32,7 @@ public enum UnlockState: Equatable, Sendable {
     case reading                          // NFC session open, awaiting a tap (FR-UNLOCK-001)
     case coolingOff(endsAt: Date)         // wait started; shield still up (FR-UNLOCK-003)
     case unshielded(graceEndsAt: Date)    // shield lifted; grace window running (FR-UNLOCK-008)
-    /// 2.5: a request is open with the ally. Shield still up. Ends with a decision, expiry,
+    /// 2.4: a request is open with the ally. Shield still up. Ends with a decision, expiry,
     /// cancel, or the person reaching for the key instead (FR-ALLY-003).
     case awaitingAlly(requestID: UUID, expiresAt: Date)
 }
@@ -46,11 +46,11 @@ public enum UnlockEvent: Equatable, Sendable {
     case coolingOffEnded                  // DeviceActivity boundary (FR-UNLOCK-007)
     case graceEnded                       // DeviceActivity boundary (FR-UNLOCK-008/009)
     case lockNow                          // 2.4: the person ends the open time early (blocks more)
-    case askAlly(requestID: UUID)         // 2.5: the person asks the ally instead of tapping the key
-    /// 2.5: the ally answered. `valid` is the app layer's signature, nonce and expiry check
+    case askAlly(requestID: UUID)         // 2.4: the person asks the ally instead of tapping the key
+    /// 2.4: the ally answered. `valid` is the app layer's signature, nonce and expiry check
     /// (AllyDecisionVerifier). A yes that is not valid is treated as a no.
     case allyDecision(requestID: UUID, approved: Bool, valid: Bool)
-    case allyExpired                      // 2.5: the 30 minute request window passed with no answer
+    case allyExpired                      // 2.4: the 30 minute request window passed with no answer
 }
 
 // MARK: - Effects (interpreted by the iOS layer)
@@ -60,8 +60,8 @@ public enum UnlockEffect: Equatable, Sendable {
     case liftShield                       // ShieldService clears ManagedSettings (FR-UNLOCK-007)
     case scheduleGrace(endsAt: Date)
     case reapplyShield                    // auto-relock (FR-UNLOCK-008/009)
-    case sendAllyRequest(requestID: UUID, expiresAt: Date)   // 2.5: write the Request record
-    case withdrawAllyRequest(requestID: UUID)                // 2.5: delete the Request record
+    case sendAllyRequest(requestID: UUID, expiresAt: Date)   // 2.4: write the Request record
+    case withdrawAllyRequest(requestID: UUID)                // 2.4: delete the Request record
 }
 
 // MARK: - Reducer
@@ -72,7 +72,7 @@ public struct UnlockMachine: Sendable {
     public let coolingOff: TimeInterval
     public let grace: TimeInterval
 
-    /// 2.5: how long a request stays open with the ally (docs/18, D4). After this the
+    /// 2.4: how long a request stays open with the ally (docs/18, D4). After this the
     /// request is gone and nothing changed.
     public nonisolated static let allyRequestWindow: TimeInterval = 30 * 60
 
@@ -131,7 +131,7 @@ public struct UnlockMachine: Sendable {
         case (.unshielded, .lockNow):
             return (.locked, [.reapplyShield])
 
-        // MARK: 2.5 ally approvals (FR-ALLY-003..006)
+        // MARK: 2.4 ally approvals (FR-ALLY-003..006)
 
         // Asking the ally opens a request. The shield stays up (FR-ALLY-003).
         case (.locked, .askAlly(let requestID)):

@@ -17,7 +17,7 @@ import UserNotifications
 import CloudKit
 
 extension Notification.Name {
-    /// 2.5: a CloudKit push arrived (the ally answered, or the owner asked). Listeners fetch
+    /// 2.4: a CloudKit push arrived (the ally answered, or the owner asked). Listeners fetch
     /// what changed; the push itself carries nothing.
     static let pawlAllyCloudChanged = Notification.Name("pawl.ally.cloudChanged")
 }
@@ -28,7 +28,7 @@ final class PawlAppDelegate: NSObject, UIApplicationDelegate, UNUserNotification
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         Task { @MainActor in ReviewPrompter.noteLaunch() }   // install clock for rating asks
         UNUserNotificationCenter.current().delegate = self
-        // 2.5: ally approvals ride on CloudKit pushes. Registering asks the user nothing (only
+        // 2.4: ally approvals ride on CloudKit pushes. Registering asks the user nothing (only
         // visible notifications need permission, and the ally side asks for that when joining).
         // Only phones that are part of a pairing register; everyone else never touches push.
         Task { @MainActor in
@@ -39,7 +39,7 @@ final class PawlAppDelegate: NSObject, UIApplicationDelegate, UNUserNotification
         return true
     }
 
-    /// 2.5: a CloudKit push. Tell whoever is listening, then let iOS know we are done. Nothing
+    /// 2.4: a CloudKit push. Tell whoever is listening, then let iOS know we are done. Nothing
     /// here touches the shield: a push can only make the app go and read iCloud.
     func application(_ application: UIApplication,
                      didReceiveRemoteNotification userInfo: [AnyHashable: Any],
@@ -53,7 +53,7 @@ final class PawlAppDelegate: NSObject, UIApplicationDelegate, UNUserNotification
         DispatchQueue.main.asyncAfter(deadline: .now() + 8) { completionHandler(.newData) }
     }
 
-    /// 2.5: an iCloud share link (the ally invite) is handed to the window scene delegate, so
+    /// 2.4: an iCloud share link (the ally invite) is handed to the window scene delegate, so
     /// the app names one. SwiftUI keeps running the window; this class only listens.
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession,
                      options: UIScene.ConnectionOptions) -> UISceneConfiguration {
@@ -76,7 +76,7 @@ final class PawlAppDelegate: NSObject, UIApplicationDelegate, UNUserNotification
 }
 
 extension Notification.Name {
-    /// 2.5: the person opened an ally invite link. The object is the CKShare.Metadata.
+    /// 2.4: the person opened an ally invite link. The object is the CKShare.Metadata.
     static let pawlAllyInvite = Notification.Name("pawl.ally.invite")
 }
 

@@ -4,7 +4,7 @@
 
 //
 //  AllyCloudMappingTests.swift
-//  PawlTests: 2.5 step 2
+//  PawlTests: 2.4 step 2
 //
 //  The CloudKit record shapes, checked without an iCloud account: a CKRecord can be built and
 //  read in memory. The network parts of AllyCloud are checked by hand on two phones.

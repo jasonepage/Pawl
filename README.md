@@ -60,7 +60,7 @@ which, and never learns the names of the apps you pick.
 | Platform | iPhone and iPad, iOS 18 and later. No Android, no Mac. |
 | Backend | **None.** No server, no account, no sign-in. Everything stays on your phone and in your own iCloud. (Up to 2.2, an optional ally feature used a Supabase server. 2.3 removed it.) |
 | Tracking | No analytics, no ads, no crash reporter. |
-| Price | Blocking, the key, the wait, your streak and the urge tools are free. Pawl Pro, a subscription, adds making new scheduled sets and the weekly report. Sets you made before Pro existed keep working free. The Pro code is in this repo too. |
+| Price | Blocking, the key, the wait, your streak and the urge tools are free. Pawl Pro, a subscription, adds ally approvals, making new scheduled sets and the weekly report. Sets you made before Pro existed keep working free. The Pro code is in this repo too. |
 
 ## What it does not promise
 
@@ -91,6 +91,14 @@ Read this before you trust it with anything.
   `#if DEBUG`, which is only switched on in the Debug build setting, so they
   are not in the App Store build. If you build Pawl yourself in Debug, you
   get them. That is on purpose: it is your own phone.
+- **An ally is a second key holder, not a guard.** Since 2.4 an ally's signed
+  yes can start the wait instead of a key tap. Pawl checks the signature
+  against a key saved when you paired, checks the request was not reused or
+  expired, and checks at pairing that the ally's record came from a different
+  Apple Account than yours. It cannot stop you from making a second Apple
+  Account and naming yourself as your own ally. That is the same as keeping the
+  key in your own pocket, and adding an ally takes the key and the wait, so it
+  is not a 1am decision. See `Pawl/Domain/AllyDecisionVerifier.swift`.
 - **No blocklist is complete.** The optional gambling list ships 167 domains,
   built into the app, and the adult filter is Apple's. New sites appear every week. Sites
   you type in yourself are blocked exactly as typed.
@@ -127,7 +135,15 @@ Read this before you trust it with anything.
 5. **The key is the accountability.** Give it to someone you trust, like your
    sister across town. Whoever holds the key decides when Pawl can loosen.
    They don't install anything and nobody makes an account.
-6. **Your clean day streak survives deleting the app.** It lives in your
+6. **An ally can say yes from their phone (Pawl Pro, since 2.4).** Instead of
+   handing the key over, the person who holds it can install Pawl, accept an
+   iCloud share link from you, and tap Approve when you ask. Their yes starts
+   the same wait a key tap starts. Nothing is skipped. It goes through your own
+   iCloud, not a Pawl server, and they never see what you block. Adding an ally
+   takes your key and the wait, like any change that blocks less. Removing one
+   is instant. Your key always works, with or without an ally. Only you need
+   Pro; your ally pays nothing.
+7. **Your clean day streak survives deleting the app.** It lives in your
    iCloud, not on the phone.
 
 Slipping up is treated as normal. The relapse log is private to you, and
@@ -141,9 +157,14 @@ nothing in the app scolds you for using it.
 | Streak, relapse log, urge log | Your phone and your iCloud | You |
 | Your registered key's credential ID | Your phone (the app's shared storage) | You |
 | Whether you have Pawl Pro | Apple (the App Store handles the purchase) | You. Pawl only learns whether Pro is active |
+| Ally requests and answers (since 2.4, if you set up an ally) | Your iCloud, in one zone shared with your ally. Deleted after each answer | You and your ally. The ally sees only that you asked, and whether it was to unlock or to block less. Never what you block, your streak, slips or notes |
+| Your ally's public signing key and first name | Your phone (Keychain) | You |
 
 Pawl has no server. Nothing in this table leaves your phone except to your own
-iCloud. Up to 2.2, an optional ally feature kept accounts, unlock requests and
+iCloud. The ally feature uses Apple's CloudKit zone sharing: a private zone in
+your iCloud that you share with one person. Apple's push service tells your
+ally's phone that something changed; the push carries no detail. The developer
+cannot read any of it. Up to 2.2, an optional ally feature kept accounts, unlock requests and
 check-ins on a Supabase server. 2.3 removed that feature, along with sign-in
 and push notifications. On first launch after updating, the app clears what it
 left on the phone (`Pawl/Services/LegacySponsorCleanup.swift`).
@@ -161,6 +182,10 @@ The best thing a stranger can do today is read. Start here:
 | `Pawl/Services/SecurityKeyService.swift` | Talking to the key through Apple's AuthenticationServices |
 | `Pawl/Services/ShieldService.swift` | Applying and lifting the shield, the app deletion block |
 | `Pawl/Services/DurationSettings.swift` | Why making the wait shorter is itself delayed |
+| `Pawl/Domain/AllyDecisionVerifier.swift` | How an ally's yes is signed on their phone and checked on yours (2.4) |
+| `PawlTests/AllyDecisionVerifierTests.swift` | 14 tests for that check, with made-up keys |
+| `PawlTests/AllyUnlockMachineTests.swift` | 14 tests that an ally's yes starts the wait and never skips it |
+| `Pawl/Services/AllyCloud.swift` | Everything the ally feature does in iCloud, and nothing else does |
 
 Security fixes are explained in a comment at the spot where they happened.
 Search the code for `SECURITY FIX` to find them.

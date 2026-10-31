@@ -28,9 +28,9 @@ struct ContentView: View {
     /// HomeView that is not on screen could consume the flag where nobody could see it,
     /// which is why the handoff only worked sometimes.
     @State private var pendingUrge = false
-    /// 2.5: an ally invite link was opened; shows the join sheet.
+    /// 2.4: an ally invite link was opened; shows the join sheet.
     @State private var allyInvite: AllyInviteItem?
-    /// 2.5: an ally-only phone chose to set up blocking for itself too.
+    /// 2.4: an ally-only phone chose to set up blocking for itself too.
     @State private var wantsOwnSetup = false
 
     var body: some View {
@@ -38,14 +38,14 @@ struct ContentView: View {
             if model.didOnboard {
                 mainTabs
             } else if model.allyRole != nil, !wantsOwnSetup {
-                // 2.5: this phone only helps someone else. No blocking, no setup, just the ally screen.
+                // 2.4: this phone only helps someone else. No blocking, no setup, just the ally screen.
                 AllyView(model: model, onSetUpOwn: { wantsOwnSetup = true })
             } else {
                 OnboardingView(model: model)
             }
         }
         .tint(PawlColor.brand)
-        // 2.5: ally approvals. The invite sheet, the "key or ally" choice on a loosening, and the
+        // 2.4: ally approvals. The invite sheet, the "key or ally" choice on a loosening, and the
         // waiting sheet while a "block less" request is open.
         .onReceive(NotificationCenter.default.publisher(for: .pawlAllyInvite)) { n in
             if let metadata = n.object as? CKShare.Metadata { allyInvite = AllyInviteItem(metadata: metadata) }
@@ -71,7 +71,7 @@ struct ContentView: View {
             await model.restorePendingCategoryChange()       // resume/commit a gated category turn-off
             await model.restorePendingDomainRemoval()        // 2.2: iCloud mirror + gated typed-site removal
             await model.restorePendingSetsChange()           // 2.2: scheduled sets, their activities, gated edits
-            await model.restorePendingAlly()                 // 2.5: ally pairing, and one waiting to become active
+            await model.restorePendingAlly()                 // 2.4: ally pairing, and one waiting to become active
             checkPendingUrge()                               // FR-SHACT-004 pickup on cold launch
         }
         .onChange(of: scenePhase) { _, phase in

@@ -4,7 +4,7 @@
 
 //
 //  AllyStore.swift
-//  Pawl: iOS integration layer (2.5, docs/18 section 4.3 and 4.7)
+//  Pawl: iOS integration layer (2.4, docs/18 section 4.3 and 4.7)
 //
 //  What each phone remembers about an ally pairing, in the Keychain, this device only.
 //

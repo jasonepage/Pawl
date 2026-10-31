@@ -1,10 +1,10 @@
 # Changelog
 
-## 2.5 (in progress)
+## 2.4 (in progress)
 
 Ally approvals, a Pawl Pro feature. The person who holds your key can say yes from their own
 phone instead of handing the key over. Plan: `docs/18_Ally_Approvals_Plan.md`. Built one step at
-a time; each step is listed here when it lands.
+a time, after the rest of 2.4 below.
 
 - Step 0, the unlock loop. `UnlockMachine` has a new state, `awaitingAlly`, and three new
   events: ask the ally, the ally's decision, and the request expiring. A valid yes starts the
@@ -67,8 +67,6 @@ a time; each step is listed here when it lands.
   favicon, the link preview image and the repo. The locked and no-key states on the Unlock tab
   use the new painted art; every other state shows one plain symbol until it has its own art. The key is the product.
 
-## 2.4 (in progress)
-
 - Home no longer pitches Pawl Pro. The week card shows the free part and one small "Full report"
   link; the paywall appears only when someone taps that or tries to add a scheduled set.
 - Tough-moment screen: "I resisted" moved to the end of the ten-minute wait, where it is
@@ -92,8 +90,7 @@ a time; each step is listed here when it lands.
   dark and tinted variants; the site, favicons, link preview and the setup card use him too.
   Design files and the reference drawing live in `design/mascot-v2/`.
 
-- Version 2.4, build 14 (app and all three extensions). The ally approvals plan
-  (`docs/18_Ally_Approvals_Plan.md`) is parked: the physical key already does that job.
+- Version 2.4, build 14 (app and all three extensions).
 - Unlock timing has more choices. Wait before unlocking: No wait, 15 min to 2 hr, or Custom
   (1 minute to 24 hours). Then open for: 15 min to 3 hr, Custom (15 minutes to 12 hours), or
   Until I lock it. Same rule as before: a longer wait or a shorter open time applies right away,
