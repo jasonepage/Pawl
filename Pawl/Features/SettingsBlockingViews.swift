@@ -430,17 +430,17 @@ struct FrictionView: View {
     private var saveButton: some View {
         Button {
             let stricter = isStricter
-            let note = stricter ? "Saved. It applies now."
-                                : "Saved. The new timing starts \(DurationText.startsIn(waitSeconds: model.cooldownSeconds))."
             Task {
                 await model.requestDurations(cooldown: Double(waitMin) * 60, grace: Double(openMin) * 60)
                 // Show what is in effect now. A looser change waits in the card above.
                 waitMin = currentWait
                 openMin = currentOpen
-                savedNote = note
+                // 2.5: a looser change needs the key first, so the note comes from the model
+                // ("Saved. It applies in 15 min." or "Key check cancelled. Nothing changed.").
+                savedNote = stricter ? "Saved. It applies now." : model.blockChangeMessage
             }
         } label: {
-            Text(isStricter ? "Save. Applies now" : "Save. Starts \(DurationText.startsIn(waitSeconds: model.cooldownSeconds))")
+            Text(isStricter ? "Save. Applies now" : "Use your key. Starts \(DurationText.startsIn(waitSeconds: model.cooldownSeconds))")
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(PawlBigButtonStyle(background: PawlColor.brand, foreground: .white))

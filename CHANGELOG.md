@@ -29,6 +29,10 @@ a time; each step is listed here when it lands.
   `Pawl/Services/AllyStore.swift` keeps the ally's public key on the owner's phone and the
   Secure Enclave signing key on the ally's phone, in the Keychain, this device only. Needs the
   Xcode capabilities in `docs/20_Ally_Xcode_Checklist.md`. Not wired to any screen yet.
+- Security fix: a looser unlock timing (a shorter wait, a longer open time, No wait, Until I
+  lock it) now needs your key first, then the current wait, like every other change that blocks
+  less. Before this, only the wait applied, so No wait could be set from Settings without the
+  key and would land 15 minutes later. The Save button says "Use your key" for a looser change.
 - The Unlock tab shows your wait and open time as two big numbers under the status card while
   apps are blocked ("15 min wait", "30 min open", or "Until I lock it"). Tap the card to change
   them; it opens the same Unlock timing screen as Settings, with the same rules.

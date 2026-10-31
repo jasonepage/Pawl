@@ -557,8 +557,16 @@ final class AppModel {
             cancelPendingDurations()                       // supersede any pending loosening
             await applyDurations(cooldown: cd, grace: gr)
         } else {
+            // 2.5 SECURITY FIX: a looser wait or open time is a loosening like any other, so it
+            // takes the key tap first, then the current wait (FR-UNLOCK-004). Before this, only
+            // the wait applied: with no key in hand, "No wait" could be set from Settings and
+            // would land 15 minutes later, making every unlock after it instant.
+            pendingDurationsCtl.clear()
+            guard await approveLoosening() else { return }
             let endsAt = Date().addingTimeInterval(cooldownSeconds)
             pendingDurationsCtl.begin(DurationPair(cooldown: cd, grace: gr), endsAt: endsAt)
+            blockChangeMessage = cooldownSeconds <= 0 ? "Saved."
+                : "Saved. It applies \(DurationText.startsIn(waitSeconds: cooldownSeconds))."
         }
     }
 
