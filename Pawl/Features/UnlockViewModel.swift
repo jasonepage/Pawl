@@ -40,6 +40,16 @@ public final class UnlockViewModel {
     private var timerTask: Task<Void, Never>?
     private var keyTimerTask: Task<Void, Never>?
 
+    // 2.5: ally approvals (docs/18). The open request, its polling loop, and the push listener.
+    // Nothing here can lift the shield: a verified yes only ever sends `.allyDecision`, and
+    // the machine turns that into the same cooling-off a key tap starts.
+    private var openAllyRequest: AllyRequest?
+    private var allyPollTask: Task<Void, Never>?
+    private var allyPushObserver: NSObjectProtocol?
+    /// The ally's first name, for the screen. nil when no ally is paired.
+    public var allyName: String? { AllyStore.shared.pairing()?.name }
+    public var hasAlly: Bool { AllyStore.shared.pairing() != nil }
+
     // The active commitment is read fresh at each unlock, so a duration change takes effect
     // without rebuilding the view.
     private let commitmentProvider: () -> Commitment?
@@ -142,6 +152,69 @@ public final class UnlockViewModel {
         pendingKeyEndsAt = nil
         pairedCredential = nil
         message = "Key removed (dev). Pair again to test the first-pair flow."
+    }
+
+    // MARK: - Ally approvals (2.5)
+
+    /// Ask the ally instead of tapping the key. The caller (the view) has already checked Pro.
+    /// Opens a 30 minute request. The answer arrives by push or by polling; see checkAllyDecision.
+    public func askAlly() {
+        guard case .locked = state else { return }
+        guard AllyStore.shared.pairing() != nil else { message = "No ally is set up."; return }
+        message = nil
+        machine = UnlockMachine(commitment: commitmentProvider() ?? Commitment(startedAt: Date(), updatedAt: Date()))
+        let request = AllyRequest.make(kind: .unlock, now: Date())
+        openAllyRequest = request
+        send(.askAlly(requestID: request.id))
+    }
+
+    /// Read the ally's answer, if any, and feed it to the machine. Safe to call any time: with
+    /// no open request it does nothing. Called by the poll loop, by a push, and when the
+    /// screen appears.
+    public func checkAllyDecision() async {
+        guard case .awaitingAlly(let openID, _) = state,
+              let request = openAllyRequest, request.id == openID,
+              let pairing = AllyStore.shared.pairing() else { return }
+        guard let decision = try? await AllyCloud.shared.fetchDecision() else { return }
+        // Still waiting on the same request? The poll may have raced a cancel.
+        guard case .awaitingAlly(let stillID, _) = state, stillID == openID else { return }
+        let approved: Bool
+        let valid: Bool
+        do {
+            approved = try AllyDecisionVerifier.verify(decision, against: request,
+                                                       allyPublicKey: pairing.publicKey, now: Date())
+            valid = true
+        } catch {
+            approved = false
+            valid = false
+            #if DEBUG
+            print("Pawl ally decision rejected: \(error)")
+            #endif
+        }
+        if valid && !approved { message = "\(pairing.name) said not now. Apps stay blocked." }
+        if !valid { message = "That answer didn't check out. Apps stay blocked." }
+        send(.allyDecision(requestID: decision.requestID, approved: approved, valid: valid))
+    }
+
+    private func startAllyPolling() {
+        allyPollTask?.cancel()
+        allyPollTask = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(5))
+                guard !Task.isCancelled else { return }
+                await self?.checkAllyDecision()
+            }
+        }
+        if allyPushObserver == nil {
+            allyPushObserver = NotificationCenter.default.addObserver(forName: .pawlAllyCloudChanged, object: nil, queue: .main) { [weak self] _ in
+                Task { @MainActor in await self?.checkAllyDecision() }
+            }
+        }
+    }
+
+    private func stopAllyPolling() {
+        allyPollTask?.cancel(); allyPollTask = nil
+        if let o = allyPushObserver { NotificationCenter.default.removeObserver(o); allyPushObserver = nil }
     }
 
     /// Begin an unlock: prove the key is present, then (if it's the same key) start cooling-off.
@@ -310,10 +383,26 @@ public final class UnlockViewModel {
         // 2.5: ally approvals. The in-app expiry timer lives here. Writing and deleting the
         // Request record in iCloud is step 2 of docs/18 and is wired in then; until that step
         // these effects only run the timer, so the state can never be stuck open.
-        case .sendAllyRequest(_, let expiresAt):
+        case .sendAllyRequest(let requestID, let expiresAt):
             scheduleFire(at: expiresAt, event: .allyExpired)
+            guard let request = openAllyRequest, request.id == requestID else { send(.cancel); return }
+            startAllyPolling()
+            Task { [weak self] in
+                do {
+                    try await AllyCloud.shared.writeRequest(request)
+                    try? await AllyCloud.shared.subscribeOwner()
+                } catch {
+                    // iCloud is not reachable. Nothing was asked, so back to locked. The key works.
+                    guard let self, case .awaitingAlly(let id, _) = self.state, id == requestID else { return }
+                    self.send(.cancel)
+                    self.message = "Couldn't reach iCloud to ask \(self.allyName ?? "your ally"). Your key still works."
+                }
+            }
         case .withdrawAllyRequest:
             timerTask?.cancel(); timerTask = nil
+            stopAllyPolling()
+            openAllyRequest = nil
+            Task { try? await AllyCloud.shared.deleteRequest() }
         case .reapplyShield:
             // 2.1: relock with the live shared selection (it includes apps added since this
             // screen opened), falling back to the one this screen started with.

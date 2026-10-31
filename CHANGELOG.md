@@ -29,6 +29,14 @@ a time; each step is listed here when it lands.
   `Pawl/Services/AllyStore.swift` keeps the ally's public key on the owner's phone and the
   Secure Enclave signing key on the ally's phone, in the Keychain, this device only. Needs the
   Xcode capabilities in `docs/20_Ally_Xcode_Checklist.md`. Not wired to any screen yet.
+- Step 3, the round trip. The owner's Unlock screen can open a request (`askAlly`), which
+  writes it to iCloud, polls every 5 seconds for the answer, and also listens for a silent
+  CloudKit push. The answer is checked with `AllyDecisionVerifier` against the saved public
+  key before the machine ever sees it. The ally's phone gets a banner, "Jason is asking you in
+  Pawl.", generic on purpose so nothing about the request rides through Apple's push servers.
+  If iCloud is unreachable the request is dropped and the screen says the key still works.
+  The app delegate registers for pushes only on phones that are part of a pairing. No button
+  calls `askAlly` yet; that is step 4.
 - Pairing your first key is instant, even if blocks are already on. It used to wait 15 minutes
   whenever a commitment existed. The wait stays for a phone where blocks synced from iCloud but
   the key did not (a new phone), because an instant pair there would be a way around the key.

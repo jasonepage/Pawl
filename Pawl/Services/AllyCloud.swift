@@ -218,6 +218,44 @@ public final class AllyCloud {
         catch let e as CKError where e.code == .unknownItem || e.code == .zoneNotFound { }
     }
 
+    // MARK: - Pushes (step 3, docs/18 section 4.6)
+
+    /// Subscription ids. One per side; saving the same id again is a harmless replace.
+    static let ownerSubscriptionID = "pawl-ally-owner"
+    static let allySubscriptionID = "pawl-ally-ally"
+
+    /// Owner: a silent push when anything in the private database changes, so the app can
+    /// fetch the ally's answer in the background. No banner: the owner is the one who asked.
+    public func subscribeOwner() async throws {
+        let sub = CKDatabaseSubscription(subscriptionID: Self.ownerSubscriptionID)
+        let info = CKSubscription.NotificationInfo()
+        info.shouldSendContentAvailable = true
+        sub.notificationInfo = info
+        _ = try await privateDB.modifySubscriptions(saving: [sub], deleting: [])
+    }
+
+    /// Ally: a banner when the owner writes a request. The text is generic on purpose: the
+    /// push goes through Apple's servers and the lock screen, so the kind of request and
+    /// anything else stays inside the app (D5).
+    public func subscribeAlly(ownerName: String) async throws {
+        let sub = CKDatabaseSubscription(subscriptionID: Self.allySubscriptionID)
+        let info = CKSubscription.NotificationInfo()
+        let who = ownerName.isEmpty ? "Someone" : ownerName
+        info.alertBody = "\(who) is asking you in Pawl."
+        info.soundName = "default"
+        info.shouldSendContentAvailable = true
+        sub.notificationInfo = info
+        _ = try await sharedDB.modifySubscriptions(saving: [sub], deleting: [])
+    }
+
+    public func unsubscribeOwner() async {
+        _ = try? await privateDB.modifySubscriptions(saving: [], deleting: [Self.ownerSubscriptionID])
+    }
+
+    public func unsubscribeAlly() async {
+        _ = try? await sharedDB.modifySubscriptions(saving: [], deleting: [Self.allySubscriptionID])
+    }
+
     // MARK: - Record mapping
 
     static func request(from r: CKRecord) throws -> AllyRequest {
