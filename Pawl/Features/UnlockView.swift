@@ -128,7 +128,7 @@ struct UnlockView: View {
         } else if usesLockedArtwork {
             PawlLockedArtwork()
         } else {
-            PawlMascot(pose: PawlMascot.pose(for: vm.state, isPaired: vm.isPaired))
+            PawlStateGlyph(symbol: stateSymbol, color: heroFg)
         }
     }
 
@@ -326,6 +326,17 @@ struct UnlockView: View {
 
     /// Only the locked state claims apps are blocked, so that is the only state to correct.
     private var showScreenTimeOff: Bool { screenTimeOff && isLocked }
+
+    /// One symbol per state for the states without painted art.
+    private var stateSymbol: String {
+        switch vm.state {
+        case .locked: return vm.isPaired ? "lock.fill" : "key.fill"
+        case .reading: return "key.radiowaves.forward.fill"
+        case .awaitingAlly: return "person.2.fill"
+        case .coolingOff: return "hourglass"
+        case .unshielded: return "lock.open.fill"
+        }
+    }
 
     private var heroBg: Color {
         if showScreenTimeOff { return PawlColor.dangerText.opacity(0.15) }

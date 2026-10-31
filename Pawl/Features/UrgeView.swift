@@ -126,7 +126,7 @@ struct UrgeView: View {
     private var waitCard: some View {
         VStack(spacing: 14) {
             if logged {
-                PawlMascot(pose: .resisted, size: 110)
+                PawlStateGlyph(symbol: "checkmark.seal.fill", size: 64, color: PawlColor.cleanText)
                 Text("Logged. That took strength.")
                     .font(.system(.title2, design: .rounded).weight(.bold))
                     .foregroundStyle(PawlColor.cleanText)
@@ -154,7 +154,6 @@ struct UrgeView: View {
                                 .foregroundStyle(PawlColor.cleanText)
                             }
                             .frame(width: 180, height: 180)
-                            PawlMascot(pose: .waiting, size: 84)   // 2.4: he waits it out with you
                             Text("Urges peak and fade on their own, usually in 10 to 20 minutes. All you have to do is nothing.")
                                 .font(.body)
                                 .foregroundStyle(.secondary)
@@ -162,7 +161,7 @@ struct UrgeView: View {
                         }
                     } else {
                         VStack(spacing: 14) {
-                            PawlMascot(pose: .resisted, size: 110)   // 2.4: the swipe. You batted it away.
+                            PawlStateGlyph(symbol: "checkmark.seal.fill", size: 64, color: PawlColor.cleanText)
                             Text("Ten minutes. You stayed.")
                                 .font(.system(.title2, design: .rounded).weight(.bold))
                                 .foregroundStyle(PawlColor.cleanText)

@@ -249,7 +249,7 @@ struct AllyJoinView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                PawlMascot(pose: .idle, size: 96)
+                PawlLogoTile(size: 72)
                 Text("\(ownerName) asked you to be their Pawl ally")
                     .font(.system(.title2, design: .rounded).weight(.bold))
                     .multilineTextAlignment(.center)
@@ -359,7 +359,7 @@ struct AllyView: View {
 
     private func header(_ role: AllyRole) -> some View {
         VStack(spacing: 8) {
-            PawlMascot(pose: request != nil ? .waiting : (answered == false ? .resisted : .idle), size: 96)
+            PawlStateGlyph(symbol: request != nil ? "hourglass" : "person.2.fill", size: 48)
             Text("You're \(role.ownerName)'s ally")
                 .font(.system(.title2, design: .rounded).weight(.bold))
             Text("When \(role.ownerName) asks, it shows here. Approve starts their wait, the same as their key would. Not now leaves things as they are.")
@@ -461,7 +461,7 @@ struct AllyWaitSheet: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            PawlMascot(pose: .waiting, size: 110)
+            PawlStateGlyph(symbol: "hourglass", size: 56)
             Text("Asking \(wait.name)")
                 .font(.system(.title2, design: .rounded).weight(.bold))
             Text("Nothing changes until \(wait.name) says yes. You can also use your key instead.")

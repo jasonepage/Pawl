@@ -61,8 +61,11 @@ a time; each step is listed here when it lands.
 - The Unlock tab shows your wait and open time as two big numbers under the status card while
   apps are blocked ("15 min wait", "30 min open", or "Until I lock it"). Tap the card to change
   them; it opens the same Unlock timing screen as Settings, with the same rules.
-- New app icon: a green security key with a paw print. The same logo now sits in the Settings
-  header in place of the brass cat key, and nothing sits over the streak ring on Home. The key is the product.
+- New app icon: a green security key with a paw print, with dark and tinted variants. The
+  same icon sits in the Settings header, and nothing sits over the streak ring on Home.
+- The 2.4 drawn mascot (the brass key with cat ears) is gone from the app, the website, the
+  favicon, the link preview image and the repo. The locked and no-key states on the Unlock tab
+  use the new painted art; every other state shows one plain symbol until it has its own art. The key is the product.
 
 ## 2.4 (in progress)
 

@@ -216,3 +216,19 @@ struct PawlLogoTile: View {
             .accessibilityHidden(true)
     }
 }
+
+
+/// 2.5: a plain state glyph where the old drawn mascot used to sit. The painted art from
+/// design/fido-first covers the locked and no-key states; every other state gets one symbol.
+struct PawlStateGlyph: View {
+    let symbol: String
+    var size: CGFloat = 56
+    var color: Color = PawlColor.brand
+    var body: some View {
+        Image(systemName: symbol)
+            .font(.system(size: size, weight: .semibold))
+            .foregroundStyle(color)
+            .frame(height: size * 1.4)
+            .accessibilityHidden(true)
+    }
+}
