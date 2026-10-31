@@ -176,10 +176,11 @@ final class AppModel {
         // "onboarded" flag went missing), setup may only ADD protection: keep every block that
         // was on, keep the existing commitment and its durations and streak (HC-4).
         let existing: Commitment?
+        let existingSnapshot = try? await repo.loadActiveCommitment()
         if let active = activeCommitment {
             existing = active
         } else {
-            existing = (try? await repo.loadActiveCommitment())?.commitment
+            existing = existingSnapshot?.commitment
         }
         let previous = SharedState.loadSelection()
         var selection = selection
@@ -200,7 +201,11 @@ final class AppModel {
             selectionTokenData: try? JSONEncoder().encode(selection),
             updatedAt: now
         )
-        try? await repo.save(CommitmentSnapshot(commitment: commitment, blockSet: blockSet, keyPairing: nil))
+        // 2.5: keep the pairing day if there is one; set it now if a key was paired during setup
+        // (the streak counts from it, and an instant first pair is only allowed before it exists).
+        let keyPairing = existingSnapshot?.keyPairing
+            ?? (keyStore.load() != nil ? KeyPairing(commitmentID: commitment.id, tagUID: "", pairedAt: now) : nil)
+        try? await repo.save(CommitmentSnapshot(commitment: commitment, blockSet: blockSet, keyPairing: keyPairing))
 
         OnboardingFlag.setRole(.blocker)
         role = .blocker

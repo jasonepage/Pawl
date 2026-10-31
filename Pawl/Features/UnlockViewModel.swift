@@ -43,6 +43,9 @@ public final class UnlockViewModel {
     // The active commitment is read fresh at each unlock, so a duration change takes effect
     // without rebuilding the view.
     private let commitmentProvider: () -> Commitment?
+    /// 2.5: the iCloud snapshot, read at pairing to tell "never had a key" from "had one, this
+    /// phone lost it", and written once so the streak knows the pairing day.
+    private let repo: CommitmentRepository = CloudCommitmentRepository()
 
     public init(shield: ShieldService,
                 selection: FamilyActivitySelection,
@@ -85,14 +88,19 @@ public final class UnlockViewModel {
             let newKey = try await security.pairNewKey(displayName: "Pawl key")
             let encoded = newKey.credentialID.base64EncodedString()
 
-            // A first pairing is free only when nothing is being protected yet. With an active
-            // commitment and no key (new phone, the key did not transfer), it waits like a re-pair.
-            if pairing == .unpaired && commitmentProvider() == nil {
+            // 2.5: a first pairing is free when this commitment has never had a key, even with
+            // blocks already on: there was no escrow to get around, and the person is stuck
+            // otherwise. The snapshot in iCloud remembers the first pairing, so a phone with
+            // blocks synced but no key (new phone, the Keychain does not sync) still waits like a
+            // re-pair. That is the one case where an instant pair would be a way around the key.
+            let everPaired = (try? await repo.loadActiveCommitment())?.keyPairing != nil
+            if pairing == .unpaired && !everPaired {
                 guard keyStore.save(newKey) else {
                     message = "Couldn't save the key. Nothing changed. Try again."
                     return
                 }
                 pairedCredential = encoded
+                await recordFirstPairing()
                 message = "Paired ✓ Now lock the key away: give it to an ally or a timebox, out of reach."
             } else {
                 // 2.4: a new key always waits at least the default 15 minutes, even with "No
@@ -367,5 +375,16 @@ public final class UnlockViewModel {
         pendingKeyEndsAt = nil
         keyTimerTask?.cancel(); keyTimerTask = nil
         message = "Your new key is now active. Lock it away, out of reach."
+        Task { await recordFirstPairing() }
+    }
+
+    /// 2.5: note the day a key was first paired in the iCloud snapshot. The streak and the week
+    /// card count from here (2.4 read this but nothing wrote it, so the home count stayed at 0).
+    /// Written once; a re-pair keeps the original day. No credential goes to iCloud: the
+    /// credential ID stays in the Keychain on this phone, as the README says.
+    private func recordFirstPairing() async {
+        guard var snap = try? await repo.loadActiveCommitment(), snap.keyPairing == nil else { return }
+        snap.keyPairing = KeyPairing(commitmentID: snap.commitment.id, tagUID: "", pairedAt: Date())
+        try? await repo.save(snap)
     }
 }

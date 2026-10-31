@@ -29,6 +29,13 @@ a time; each step is listed here when it lands.
   `Pawl/Services/AllyStore.swift` keeps the ally's public key on the owner's phone and the
   Secure Enclave signing key on the ally's phone, in the Keychain, this device only. Needs the
   Xcode capabilities in `docs/20_Ally_Xcode_Checklist.md`. Not wired to any screen yet.
+- Pairing your first key is instant, even if blocks are already on. It used to wait 15 minutes
+  whenever a commitment existed. The wait stays for a phone where blocks synced from iCloud but
+  the key did not (a new phone), because an instant pair there would be a way around the key.
+- Fix: the streak now really starts the day you pair a key. 2.4 read the pairing day from
+  iCloud but nothing ever wrote it, so Home kept saying 0 days and "your count starts the day
+  you pair a key" after pairing. The day is written at the first pairing (and once, at the end
+  of setup, if a key was paired during it). A re-pair keeps the original day.
 - Security fix: a looser unlock timing (a shorter wait, a longer open time, No wait, Until I
   lock it) now needs your key first, then the current wait, like every other change that blocks
   less. Before this, only the wait applied, so No wait could be set from Settings without the

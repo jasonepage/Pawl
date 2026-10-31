@@ -119,6 +119,12 @@ struct UnlockView: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 50, weight: .semibold))
                 .foregroundStyle(heroFg)
+        } else if usesNoKeyArtwork {
+            Image("PawlUnlockNoKey")
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: 210, maxHeight: 130)
+                .accessibilityHidden(true)
         } else if usesLockedArtwork {
             PawlLockedArtwork()
         } else {
@@ -296,6 +302,16 @@ struct UnlockView: View {
     /// in the no-key state or while Screen Time protection is unavailable.
     private var usesLockedArtwork: Bool {
         isLocked && vm.isPaired && !showScreenTimeOff
+    }
+
+    /// Setup and registration show the real product category instead of the retired
+    /// antique cat-key silhouette. The art contains no state or action of its own.
+    private var usesNoKeyArtwork: Bool {
+        guard !vm.isPaired && !showScreenTimeOff else { return false }
+        switch vm.state {
+        case .locked, .reading: return true
+        case .awaitingAlly, .coolingOff, .unshielded: return false
+        }
     }
 
     /// Only the locked state claims apps are blocked, so that is the only state to correct.

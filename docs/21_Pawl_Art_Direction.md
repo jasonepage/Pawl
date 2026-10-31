@@ -223,6 +223,10 @@ The unlock action lives only in this tab and should use the shipping label
 The first cat-heavy frame at `design/pawl-cat-v3/styleframes/unlock-locked.png` is an
 archived composition study, not a production reference.
 
+When no key is paired, use `design/fido-first/unlock-art/no-key-v1.png`: one modern
+generic USB-C/FIDO2 key on its own. Do not fall back to the antique cat-key outline or
+introduce a mascot before the hardware mechanism is understood.
+
 ### Cooling off
 
 The timer is the hero. The verified-key step and the remaining wait should be

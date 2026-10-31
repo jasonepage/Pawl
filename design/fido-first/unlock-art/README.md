@@ -39,3 +39,19 @@ source remains transparent and is supplied at 1x, 2x, and 3x in
 Do not reuse this painting for no-key, checking, cooling-off, or open states: the cat
 guarding a key specifically communicates that a physical key is paired and access is
 currently blocked.
+
+## No-key / setup artwork
+
+`no-key-v1.png` replaces the retired dashed antique cat-key silhouette in the unpaired
+and registration states. It shows one generic modern USB-C/FIDO2 key, with no cat or
+companion behavior. The source is a 1536 × 1024 transparent PNG; the asset catalog
+contains 1x, 2x, and 3x versions in `PawlUnlockNoKey.imageset`.
+
+Built-in image generation, `stylized-concept` use case:
+
+> Create a compact transparent in-app illustration of one generic modern USB-C/FIDO2
+> security key waiting to be paired. Match the warm hand-painted editorial style of the
+> approved locked-state art. Preserve the forest-green body, visible silver USB-C plug,
+> warm-ivory capacitive touch target with a subtle four-toe paw mark, and keyring hole.
+> Use a calm three-quarter top view and a subtle broken ivory setup halo. No text, UI,
+> cat, face, antique key, lock, shield, phone, hand, cable, logo, or extra object.
