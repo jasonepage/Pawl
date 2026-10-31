@@ -21,6 +21,14 @@ a time; each step is listed here when it lands.
   against the ally's saved public key and refuses a wrong request, a late answer, a flipped
   answer, a stretched expiry, a wrong key or a replay. Fourteen tests in
   `PawlTests/AllyDecisionVerifierTests.swift` with made-up keys. Still no iCloud code.
+- Step 2, the iCloud layer. `Pawl/Services/AllyCloud.swift` makes the owner's private `Ally`
+  zone, a share for the whole zone (the invite link), and the three records: `allyLink`,
+  `request` and `decision`, each with a fixed name so nothing needs a query. The owner's
+  phone checks that `allyLink` was written by someone the share was sent to and not by the
+  owner's own Apple Account. Removing an ally deletes the zone, instantly.
+  `Pawl/Services/AllyStore.swift` keeps the ally's public key on the owner's phone and the
+  Secure Enclave signing key on the ally's phone, in the Keychain, this device only. Needs the
+  Xcode capabilities in `docs/20_Ally_Xcode_Checklist.md`. Not wired to any screen yet.
 - The Settings tab header shows Pawl, like the app icon, instead of the old shield drawing.
 
 ## 2.4 (in progress)

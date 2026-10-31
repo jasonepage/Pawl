@@ -20,4 +20,9 @@ public enum PawlConfig {
     // `nonisolated` so it can be read from any context (e.g. as a default argument),
     // not just the main actor under the project's main-actor-by-default mode.
     public nonisolated static let relyingPartyID = "getpawl.com"
+
+    /// 2.5: the iCloud container that holds the ally zone (docs/18 section 4.9). Must match the
+    /// container ticked under Signing & Capabilities, iCloud, CloudKit. Only the app target
+    /// has it; the three extensions never touch iCloud.
+    public nonisolated static let cloudKitContainer = "iCloud.io.github.jasonepage.Pawl"
 }
