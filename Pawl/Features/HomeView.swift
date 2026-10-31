@@ -233,6 +233,13 @@ struct HomeView: View {
                            startPoint: .top, endPoint: .bottom),
             ignoresSafeAreaEdges: []
         )
+        .overlay(alignment: .topTrailing) {
+            if !screenTimeOff && !needsKey {
+                PawlHomeCameo(size: 58)
+                    .padding(.top, 16)
+                    .padding(.trailing, 16)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityHeroLabel)

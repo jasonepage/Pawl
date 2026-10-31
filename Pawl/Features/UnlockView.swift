@@ -103,7 +103,7 @@ struct UnlockView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, usesLockedArtwork ? 28 : 40)
+        .padding(.vertical, usesIllustration ? 28 : 40)
         .padding(.horizontal, 20)
         .background(heroBg)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
@@ -119,6 +119,8 @@ struct UnlockView: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 50, weight: .semibold))
                 .foregroundStyle(heroFg)
+        } else if isReading {
+            PawlReadingArtwork()
         } else if usesNoKeyArtwork {
             Image("PawlUnlockNoKey")
                 .resizable()
@@ -127,6 +129,8 @@ struct UnlockView: View {
                 .accessibilityHidden(true)
         } else if usesLockedArtwork {
             PawlLockedArtwork()
+        } else if isUnshielded {
+            PawlOpenArtwork()
         } else {
             PawlStateGlyph(symbol: stateSymbol, color: heroFg)
         }
@@ -308,6 +312,16 @@ struct UnlockView: View {
         return false
     }
 
+    private var isReading: Bool {
+        if case .reading = vm.state { return true }
+        return false
+    }
+
+    private var isUnshielded: Bool {
+        if case .unshielded = vm.state { return true }
+        return false
+    }
+
     /// The painting shows Pawl guarding a paired physical key, so it would be misleading
     /// in the no-key state or while Screen Time protection is unavailable.
     private var usesLockedArtwork: Bool {
@@ -321,6 +335,15 @@ struct UnlockView: View {
         switch vm.state {
         case .locked, .reading: return true
         case .awaitingAlly, .coolingOff, .unshielded: return false
+        }
+    }
+
+    private var usesIllustration: Bool {
+        guard !showScreenTimeOff else { return false }
+        if usesLockedArtwork || usesNoKeyArtwork { return true }
+        switch vm.state {
+        case .reading, .unshielded: return true
+        case .locked, .awaitingAlly, .coolingOff: return false
         }
     }
 

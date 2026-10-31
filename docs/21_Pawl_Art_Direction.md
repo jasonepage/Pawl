@@ -210,6 +210,10 @@ The streak or current progress is the visual hero. Pawl is optional, not a persi
 pet. `I'm tempted` is warm and easy to find without reading as a destructive or
 emergency action. No unlock action appears here.
 
+The protected-state Home card may show the 58-point `PawlHomeCameo` in unused corner
+space. It blinks rarely, takes no input, disappears when protection is off or no key is
+paired, and never enters the progress ring.
+
 The first cat-heavy style frame is archived at
 `design/pawl-cat-v3/styleframes/home.png`; it is not a production reference.
 
@@ -240,6 +244,9 @@ archived composition study, not a production reference.
 
 The timer remains the hero. The green returns, but the screen is controlled rather than
 celebratory. `Lock now` is the sole primary action. Character art is optional.
+
+The approved optional art is `design/fido-first/unlock-art/open-v1.png`, paired with the
+aligned blink frame. The blink is rare and decorative; the modern FIDO2 key remains visible.
 
 The first cat-heavy frame at `design/pawl-cat-v3/styleframes/unlock-open.png` is an
 archived composition study, not a production reference.

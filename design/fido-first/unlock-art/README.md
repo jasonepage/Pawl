@@ -55,3 +55,43 @@ Built-in image generation, `stylized-concept` use case:
 > warm-ivory capacitive touch target with a subtle four-toe paw mark, and keyring hole.
 > Use a calm three-quarter top view and a subtle broken ivory setup halo. No text, UI,
 > cat, face, antique key, lock, shield, phone, hand, cable, logo, or extra object.
+
+## Checking artwork
+
+`reading-v1.png` shows the approved modern FIDO2 key approaching a generic phone. The
+painting is still; `PawlReadingArtwork` supplies three restrained native SwiftUI signal
+rings in the gap between devices. Reduce Motion removes the signal loop.
+
+Built-in image generation, `stylized-concept` use case:
+
+> Create a compact transparent illustration of a generic phone checking the approved
+> forest-green USB-C/FIDO2 key. Keep the phone secondary and leave a clean gap for native
+> animated read waves. Match the approved warm hand-painted editorial art. No cat, text,
+> UI, antique key, hand, cable, baked-in waves, logo, or extra object.
+
+## Apps-open artwork
+
+`open-v1.png` and `open-blink-v1.png` are aligned frames for the unshielded state. Pawl
+is awake beside the modern key and gives a rare natural blink. The key stays visible,
+there is no tap response, and Reduce Motion holds the base frame.
+
+Built-in image generation, `stylized-concept` plus `precise-object-edit`:
+
+> Create a compact transparent horizontal illustration of the same mature tabby awake
+> and calm beside the approved modern FIDO2 key. Keep the key prominent and both eyes
+> open in the base frame. Then change only both eyes into a calm closed blink, preserving
+> the exact canvas, pose, markings, key, lighting, and alignment.
+
+## Home cameo
+
+`home-cameo-v1.png` and `home-cameo-blink-v1.png` are a tiny protected-state cameo,
+not a new hero. `PawlHomeCameo` places it in unused card space at 58 points and performs
+one slow blink about every five seconds. It is hidden when protection is off or no key is
+paired, and Reduce Motion holds the open-eye frame.
+
+Built-in image generation, `stylized-concept` plus `precise-object-edit`:
+
+> Create a near-square transparent head-and-paws cutout of the mature tabby quietly
+> peeking over a card edge, both heavy-lidded olive eyes open, recognizable at 44–64
+> points. Then change only both eyes into a natural closed blink while preserving exact
+> alignment, anatomy, markings, whiskers, paws, color, and texture.
