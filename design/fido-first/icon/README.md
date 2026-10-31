@@ -1,12 +1,16 @@
 # App icon candidate 1
 
-Status: visual direction approved on 2026-10-31. Not wired into the app asset catalog
-until matching dark and tinted variants are approved.
+Status: implemented in the app asset catalog on 2026-10-31, with intentional light,
+dark, and tinted variants.
 
 Files:
 
 - `app-icon-candidate-v1-source.png`: original 1254 px built-in image-generation output.
-- `app-icon-candidate-v1.png`: 1024 px iOS app-icon candidate.
+- `app-icon-candidate-v1.png`: 1024 px light/default iOS app icon.
+- `app-icon-dark-v1-source.png`: original dark-appearance generation output.
+- `app-icon-dark-v1.png`: 1024 px dark-appearance iOS app icon.
+- `app-icon-tinted-v1-source.png`: original monochrome/tinted generation output.
+- `app-icon-tinted-v1.png`: 1024 px tinted iOS app icon.
 
 ## Direction
 
@@ -34,9 +38,8 @@ Built-in image generation, `logo-brand` use case:
 > antique key, gold, lock, shield, phone, hand, cable, NFC waves, watermark, or copied
 > commercial enclosure.
 
-## Before shipping
+## Shipping checks
 
 - Test against real home-screen backgrounds and all required icon masks.
 - Confirm the touch target and USB-C connector survive at 40–60 px.
-- Produce intentional dark and tinted iOS 18 variants; do not derive them blindly.
 - Run trademark/product-shape review before release.

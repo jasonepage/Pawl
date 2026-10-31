@@ -1,6 +1,6 @@
 # Unlock-screen 2D art
 
-Status: visual candidate, not wired into the app.
+Status: implemented on 2026-10-31 for the paired-and-locked Unlock state.
 
 `locked-v1.png` revives the warm 2D editorial style from
 `design/pawl-cat-v3/references/pawl-direction-board.png` without reviving its cat-first
@@ -27,5 +27,10 @@ Built-in image generation, `stylized-concept` use case:
 > texture, and a clear small-size silhouette. No antique key, panel, scenery, text,
 > phone, hand, accessories, pet UI, or extra symbols.
 
-Before implementation, validate the asset on both light and dark card surfaces and crop
-transparent padding without clipping whiskers.
+The shipping asset uses a dedicated dark hardware surface in both appearances. The
+source remains transparent and is supplied at 1x, 2x, and 3x in
+`Pawl/Assets.xcassets/PawlUnlockLocked.imageset`.
+
+Do not reuse this painting for no-key, checking, cooling-off, or open states: the cat
+guarding a key specifically communicates that a physical key is paired and access is
+currently blocked.

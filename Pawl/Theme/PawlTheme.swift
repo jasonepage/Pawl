@@ -35,6 +35,11 @@ public enum PawlColor {
     public static let urgeBg    = adaptive(light: 0xFAE2B5, dark: 0x4A2A05)
     public static let urgeText  = adaptive(light: 0x633806, dark: 0xFAC775)
 
+    // Physical-key art surface. Intentionally dark in both appearances so the locked
+    // illustration stays calm and legible without maintaining two painted variants.
+    public static let hardwareBg   = adaptive(light: 0x17301A, dark: 0x0D160D)
+    public static let hardwareText = adaptive(light: 0xF4EBCF, dark: 0xF4EBCF)
+
     // Relapse (red): reserved, never used for anything positive.
     public static let dangerText = adaptive(light: 0xA32D2D, dark: 0xF09595)
 

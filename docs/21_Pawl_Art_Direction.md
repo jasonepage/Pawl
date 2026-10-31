@@ -2,15 +2,18 @@
 
 Status: security-key-first correction, 2026-10-31. The initial real-cat exploration
 drifted too close to a customizable pet product. Pawl does not promise a pet feature.
-This direction does not yet replace shipping assets or `PawlMascot` in code.
+The first production pass now replaces the app icon and the paired-and-locked Unlock
+artwork. Other state artwork remains unchanged until each state has an approved asset.
 
 Approved security-key-first icon direction:
-`design/fido-first/icon/app-icon-candidate-v1.png`. It is not yet connected to the app
-asset catalog; matching dark and tinted variants must be approved first.
+`design/fido-first/icon/app-icon-candidate-v1.png`. Light, dark, and tinted variants are
+connected to `Pawl/Assets.xcassets/AppIcon.appiconset`.
 
 The original 2D cat art style remains approved for restrained in-app illustration. The
 first corrected Unlock asset is `design/fido-first/unlock-art/locked-v1.png`: the cat is
-supporting art and guards the modern generic FIDO2 key rather than an antique key.
+supporting art and guards the modern generic FIDO2 key rather than an antique key. It
+ships only in the paired-and-locked state; no-key, checking, cooling-off, and open keep
+their existing state-specific presentation.
 
 `design/pawl-cat-v3/character/model-sheet-v1.png` remains an approved character
 reference, not a production gate. Do not derive a six-pose pet system from it unless an

@@ -64,14 +64,7 @@ struct UnlockView: View {
 
     private var statusHero: some View {
         VStack(spacing: 10) {
-            if showScreenTimeOff {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 50, weight: .semibold))
-                    .foregroundStyle(heroFg)
-            } else {
-                // 2.4: Pawl, the old cat key. His pose follows the state; tap him and he swipes.
-                PawlMascot(pose: PawlMascot.pose(for: vm.state, isPaired: vm.isPaired))
-            }
+            statusArtwork
             Text(heroTitle)
                 .font(.system(.largeTitle, design: .rounded).weight(.bold))
                 .foregroundStyle(heroFg)
@@ -101,11 +94,31 @@ struct UnlockView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 40)
+        .padding(.vertical, usesLockedArtwork ? 28 : 40)
         .padding(.horizontal, 20)
         .background(heroBg)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .accessibilityElement(children: .combine)
+    }
+
+    /// The first security-key-first art pass is deliberately narrow: paired + locked only.
+    /// Every other state keeps the existing animated mascot until it has an approved asset,
+    /// so presentation work cannot accidentally blur the unlock state machine.
+    @ViewBuilder
+    private var statusArtwork: some View {
+        if showScreenTimeOff {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 50, weight: .semibold))
+                .foregroundStyle(heroFg)
+        } else if usesLockedArtwork {
+            Image("PawlUnlockLocked")
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: 250, maxHeight: 150)
+                .accessibilityHidden(true)
+        } else {
+            PawlMascot(pose: PawlMascot.pose(for: vm.state, isPaired: vm.isPaired))
+        }
     }
 
     // MARK: - Primary action (one clear thing to do, per state)
@@ -229,13 +242,19 @@ struct UnlockView: View {
         return false
     }
 
+    /// The painting shows Pawl guarding a paired physical key, so it would be misleading
+    /// in the no-key state or while Screen Time protection is unavailable.
+    private var usesLockedArtwork: Bool {
+        isLocked && vm.isPaired && !showScreenTimeOff
+    }
+
     /// Only the locked state claims apps are blocked, so that is the only state to correct.
     private var showScreenTimeOff: Bool { screenTimeOff && isLocked }
 
     private var heroBg: Color {
         if showScreenTimeOff { return PawlColor.dangerText.opacity(0.15) }
         switch vm.state {
-        case .locked: return vm.isPaired ? PawlColor.cleanBg : PawlColor.cardBg
+        case .locked: return vm.isPaired ? PawlColor.hardwareBg : PawlColor.cardBg
         case .reading, .awaitingAlly: return PawlColor.cardBg
         case .coolingOff, .unshielded: return PawlColor.urgeBg
         }
@@ -244,7 +263,7 @@ struct UnlockView: View {
     private var heroFg: Color {
         if showScreenTimeOff { return PawlColor.dangerText }
         switch vm.state {
-        case .locked: return vm.isPaired ? PawlColor.cleanText : .primary
+        case .locked: return vm.isPaired ? PawlColor.hardwareText : .primary
         case .reading, .awaitingAlly: return .primary
         case .coolingOff, .unshielded: return PawlColor.urgeText
         }
