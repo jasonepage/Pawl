@@ -15,6 +15,12 @@ a time; each step is listed here when it lands.
   `PawlTests/AllyUnlockMachineTests.swift`; the nine original loop tests are unchanged. The
   Unlock screen shows a plain "Asking your ally" state with a cancel button so the new state is
   never blank, and Pawl waits in that state. No iCloud code yet.
+- Step 1, the signature check. `Pawl/Domain/AllyDecisionVerifier.swift` defines the `Request`
+  and `Decision` shapes and the exact bytes the ally's phone signs: a fixed label, the request
+  id, a random nonce, the answer, and the expiry. The owner's phone checks the ES256 signature
+  against the ally's saved public key and refuses a wrong request, a late answer, a flipped
+  answer, a stretched expiry, a wrong key or a replay. Fourteen tests in
+  `PawlTests/AllyDecisionVerifierTests.swift` with made-up keys. Still no iCloud code.
 - The Settings tab header shows Pawl, like the app icon, instead of the old shield drawing.
 
 ## 2.4 (in progress)
