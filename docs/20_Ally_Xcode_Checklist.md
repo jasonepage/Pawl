@@ -9,7 +9,7 @@ Project navigator, click the blue Pawl project, pick the Pawl target.
 
 1. Find the **iCloud** box that is already there (it has Key-value storage ticked).
    - Tick **CloudKit**.
-   - Under **Containers**, press **+** and type exactly: `iCloud.io.github.jasonepage.Pawl`
+   - Under **Containers**, press **+** and type exactly: `iCloud.io.github.jasonepage.PawlAlly`
    - Make sure its checkbox is ticked. Leave Key-value storage ticked.
 2. Press **+ Capability** (top left), add **Push Notifications**. There is nothing to fill in.
 3. Press **+ Capability**, add **Background Modes**. Tick **Remote notifications** only.

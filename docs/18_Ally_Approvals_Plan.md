@@ -171,7 +171,7 @@ valid signed yes. Everything after that (the pending change and its wait) is unc
 ### 4.9 Xcode changes
 
 - iCloud capability: add the CloudKit service and a container, for example
-  `iCloud.io.github.jasonepage.Pawl`. Today the entitlement lists no containers and only
+  `iCloud.io.github.jasonepage.PawlAlly`. Today the entitlement lists no containers and only
   uses iCloud key-value storage.
 - Push Notifications capability (`aps-environment`).
 - Background Modes: Remote notifications.
