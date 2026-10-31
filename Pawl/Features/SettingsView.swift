@@ -181,6 +181,12 @@ struct SettingsView: View {
                                                          openSeconds: model.graceSeconds))
             }
             NavigationLink {
+                AllyPage(model: model, onShowPaywall: { showPaywall = true })
+            } label: {
+                SettingsRows.detail("person.2.fill", .indigo, "Ally",
+                                    allyLine, value: (!hasPro && model.allyPairing == nil) ? "Pro" : nil)
+            }
+            NavigationLink {
                 HardLockView(onAttest: { model.attestHardLock() },
                              onReset: { model.resetHardLock() },
                              alreadyAttested: model.hardLockAttested,
@@ -204,7 +210,7 @@ struct SettingsView: View {
                 showPaywall = true
             } label: {
                 SettingsRows.detail("star.fill", .yellow, "Pawl Pro",
-                                    hasPro ? "Active" : "Scheduled sets and the weekly report")
+                                    hasPro ? "Active" : "Ally approvals, scheduled sets and the weekly report")
             }
             NavigationLink {
                 ProtectionInfoView(showGamblingHelp: model.showGamblingHelp)
@@ -219,6 +225,13 @@ struct SettingsView: View {
         } footer: {
             Text(versionLine)
         }
+    }
+
+    /// 2.5: one line for the Ally row.
+    private var allyLine: String {
+        if let p = model.allyPairing { return "\(p.name) can say yes from their phone." }
+        if let pending = model.pendingAlly { return "\(pending.name) becomes your ally soon." }
+        return "Someone you trust can say yes from their phone."
     }
 
     private var versionLine: String {

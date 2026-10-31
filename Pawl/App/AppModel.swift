@@ -15,6 +15,7 @@ import Foundation
 import FamilyControls
 import ManagedSettings
 import DeviceActivity
+import UIKit
 
 /// Who this person is using Pawl as. 2.3: the approver-only role (someone who only approved
 /// another person's unlocks) was removed with the ally feature, so blocker is the only role.
@@ -106,6 +107,15 @@ final class AppModel {
         }
         pendingDurationsCtl.apply = { [weak self] pair in
             await self?.applyDurations(cooldown: pair.cooldown, grace: pair.grace)
+        }
+        // 2.5: adding an ally is a loosening. After the key tap and the wait, this makes it real.
+        pendingAllyCtl.apply = { [weak self] pairing in
+            guard let self else { return }
+            AllyStore.shared.savePairing(pairing)
+            self.allyPairing = pairing
+            try? await AllyCloud.shared.subscribeOwner()
+            UIApplication.shared.registerForRemoteNotifications()
+            self.blockChangeMessage = "\(pairing.name) is now your ally."
         }
         pendingDomains.apply = { [weak self] domains in
             guard let self else { return }
@@ -252,6 +262,19 @@ final class AppModel {
     /// cooldown; any failure leaves protection in place. Tightening never calls this.
     /// 2.3: the ally approval step that used to follow the key was removed with the backend.
     private func approveLoosening() async -> Bool {
+        // 2.5: with an active ally (and Pro), the person picks: key or ally. The prompt is a
+        // dialog in ContentView; it answers through chooseLoosen. Dismissing it is a no.
+        if let pairing = allyPairing, pro.isPro {
+            loosenPrompt = true
+            let method = await withCheckedContinuation { loosenContinuation = $0 }
+            switch method {
+            case .ally: return await askAllyForLoosening(pairing)
+            case .key: break
+            case nil:
+                blockChangeMessage = "Cancelled. Nothing changed."
+                return false
+            }
+        }
         guard let paired = keyStore.load() else {
             blockChangeMessage = "Pair your key first to reduce protection."
             return false
@@ -546,6 +569,128 @@ final class AppModel {
         scheduledSetStore.save(sets)
         scheduledSets = sets
         if SharedState.phase() == "locked" { shield.apply(selectionStore.load()) }
+    }
+
+    // MARK: - Ally approvals (2.5, docs/18)
+
+    /// The owner's one ally, mirrored from the Keychain so views update. nil: no ally.
+    private(set) var allyPairing: AllyPairing?
+    /// This phone's ally role (it helps someone else). nil: not an ally.
+    private(set) var allyRole: AllyRole?
+    /// An ally waiting out the loosening wait before becoming active.
+    let pendingAllyCtl = PendingChangeController<AllyPairing>(store: PendingChangeStore(name: "pawl.pendingAlly"))
+    var pendingAlly: (name: String, endsAt: Date)? {
+        pendingAllyCtl.pending.map { ($0.payload.name, $0.endsAt) }
+    }
+    /// True when "Ask my ally" should be offered: an ally exists and Pro is active (docs/18 4.8).
+    var canAskAlly: Bool { allyPairing != nil && pro.isPro }
+
+    func loadAlly() {
+        allyPairing = AllyStore.shared.pairing()
+        allyRole = AllyStore.shared.role()
+    }
+
+    func restorePendingAlly() async {
+        loadAlly()
+        await pendingAllyCtl.restore()
+    }
+
+    /// The ally joined and their record checked out. Adding them blocks less, so: key tap, then
+    /// the current wait, then they become active (docs/18 section 4.4).
+    func confirmAlly(_ pairing: AllyPairing) async {
+        pendingAllyCtl.clear()
+        guard await approveLoosening() else { return }
+        let endsAt = Date().addingTimeInterval(cooldownSeconds)
+        pendingAllyCtl.begin(pairing, endsAt: endsAt)
+        blockChangeMessage = cooldownSeconds <= 0 ? "\(pairing.name) is now your ally."
+            : "\(pairing.name) becomes your ally \(DurationText.startsIn(waitSeconds: cooldownSeconds))."
+    }
+
+    /// Removing an ally blocks more: instant, no key. Also drops a pending one. The Keychain
+    /// copy goes first, so no answer can be verified while iCloud catches up.
+    func removeAlly() async {
+        pendingAllyCtl.clear()
+        AllyStore.shared.removePairing()
+        allyPairing = nil
+        await AllyCloud.shared.unsubscribeOwner()
+        try? await AllyCloud.shared.removeAlly()
+        blockChangeMessage = "Ally removed. Your key still works."
+    }
+
+    /// The ally stopped sharing on their side. Same as removing them.
+    func allyLeft() async {
+        await removeAlly()
+        blockChangeMessage = "Your ally left. Your key still works."
+    }
+
+    /// Ally side: stop helping. Instant.
+    func leaveAllyRole() async {
+        guard let role = allyRole else { return }
+        await AllyCloud.shared.unsubscribeAlly()
+        try? await AllyCloud.shared.leave(zone: role.zone)
+        AllyStore.shared.clearRole()
+        allyRole = nil
+    }
+
+    func setAllyRole(_ role: AllyRole) {
+        AllyStore.shared.saveRole(role)
+        allyRole = role
+    }
+
+    enum LoosenMethod { case key, ally }
+    /// True while the "Use my key / Ask my ally" dialog is up. Closing it without a choice is a no.
+    var loosenPrompt = false {
+        didSet { if !loosenPrompt, let c = loosenContinuation { loosenContinuation = nil; c.resume(returning: nil) } }
+    }
+    @ObservationIgnored private var loosenContinuation: CheckedContinuation<LoosenMethod?, Never>?
+
+    func chooseLoosen(_ method: LoosenMethod) {
+        guard let c = loosenContinuation else { return }
+        loosenContinuation = nil
+        loosenPrompt = false
+        c.resume(returning: method)
+    }
+
+    /// Shown as a sheet while a "block less" request is open with the ally.
+    struct AllyWait: Identifiable {
+        let id = UUID()
+        let name: String
+        let expiresAt: Date
+    }
+    var allyWait: AllyWait?
+    @ObservationIgnored private var allyWaitCancelled = false
+    func cancelAllyWait() { allyWaitCancelled = true }
+
+    /// Open a `blockLess` request and wait for a signed yes. Returns true only on a verified
+    /// yes. Everything else (no, bad signature, expiry, cancel, no iCloud) returns false and
+    /// changes nothing. The request is deleted on the way out, whatever happened.
+    private func askAllyForLoosening(_ pairing: AllyPairing) async -> Bool {
+        let request = AllyRequest.make(kind: .blockLess, now: Date())
+        allyWaitCancelled = false
+        allyWait = AllyWait(name: pairing.name, expiresAt: request.expiresAt)
+        defer { allyWait = nil }
+        do { try await AllyCloud.shared.writeRequest(request) } catch {
+            blockChangeMessage = "Couldn't reach iCloud to ask \(pairing.name). Your key still works."
+            return false
+        }
+        defer { Task { try? await AllyCloud.shared.deleteRequest() } }
+        while !allyWaitCancelled, Date() <= request.expiresAt {
+            if let decision = try? await AllyCloud.shared.fetchDecision() {
+                do {
+                    let ok = try AllyDecisionVerifier.verify(decision, against: request,
+                                                             allyPublicKey: pairing.publicKey, now: Date())
+                    if !ok { blockChangeMessage = "\(pairing.name) said not now. Nothing changed." }
+                    return ok
+                } catch {
+                    blockChangeMessage = "That answer didn't check out. Nothing changed."
+                    return false
+                }
+            }
+            try? await Task.sleep(for: .seconds(5))
+        }
+        blockChangeMessage = allyWaitCancelled ? "Cancelled. Nothing changed."
+            : "No answer from \(pairing.name). Nothing changed."
+        return false
     }
 
     // MARK: - Friction customization (cooldown + grace)

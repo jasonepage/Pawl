@@ -73,6 +73,8 @@ struct PaywallView: View {
                 .foregroundStyle(.secondary)
 
             VStack(alignment: .leading, spacing: 12) {
+                proFeature("person.2.fill", "Ally approvals",
+                           "The person who holds your key can say yes from their own phone. Their yes starts the same wait your key does. Only you need Pro.")
                 proFeature("calendar.badge.clock", "Scheduled sets",
                            "Block a different group of apps and sites during the hours you pick, like work hours or late nights.")
                 proFeature("chart.bar.fill", "Weekly report",

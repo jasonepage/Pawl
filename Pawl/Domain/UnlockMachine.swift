@@ -74,7 +74,7 @@ public struct UnlockMachine: Sendable {
 
     /// 2.5: how long a request stays open with the ally (docs/18, D4). After this the
     /// request is gone and nothing changed.
-    public static let allyRequestWindow: TimeInterval = 30 * 60
+    public nonisolated static let allyRequestWindow: TimeInterval = 30 * 60
 
     public init(coolingOff: TimeInterval, grace: TimeInterval) {
         // Enforce the floor and ceiling here too (FR-UNLOCK-004). 2.4: the floor is 0 ("No

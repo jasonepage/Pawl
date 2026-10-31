@@ -50,7 +50,8 @@ public final class AllyCloud {
     static let requestRecordType = "Request", requestRecordName = "request"
     static let decisionRecordType = "Decision", decisionRecordName = "decision"
 
-    private let container: CKContainer
+    /// The container, for the share sheet (CKShareTransferRepresentation needs it).
+    public let container: CKContainer
     private var privateDB: CKDatabase { container.privateCloudDatabase }
     private var sharedDB: CKDatabase { container.sharedCloudDatabase }
 

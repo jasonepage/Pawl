@@ -37,6 +37,16 @@ a time; each step is listed here when it lands.
   If iCloud is unreachable the request is dropped and the screen says the key still works.
   The app delegate registers for pushes only on phones that are part of a pairing. No button
   calls `askAlly` yet; that is step 4.
+- Step 4, the screens. Settings has an Ally page: invite someone with an iCloud share link
+  (Messages, Mail, AirDrop), see when they joined, then "Use my key" to make them your ally
+  after the usual wait. Remove is instant. The Unlock tab gets an "Ask Sam" button next to the
+  key, and an "Asking Sam" state with "Use my key instead" and cancel. Every other change that
+  blocks less (removing an app, turning off a category, removing a site, loosening a set, a
+  looser timing) now asks "Use my key" or "Ask Sam" when an ally is set up, and shows a waiting
+  sheet with a cancel while the request is open. The ally's phone gets a join sheet when the
+  link is opened, and an Ally screen (its own tab, or the whole app if they only help someone):
+  "Jason wants to unlock Pawl." with Approve (Face ID) and Not now, Pawl waiting beside it, and
+  a Stop button. The paywall lists ally approvals first.
 - Pairing your first key is instant, even if blocks are already on. It used to wait 15 minutes
   whenever a commitment existed. The wait stays for a phone where blocks synced from iCloud but
   the key did not (a new phone), because an instant pair there would be a way around the key.

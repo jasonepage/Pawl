@@ -106,7 +106,14 @@ public final class AllyStore {
     /// Throws on phones without a Secure Enclave (the simulator, some iPads), in which case
     /// the person cannot be an ally; the owner's key still works.
     public static func makeSigningKey() throws -> SecureEnclave.P256.Signing.PrivateKey {
-        try SecureEnclave.P256.Signing.PrivateKey()
+        // Every signature asks for Face ID, Touch ID or the passcode (docs/18 section 1: "taps
+        // Approve, then confirms with Face ID"). A phone left on a table cannot say yes.
+        var error: Unmanaged<CFError>?
+        guard let access = SecAccessControlCreateWithFlags(nil, kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+                                                           [.privateKeyUsage, .userPresence], &error) else {
+            throw error?.takeRetainedValue() ?? CocoaError(.coderInvalidValue)
+        }
+        return try SecureEnclave.P256.Signing.PrivateKey(accessControl: access)
     }
 
     /// Reopen the saved signing key for one signature.

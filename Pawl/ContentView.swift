@@ -11,10 +11,11 @@
 //
 
 import SwiftUI
+import CloudKit
 
 /// The main tabs, tagged so one tab can programmatically switch to another
 /// (e.g. the Home "pair your key" nudge jumps to Unlock).
-enum AppTab: Hashable { case home, unlock, settings }
+enum AppTab: Hashable { case home, unlock, ally, settings }
 
 struct ContentView: View {
     @State private var model = AppModel()
@@ -27,16 +28,41 @@ struct ContentView: View {
     /// HomeView that is not on screen could consume the flag where nobody could see it,
     /// which is why the handoff only worked sometimes.
     @State private var pendingUrge = false
+    /// 2.5: an ally invite link was opened; shows the join sheet.
+    @State private var allyInvite: AllyInviteItem?
+    /// 2.5: an ally-only phone chose to set up blocking for itself too.
+    @State private var wantsOwnSetup = false
 
     var body: some View {
         Group {
             if model.didOnboard {
                 mainTabs
+            } else if model.allyRole != nil, !wantsOwnSetup {
+                // 2.5: this phone only helps someone else. No blocking, no setup, just the ally screen.
+                AllyView(model: model, onSetUpOwn: { wantsOwnSetup = true })
             } else {
                 OnboardingView(model: model)
             }
         }
         .tint(PawlColor.brand)
+        // 2.5: ally approvals. The invite sheet, the "key or ally" choice on a loosening, and the
+        // waiting sheet while a "block less" request is open.
+        .onReceive(NotificationCenter.default.publisher(for: .pawlAllyInvite)) { n in
+            if let metadata = n.object as? CKShare.Metadata { allyInvite = AllyInviteItem(metadata: metadata) }
+        }
+        .sheet(item: $allyInvite) { item in
+            AllyJoinView(model: model, metadata: item.metadata)
+        }
+        .confirmationDialog("This blocks less", isPresented: $model.loosenPrompt, titleVisibility: .visible) {
+            Button("Use my key") { model.chooseLoosen(.key) }
+            Button("Ask \(model.allyPairing?.name ?? "my ally")") { model.chooseLoosen(.ally) }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Your key or your ally's yes, then the wait.")
+        }
+        .sheet(item: $model.allyWait) { wait in
+            AllyWaitSheet(wait: wait, onCancel: { model.cancelAllyWait() })
+        }
         .task {
             await RecoveryService.restoreOnLaunch()          // FR-PERSIST-002/003 (local, offline-safe)
             await model.loadCommitment()                     // phone + iCloud (FR-PERSIST-*)
@@ -45,6 +71,7 @@ struct ContentView: View {
             await model.restorePendingCategoryChange()       // resume/commit a gated category turn-off
             await model.restorePendingDomainRemoval()        // 2.2: iCloud mirror + gated typed-site removal
             await model.restorePendingSetsChange()           // 2.2: scheduled sets, their activities, gated edits
+            await model.restorePendingAlly()                 // 2.5: ally pairing, and one waiting to become active
             checkPendingUrge()                               // FR-SHACT-004 pickup on cold launch
         }
         .onChange(of: scenePhase) { _, phase in
@@ -98,6 +125,12 @@ struct ContentView: View {
             )
             .tabItem { Label("Unlock", systemImage: "key.fill") }
             .tag(AppTab.unlock)
+
+            if model.allyRole != nil {
+                AllyView(model: model)
+                    .tabItem { Label("Ally", systemImage: "person.2.fill") }
+                    .tag(AppTab.ally)
+            }
 
             SettingsView(model: model, openBlockedItems: $openBlockedItems,
                          onOpenUnlock: { tab = .unlock })

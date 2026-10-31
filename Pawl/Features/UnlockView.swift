@@ -64,7 +64,7 @@ struct UnlockView: View {
             }
             .background(PawlColor.groupedBg)
             .toolbar(.hidden, for: .navigationBar)
-            .task { vm.syncFromShared() }
+            .task { vm.syncFromShared(); await vm.checkAllyDecision() }
         }
         .tint(PawlColor.brand)
     }
@@ -189,6 +189,12 @@ struct UnlockView: View {
                     Task { await vm.beginUnlock() }
                 }
                 .disabled(vm.isBusy)
+                // 2.5: with an ally and Pro, a second way to start the same wait (docs/18, D1).
+                if let model, model.canAskAlly, let name = vm.allyName {
+                    bigButton("Ask \(name)", "person.2.fill",
+                              bg: PawlColor.cardBg, fg: .primary) { vm.askAlly() }
+                    .disabled(vm.isBusy)
+                }
                 helper(vm.unlockHelpText)   // 2.4: follows the saved wait and open time
             } else {
                 bigButton("Pair your security key", "key.fill",
@@ -203,9 +209,13 @@ struct UnlockView: View {
             helper("Hold your security key to the phone…")
 
         case .awaitingAlly:
-            // 2.5: a request is open with the ally. Apps stay blocked. Step 4 gives this
-            // its own screen; this is the minimum so the state is never blank.
-            helper("Waiting for your ally. Apps stay blocked until they answer.")
+            // 2.5: a request is open with the ally. Apps stay blocked until a yes checks out.
+            helper("\(vm.allyName ?? "Your ally") has been asked. Apps stay blocked until they say yes. Their yes starts the same wait your key starts.")
+            bigButton("Use my key instead", "key.fill",
+                      bg: PawlColor.cleanBg, fg: PawlColor.cleanText) {
+                Task { await vm.beginUnlock() }
+            }
+            .disabled(vm.isBusy)
             bigButton("Cancel: keep apps locked", "lock.fill",
                       bg: PawlColor.cardBg, fg: .primary) { vm.cancel() }
 
@@ -340,7 +350,7 @@ struct UnlockView: View {
         switch vm.state {
         case .locked: return vm.isPaired ? "Apps are blocked" : "Set up your key"
         case .reading: return "Checking your key"
-        case .awaitingAlly: return "Asking your ally"      // 2.5
+        case .awaitingAlly: return "Asking \(vm.allyName ?? "your ally")"      // 2.5
         case .coolingOff: return "Unlocking soon"
         case .unshielded: return "Apps unlocked"
         }

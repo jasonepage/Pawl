@@ -53,6 +53,15 @@ final class PawlAppDelegate: NSObject, UIApplicationDelegate, UNUserNotification
         DispatchQueue.main.asyncAfter(deadline: .now() + 8) { completionHandler(.newData) }
     }
 
+    /// 2.5: an iCloud share link (the ally invite) is handed to the window scene delegate, so
+    /// the app names one. SwiftUI keeps running the window; this class only listens.
+    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession,
+                     options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        let config = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+        config.delegateClass = PawlSceneDelegate.self
+        return config
+    }
+
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         // Nothing to do: the owner polls while the Unlock screen is open, and the ally can
         // always open Pawl and see the request. Pushes are a convenience, never the mechanism.
@@ -63,5 +72,26 @@ final class PawlAppDelegate: NSObject, UIApplicationDelegate, UNUserNotification
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.banner, .list, .sound])
+    }
+}
+
+extension Notification.Name {
+    /// 2.5: the person opened an ally invite link. The object is the CKShare.Metadata.
+    static let pawlAllyInvite = Notification.Name("pawl.ally.invite")
+}
+
+final class PawlSceneDelegate: NSObject, UIWindowSceneDelegate {
+    /// Cold launch from an invite link: the metadata rides in the connection options. Post it a
+    /// moment later so the SwiftUI view that listens exists by then.
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        guard let metadata = connectionOptions.cloudKitShareMetadata else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            NotificationCenter.default.post(name: .pawlAllyInvite, object: metadata)
+        }
+    }
+
+    /// Warm launch from an invite link.
+    func windowScene(_ windowScene: UIWindowScene, userDidAcceptCloudKitShareWith cloudKitShareMetadata: CKShare.Metadata) {
+        NotificationCenter.default.post(name: .pawlAllyInvite, object: cloudKitShareMetadata)
     }
 }
