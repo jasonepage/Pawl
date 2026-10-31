@@ -54,8 +54,8 @@
   .price{margin-top:var(--s-4);font-size:var(--fs-0);color:var(--on-green-muted);max-width:48ch;line-height:1.5}
 
   /* hero icon */
-  .hero-mascot{width:112px;height:112px;margin:0 0 var(--s-3) -22px;transform-origin:50% 100%;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
-  @media(min-width:860px){.hero-mascot{width:128px;height:128px;margin-left:-26px}}
+  .hero-mascot{width:min(300px,70vw);height:auto;margin:0 0 var(--s-3) -10px;transform-origin:50% 100%;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+  @media(min-width:860px){.hero-mascot{width:340px;margin-left:-16px}}
   .hero-mascot.wiggle{animation:mascot-wiggle 1s ease-in-out}
   @keyframes mascot-wiggle{
     0%{transform:none}
@@ -83,10 +83,11 @@
 
   /* how it works */
   .steps{display:grid;grid-template-columns:1fr;gap:var(--s-4);margin-top:var(--s-6)}
-  @media(min-width:760px){.steps{grid-template-columns:repeat(3,1fr)}}
+  @media(min-width:760px){.steps{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1100px){.steps{grid-template-columns:repeat(4,1fr)}}
   .step{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-2);padding:var(--s-5)}
   .step .pic{display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-4)}
-  .step .pic img{width:72px;height:72px;flex:none}
+  .step .pic img{width:96px;height:auto;max-height:72px;object-fit:contain;flex:none}
   .step .n{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--green-500);color:#fff;font-weight:700}
   .step p{margin-top:var(--s-2);font-size:var(--fs-0);color:var(--ink)}
 
@@ -137,7 +138,7 @@
 <header class="hero">
   <div class="wrap">
     <div class="hero-copy">
-      <img id="hero-mascot" class="hero-mascot" src="/img/icon-192.png?v=2" alt="The Pawl app icon: a green security key with a paw print." width="128" height="128">
+      <img id="hero-mascot" class="hero-mascot" src="/img/art/locked.png?v=3" alt="A tabby cat asleep with one paw resting on a green security key." width="900" height="600">
       <span class="kicker"><img src="/img/pawl-mark.png?v=2" alt="" width="22" height="22">Pawl: App Blocker With a Key</span>
       <h1>Block any app. Keep the key out of reach.</h1>
       <p class="sub">Pawl uses Apple Screen Time to block the apps and sites you choose. Nothing on the phone can lift the block. To unblock, you need a physical security key you have left somewhere else, and then a 15 minute wait.</p>
@@ -156,7 +157,7 @@
         </a>
         <a class="gh" href="https://github.com/jasonepage/Pawl">Read the source on GitHub</a>
       </div>
-      <p class="price">Blocking, the key, the wait and your streak are free. Pawl Pro is optional ($3.99 a month or $29.99 a year in the US, with a 7-day free trial on the yearly plan) and adds new scheduled sets and the full weekly report. You need a USB-C security key (FIDO2), sold separately.</p>
+      <p class="price">Blocking, the key, the wait and your streak are free. Pawl Pro is optional ($3.99 a month or $29.99 a year in the US, with a 7-day free trial on the yearly plan) and adds ally approvals (the person holding your key can say yes from their own phone), new scheduled sets and the full weekly report. You need a USB-C security key (FIDO2), sold separately.</p>
     </div>
     <div class="phone-wrap">
       <div class="phone" aria-hidden="false">
@@ -175,19 +176,24 @@
     <p class="lead">Most blockers fail at 1am because you can switch them off with one tap. Pawl moves that decision to a small object you have already put out of reach.</p>
     <div class="steps">
       <div class="step">
-        <div class="pic"><img src="/img/pawl-mark.png?v=2" alt="" aria-hidden="true" width="72" height="72"><span class="n">1</span></div>
+        <div class="pic"><img src="/img/art/no-key.png?v=3" alt="A tabby cat looking at an empty spot where a key should be." width="72" height="48"><span class="n">1</span></div>
         <h3>Pick what to block</h3>
         <p>Choose any apps and sites you keep reaching for: betting, adult sites, social feeds, games, or the one app that eats your evenings. Apple Screen Time does the blocking and shows a calm locked screen with no unlock button.</p>
       </div>
       <div class="step">
-        <div class="pic"><img src="/img/pawl-mark.png?v=2" alt="" aria-hidden="true" width="72" height="72"><span class="n">2</span></div>
+        <div class="pic"><img src="/img/art/reading.png?v=3" alt="A tabby cat watching a green security key being plugged in." width="72" height="48"><span class="n">2</span></div>
         <h3>Put the key somewhere else</h3>
         <p>Unblocking needs a physical USB-C security key. You plug it in once when you set Pawl up, and Pawl remembers that key and only that key. Then leave it at a friend's place, in your car, or anywhere that is not your pocket at 1am.</p>
       </div>
       <div class="step">
-        <div class="pic"><img src="/img/pawl-mark.png?v=2" alt="" aria-hidden="true" width="72" height="72"><span class="n">3</span></div>
+        <div class="pic"><img src="/img/art/open.png?v=3" alt="A tabby cat with its eyes open beside a green security key." width="72" height="48"><span class="n">3</span></div>
         <h3>Wait it out</h3>
         <p>Even with the key in hand, unblocking starts a 15 minute wait. After a short open window (30 minutes by default), the block comes back on by itself.</p>
+      </div>
+      <div class="step">
+        <div class="pic"><img src="/img/icon-192.png?v=2" alt="" aria-hidden="true" width="72" height="72" style="width:72px;border-radius:16px"><span class="n">4</span></div>
+        <h3>Or ask your ally (Pro)</h3>
+        <p>Give the key to someone you trust. With Pawl Pro they can say yes from their own phone instead of handing it over. Their yes starts the same wait. It goes through your own iCloud, not a server, and they never see what you block.</p>
       </div>
     </div>
   </div>

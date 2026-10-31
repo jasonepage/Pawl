@@ -63,6 +63,9 @@ a time, after the rest of 2.4 below.
   them; it opens the same Unlock timing screen as Settings, with the same rules.
 - New app icon: a green security key with a paw print, with dark and tinted variants. The
   same icon sits in the Settings header, and nothing sits over the streak ring on Home.
+- getpawl.com: the hero shows the new painting (the tabby asleep on the key), the how-it-works
+  steps use the state art, and a fourth step explains ally approvals. The Pro line mentions
+  them. The App Store screenshots on the page still show the old mascot until they are retaken.
 - The 2.4 drawn mascot (the brass key with cat ears) is gone from the app, the website, the
   favicon, the link preview image and the repo. The locked and no-key states on the Unlock tab
   use the new painted art; every other state shows one plain symbol until it has its own art. The key is the product.
