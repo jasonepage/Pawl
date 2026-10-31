@@ -111,11 +111,7 @@ struct UnlockView: View {
                 .font(.system(size: 50, weight: .semibold))
                 .foregroundStyle(heroFg)
         } else if usesLockedArtwork {
-            Image("PawlUnlockLocked")
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: 250, maxHeight: 150)
-                .accessibilityHidden(true)
+            PawlLockedArtwork()
         } else {
             PawlMascot(pose: PawlMascot.pose(for: vm.state, isPaired: vm.isPaired))
         }

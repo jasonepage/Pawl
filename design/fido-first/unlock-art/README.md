@@ -2,6 +2,11 @@
 
 Status: implemented on 2026-10-31 for the paired-and-locked Unlock state.
 
+The shipping view adds two restrained, native SwiftUI sleep marks above the still
+painting. They rise briefly, pause for several seconds between loops, do not respond to
+touch, and are removed entirely when Reduce Motion is enabled. The painting and physical
+key do not move.
+
 `locked-v1.png` revives the warm 2D editorial style from
 `design/pawl-cat-v3/references/pawl-direction-board.png` without reviving its cat-first
 product hierarchy or antique key.

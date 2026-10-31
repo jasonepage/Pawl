@@ -250,6 +250,9 @@ Motion explains the mechanism and state, not a pet relationship.
 - Open: one clear state transition, then stillness.
 - Pawl artwork is static by default. A rare blink may remain in the existing code mascot
   during transition, but it is not a promised feature.
+- Paired-and-locked artwork may use a brief, infrequent `zz` overlay. Keep the painted
+  cat and physical key still, provide no tap response, and disable the loop with Reduce
+  Motion.
 - Reduce Motion: every state works fully as a still.
 
 Do not animate the character as a reward loop or imply that tapping, caring for, or
