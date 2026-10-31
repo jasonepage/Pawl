@@ -24,5 +24,5 @@ public enum PawlConfig {
     /// 2.4: the iCloud container that holds the ally zone (docs/18 section 4.9). Must match the
     /// container ticked under Signing & Capabilities, iCloud, CloudKit. Only the app target
     /// has it; the three extensions never touch iCloud.
-    public nonisolated static let cloudKitContainer = "iCloud.io.github.jasonepage.PawlAlly"
+    public nonisolated static let cloudKitContainer = "iCloud.io.github.jasonepage.Pawl"
 }
