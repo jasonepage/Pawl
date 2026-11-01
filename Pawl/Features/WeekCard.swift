@@ -29,6 +29,8 @@ struct WeekCard: View {
     var hoursPerDay: Double = 0
     /// The full report is part of Pawl Pro; the header and day strip are free. Free users see
     /// one small link, not a pitch (2.4).
+    /// 2.4: Home's hero shows the week's numbers, so the card can skip its own tiles.
+    var showTiles: Bool = true
     var isPro: Bool = false
     /// The newest note the person wrote on an urge this week, if any.
     var latestNote: String? = nil
@@ -179,7 +181,7 @@ struct WeekCard: View {
 
     @ViewBuilder
     private var details: some View {
-        if !tiles.isEmpty {
+        if showTiles, !tiles.isEmpty {
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)],
                       alignment: .leading, spacing: 10) {
                 ForEach(tiles) { tile in

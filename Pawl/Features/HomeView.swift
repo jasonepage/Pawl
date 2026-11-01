@@ -56,12 +56,12 @@ struct HomeView: View {
                 VStack(spacing: 16) {
                     if screenTimeOff { screenTimeBanner }
                     weekHero
-                    if let facts = vm.facts { factTiles(facts) }
                     urgeButton
                     if needsKey { keyNudge }
                     if let week = vm.week {
                         WeekCard(report: week,
                                  hoursPerDay: hoursPerDay,
+                                 showTiles: false,
                                  isPro: pro?.isPro == true,
                                  latestNote: weekNote(week),
                                  onGetPro: { showPaywall = true },
@@ -184,38 +184,66 @@ struct HomeView: View {
     // MARK: Week hero (2.4, docs/24): time back, not days clean
 
     private var weekHero: some View {
-        VStack(spacing: 10) {
-            if let facts = vm.facts, let hours = facts.hoursBack {
-                Text("About \(hours) hr back")
-                    .font(.system(size: heroNumberSize * 0.72, weight: .bold, design: .rounded))
-                    .minimumScaleFactor(0.6)
-                    .lineLimit(1)
-                Text("this week")
-                    .font(.subheadline.weight(.medium))
-                    .opacity(0.85)
-            } else if let facts = vm.facts {
-                Text("Blocked \(facts.daysBlocked) of \(facts.daysInWindow) days")
-                    .font(.system(size: heroNumberSize * 0.55, weight: .bold, design: .rounded))
-                    .minimumScaleFactor(0.6)
-                    .lineLimit(1)
-                Text("this week")
-                    .font(.subheadline.weight(.medium))
-                    .opacity(0.85)
-            } else {
-                Text("Pawl is on")
-                    .font(.system(size: heroNumberSize * 0.55, weight: .bold, design: .rounded))
+        VStack(spacing: 18) {
+            VStack(spacing: 4) {
+                if let facts = vm.facts, let hours = facts.hoursBack {
+                    Text("About \(hours) hr back")
+                        .font(.system(size: heroNumberSize * 0.7, weight: .bold, design: .rounded))
+                        .minimumScaleFactor(0.6)
+                        .lineLimit(1)
+                    Text("this week, with \(facts.daysBlocked == 7 ? "every day" : "\(facts.daysBlocked) of \(facts.daysInWindow) days") blocked")
+                        .font(.subheadline.weight(.medium))
+                        .opacity(0.85)
+                } else if let facts = vm.facts {
+                    Text("\(facts.daysBlocked) of \(facts.daysInWindow) days")
+                        .font(.system(size: heroNumberSize * 0.7, weight: .bold, design: .rounded))
+                        .minimumScaleFactor(0.6)
+                        .lineLimit(1)
+                    Text("blocked this week")
+                        .font(.subheadline.weight(.medium))
+                        .opacity(0.85)
+                } else {
+                    Text("Pawl is on")
+                        .font(.system(size: heroNumberSize * 0.6, weight: .bold, design: .rounded))
+                }
             }
-            if let facts = vm.facts, facts.hoursBack != nil {
-                Text("Blocked \(facts.daysBlocked) of \(facts.daysInWindow) days.")
-                    .font(.subheadline)
-                    .opacity(0.85)
+
+            if let facts = vm.facts, !stats(facts).isEmpty {
+                HStack(spacing: 0) {
+                    ForEach(Array(stats(facts).enumerated()), id: \.offset) { i, stat in
+                        if i > 0 {
+                            Rectangle()
+                                .fill(PawlColor.cleanText.opacity(0.18))
+                                .frame(width: 1)
+                                .padding(.vertical, 6)
+                        }
+                        VStack(spacing: 2) {
+                            Text(stat.value)
+                                .font(.system(.title2, design: .rounded).weight(.bold))
+                                .monospacedDigit()
+                                .minimumScaleFactor(0.7)
+                                .lineLimit(1)
+                            Text(stat.label)
+                                .font(.caption)
+                                .opacity(0.8)
+                                .multilineTextAlignment(.center)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .accessibilityElement(children: .combine)
+                    }
+                }
+                .padding(.vertical, 12)
+                .padding(.horizontal, 8)
+                .background(PawlColor.cleanText.opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
+
             statusPill
-                .padding(.top, 6)
         }
         .foregroundStyle(PawlColor.cleanText)
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 26)
+        .padding(.vertical, 24)
         .padding(.horizontal, 20)
         .background(
             LinearGradient(colors: [PawlColor.cleanBg, PawlColor.cleanBg.opacity(0.45)],
@@ -223,52 +251,18 @@ struct HomeView: View {
             ignoresSafeAreaEdges: []
         )
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .accessibilityElement(children: .combine)
     }
 
-    /// Plain facts, two to a row. Zero of anything is left out.
-    @ViewBuilder
-    private func factTiles(_ facts: WeekFacts) -> some View {
-        let maybe: [(String, String, String)?] = [
-            facts.unlocks > 0
-                ? ("lock.open.fill", facts.unlocks == 1 ? "Unlocked once" : "Unlocked \(facts.unlocks) times",
-                   facts.openMinutes > 0 ? "\(DurationText.short(minutes: facts.openMinutes)) open" : "")
-                : nil,
-            facts.hitTheWall > 0
-                ? ("hand.raised.fill", facts.hitTheWall == 1 ? "Hit the wall once" : "Hit the wall \(facts.hitTheWall) times",
-                   "and walked away")
-                : nil,
-            facts.urgesRidden > 0
-                ? ("checkmark.circle.fill", facts.urgesRidden == 1 ? "Rode out 1 urge" : "Rode out \(facts.urgesRidden) urges",
-                   "with the block on")
-                : nil,
-            vm.week?.hardestTime.map { ("moon.stars.fill", "Hardest: \($0.name.lowercased())", "most urges and wall hits") },
-        ]
-        let tiles = maybe.compactMap { $0 }
-        if !tiles.isEmpty {
-            LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-                ForEach(Array(tiles.enumerated()), id: \.offset) { _, t in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Image(systemName: t.0)
-                            .font(.title3)
-                            .foregroundStyle(PawlColor.brand)
-                        Text(t.1)
-                            .font(.headline)
-                            .fixedSize(horizontal: false, vertical: true)
-                        if !t.2.isEmpty {
-                            Text(t.2)
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, minHeight: 96, alignment: .topLeading)
-                    .padding(14)
-                    .background(PawlColor.cardBg)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                }
-            }
+    /// Up to three plain facts for the row under the hero number. Zeros are left out.
+    private func stats(_ f: WeekFacts) -> [(value: String, label: String)] {
+        var out: [(String, String)] = []
+        if f.unlocks > 0 {
+            out.append(("\(f.unlocks)", f.unlocks == 1 ? "unlock" : "unlocks"))
+            if f.openMinutes > 0 { out.append((DurationText.short(minutes: f.openMinutes), "apps open")) }
         }
+        if f.hitTheWall > 0 { out.append(("\(f.hitTheWall)", f.hitTheWall == 1 ? "time you hit the wall" : "times you hit the wall")) }
+        if f.urgesRidden > 0 { out.append(("\(f.urgesRidden)", f.urgesRidden == 1 ? "urge rode out" : "urges rode out")) }
+        return Array(out.prefix(3)).map { (value: $0.0, label: $0.1) }
     }
 
     /// The old slip log, now one quiet link. For the people whose slip is off the phone.
