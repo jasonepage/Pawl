@@ -1,7 +1,7 @@
 # 23. Ally-only mode (after 2.4)
 
-**Decided 2026-10-31:** Jason picked option 2. A person with no security key can use an ally
-(Pro) as their only way to unlock. Not in 2.4. Build after 2.4 ships.
+**Decided 2026-10-31, built 2026-11-01 into 2.4.** A person with no security key can use an
+ally (Pro) as their only way to unlock. Adding an ally takes the wait only, never a key tap.
 
 ## What it is
 

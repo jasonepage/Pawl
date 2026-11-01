@@ -51,7 +51,7 @@ struct AllyPage: View {
     var body: some View {
         List {
             Section {
-                Text("Whoever holds your key decides when Pawl can loosen. An ally can say yes from their own phone instead of handing the key over. Their yes starts the same wait a key tap starts. Your key always works, with or without an ally.")
+                Text("An ally is someone you trust who can say yes from their own phone when you want to unlock. Their yes starts the same wait a key tap starts. You can have an ally with a key, or instead of one. A key always works too.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -102,14 +102,14 @@ struct AllyPage: View {
                     Label("\(joined.name) joined", systemImage: "person.fill.checkmark")
                         .font(.headline)
                     Text(model.cooldownSeconds <= 0
-                         ? "Use your key to make \(joined.name) your ally."
-                         : "Use your key to make \(joined.name) your ally. It takes effect \(DurationText.startsIn(waitSeconds: model.cooldownSeconds)), like any change that blocks less.")
+                         ? "Make \(joined.name) your ally."
+                         : "Make \(joined.name) your ally. It takes effect \(DurationText.startsIn(waitSeconds: model.cooldownSeconds)), like any change that blocks less.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     Button {
                         Task { await model.confirmAlly(joined); note = model.blockChangeMessage; self.joined = nil }
                     } label: {
-                        Label("Use my key", systemImage: "key.fill").frame(maxWidth: .infinity)
+                        Label("Make \(joined.name) my ally", systemImage: "person.fill.checkmark").frame(maxWidth: .infinity)
                     }
                     .buttonStyle(PawlBigButtonStyle(background: PawlColor.brand, foreground: .white))
                     .disabled(busy)

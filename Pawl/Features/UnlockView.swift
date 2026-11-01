@@ -206,6 +206,15 @@ struct UnlockView: View {
                     .disabled(vm.isBusy)
                 }
                 helper(vm.unlockHelpText)   // 2.4: follows the saved wait and open time
+            } else if let model, model.canAskAlly, let name = vm.allyName {
+                // 2.4: no key, but an ally. Their yes is the way to unlock.
+                bigButton("Ask \(name)", "person.2.fill",
+                          bg: PawlColor.cleanBg, fg: PawlColor.cleanText) { vm.askAlly() }
+                .disabled(vm.isBusy)
+                helper("\(name) decides. Their yes starts \(vm.unlockHelpShort).")
+                Button("Pair a security key instead") { Task { await vm.pairKey() } }
+                    .font(.subheadline.weight(.medium))
+                    .disabled(vm.isBusy)
             } else {
                 bigButton("Pair your security key", "key.fill",
                           bg: PawlColor.cleanBg, fg: PawlColor.cleanText) {
@@ -364,7 +373,7 @@ struct UnlockView: View {
     /// One symbol per state for the states without painted art.
     private var stateSymbol: String {
         switch vm.state {
-        case .locked: return vm.isPaired ? "lock.fill" : "key.fill"
+        case .locked: return (vm.isPaired || vm.hasAlly) ? "lock.fill" : "key.fill"
         case .reading: return "key.radiowaves.forward.fill"
         case .awaitingAlly: return "person.2.fill"
         case .coolingOff: return "hourglass"
@@ -393,7 +402,7 @@ struct UnlockView: View {
     private var heroTitle: String {
         if showScreenTimeOff { return "Screen Time is off" }
         switch vm.state {
-        case .locked: return vm.isPaired ? "Apps are blocked" : "Set up your key"
+        case .locked: return (vm.isPaired || vm.hasAlly) ? "Apps are blocked" : "Set up your key"
         case .reading: return "Checking your key"
         case .awaitingAlly: return "Asking \(vm.allyName ?? "your ally")"      // 2.4
         case .coolingOff: return "Unlocking soon"

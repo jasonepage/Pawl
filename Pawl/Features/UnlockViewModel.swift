@@ -285,6 +285,13 @@ public final class UnlockViewModel {
                                        openSeconds: c?.graceSeconds ?? PawlDefaults.graceDefault)
     }
 
+    /// "a 15 minute wait" or "no wait", for the ally line under the button.
+    public var unlockHelpShort: String {
+        let c = commitmentProvider()
+        let wait = c?.coolingOffSeconds ?? PawlDefaults.coolingOffDefault
+        return wait <= 0 ? "no wait: apps open right away" : "the same \(DurationText.short(seconds: wait)) wait your key would"
+    }
+
     /// 2.4: apps are open with "Until I lock it", so no timer will lock them.
     public var isOpenUntilLocked: Bool {
         if case .unshielded(let endsAt) = state { return endsAt == .distantFuture }

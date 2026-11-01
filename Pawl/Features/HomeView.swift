@@ -413,7 +413,7 @@ struct HomeView: View {
                     Text("Pair your security key")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.primary)
-                    Text("Your blocks are on, but unlocking won't work until a key is paired. Tap to set it up.")
+                    Text("Your blocks are on, but nothing can unlock them yet. Pair a key, or add an ally in Settings (Pro).")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)

@@ -100,7 +100,7 @@ struct ContentView: View {
     private var mainTabs: some View {
         TabView(selection: $tab) {
             HomeView(
-                needsKey: !model.isKeyPaired,
+                needsKey: !model.isKeyPaired && model.allyPairing == nil,   // 2.4: an ally counts
                 screenTimeOff: !model.auth.isApproved,
                 blockedItems: model.blockedSummaryParts,
                 activeSetName: model.activeScheduledSetName,

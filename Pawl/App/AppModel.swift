@@ -264,6 +264,10 @@ final class AppModel {
     private func approveLoosening() async -> Bool {
         // 2.4: with an active ally (and Pro), the person picks: key or ally. The prompt is a
         // dialog in ContentView; it answers through chooseLoosen. Dismissing it is a no.
+        // With no key paired at all, the ally is the only way, so there is nothing to pick.
+        if let pairing = allyPairing, pro.isPro, keyStore.load() == nil {
+            return await askAllyForLoosening(pairing)
+        }
         if let pairing = allyPairing, pro.isPro {
             loosenPrompt = true
             let method = await withCheckedContinuation { loosenContinuation = $0 }
@@ -595,11 +599,12 @@ final class AppModel {
         await pendingAllyCtl.restore()
     }
 
-    /// The ally joined and their record checked out. Adding them blocks less, so: key tap, then
-    /// the current wait, then they become active (docs/18 section 4.4).
+    /// The ally joined and their record checked out. Adding them blocks less, so they wait out
+    /// the current cooling-off before becoming active (docs/18 section 4.4). No key tap: the
+    /// hurdle is that another person had to join, plus the wait. That also makes an ally the
+    /// way to unlock for someone who has no key (docs/23).
     func confirmAlly(_ pairing: AllyPairing) async {
         pendingAllyCtl.clear()
-        guard await approveLoosening() else { return }
         let endsAt = Date().addingTimeInterval(cooldownSeconds)
         pendingAllyCtl.begin(pairing, endsAt: endsAt)
         blockChangeMessage = cooldownSeconds <= 0 ? "\(pairing.name) is now your ally."
