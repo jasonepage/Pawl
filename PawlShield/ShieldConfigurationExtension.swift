@@ -123,8 +123,8 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
             // Primary colors are set explicitly. Left unset, iOS fills the button with its own
             // light blue, and white text on it is hard to read.
             primaryButtonLabel: ShieldConfiguration.Label(text: "Close this app", color: Self.forest),
-            primaryButtonBackgroundColor: Self.leaf,
-            secondaryButtonLabel: ShieldConfiguration.Label(text: "I'm tempted", color: Self.leaf)
+            primaryButtonBackgroundColor: Self.leaf
+            // 2.4: no second button. The "I'm tempted" flow is gone from the block screen.
         )
     }
 

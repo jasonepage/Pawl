@@ -56,7 +56,6 @@ struct HomeView: View {
                 VStack(spacing: 16) {
                     if screenTimeOff { screenTimeBanner }
                     weekHero
-                    urgeButton
                     if needsKey { keyNudge }
                     if let week = vm.week {
                         WeekCard(report: week,
