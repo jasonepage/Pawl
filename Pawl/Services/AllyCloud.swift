@@ -84,7 +84,13 @@ public final class AllyCloud {
         share[CKShare.SystemFieldKey.title] = "Be my Pawl ally"
         share.publicPermission = .none
         let result = try await privateDB.modifyRecords(saving: [share], deleting: [], savePolicy: .allKeys, atomically: true)
-        for (_, r) in result.saveResults { if case .success(let rec) = r, let s = rec as? CKShare { return s } }
+        // modifyRecords reports a failed save inside the results, not by throwing. Surface it.
+        for (_, r) in result.saveResults {
+            switch r {
+            case .success(let rec): if let s = rec as? CKShare { return s }
+            case .failure(let error): throw error
+            }
+        }
         throw AllyCloudError.noShare
     }
 
@@ -150,7 +156,7 @@ public final class AllyCloud {
         record["createdAt"] = request.createdAt
         record["expiresAt"] = request.expiresAt
         record["nonce"] = request.nonce
-        _ = try await privateDB.modifyRecords(saving: [record], deleting: [], savePolicy: .allKeys, atomically: true)
+        try Self.check(try await privateDB.modifyRecords(saving: [record], deleting: [], savePolicy: .allKeys, atomically: true))
     }
 
     /// Delete the open request and any decision. Called for the `withdrawAllyRequest` effect,
@@ -190,7 +196,7 @@ public final class AllyCloud {
                               recordID: CKRecord.ID(recordName: Self.linkRecordName, zoneID: zoneID(zone)))
         record["publicKey"] = publicKey
         record["name"] = String(name.trimmingCharacters(in: .whitespacesAndNewlines).prefix(40))
-        _ = try await sharedDB.modifyRecords(saving: [record], deleting: [], savePolicy: .allKeys, atomically: true)
+        try Self.check(try await sharedDB.modifyRecords(saving: [record], deleting: [], savePolicy: .allKeys, atomically: true))
     }
 
     /// The open request, if the owner has one. The ally sees only this (D5).
@@ -208,7 +214,7 @@ public final class AllyCloud {
         record["approved"] = (decision.approved ? 1 : 0)
         record["signedAt"] = decision.signedAt
         record["signature"] = decision.signature
-        _ = try await sharedDB.modifyRecords(saving: [record], deleting: [], savePolicy: .allKeys, atomically: true)
+        try Self.check(try await sharedDB.modifyRecords(saving: [record], deleting: [], savePolicy: .allKeys, atomically: true))
     }
 
     /// The ally leaves. Deleting the share record from the shared database removes this
@@ -255,6 +261,11 @@ public final class AllyCloud {
 
     public func unsubscribeAlly() async {
         _ = try? await sharedDB.modifySubscriptions(saving: [], deleting: [Self.allySubscriptionID])
+    }
+
+    /// A failed save inside a modifyRecords result becomes a thrown error.
+    static func check(_ result: (saveResults: [CKRecord.ID: Result<CKRecord, Error>], deleteResults: [CKRecord.ID: Result<Void, Error>])) throws {
+        for (_, r) in result.saveResults { if case .failure(let e) = r { throw e } }
     }
 
     // MARK: - Record mapping
