@@ -1,5 +1,17 @@
 DEFINE SCHEMA
 
+    RECORD TYPE cloudkit.share (
+        "___createTime" TIMESTAMP,
+        "___createdBy"  REFERENCE,
+        "___etag"       STRING,
+        "___modTime"    TIMESTAMP,
+        "___modifiedBy" REFERENCE,
+        "___recordID"   REFERENCE QUERYABLE,
+        GRANT WRITE TO "_creator",
+        GRANT CREATE TO "_icloud",
+        GRANT READ TO "_world"
+    );
+
     RECORD TYPE AllyLink (
         "___createTime" TIMESTAMP,
         "___createdBy"  REFERENCE,
