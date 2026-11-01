@@ -43,7 +43,23 @@ public final class UnlockViewModel {
     // 2.4: ally approvals (docs/18). The open request, its polling loop, and the push listener.
     // Nothing here can lift the shield: a verified yes only ever sends `.allyDecision`, and
     // the machine turns that into the same cooling-off a key tap starts.
-    private var openAllyRequest: AllyRequest?
+    private var openAllyRequest: AllyRequest? {
+        didSet { Self.saveOpenAllyRequest(openAllyRequest) }
+    }
+    /// The open request is saved so switching tabs, leaving the app or a force quit does not
+    /// lose it. syncFromShared() puts the screen back in "asking" if it is still open.
+    private static let openAllyRequestKey = "pawl.ally.openRequest"
+    private static func saveOpenAllyRequest(_ r: AllyRequest?) {
+        if let r, let data = try? JSONEncoder().encode(r) {
+            UserDefaults.standard.set(data, forKey: openAllyRequestKey)
+        } else {
+            UserDefaults.standard.removeObject(forKey: openAllyRequestKey)
+        }
+    }
+    private static func loadOpenAllyRequest() -> AllyRequest? {
+        guard let data = UserDefaults.standard.data(forKey: openAllyRequestKey) else { return nil }
+        return try? JSONDecoder().decode(AllyRequest.self, from: data)
+    }
     private var allyPollTask: Task<Void, Never>?
     private var allyPushObserver: NSObjectProtocol?
     /// The ally's first name, for the screen. nil when no ally is paired.
@@ -314,6 +330,19 @@ public final class UnlockViewModel {
                 state = .locked
             }
         default:
+            // 2.4: an ally request that is still open comes back as "asking", with its timer
+            // and polling. An expired one is cleaned up. Nothing here touches the shield.
+            if let saved = Self.loadOpenAllyRequest() {
+                if saved.expiresAt > now, AllyStore.shared.pairing() != nil {
+                    openAllyRequest = saved
+                    state = .awaitingAlly(requestID: saved.id, expiresAt: saved.expiresAt)
+                    scheduleFire(at: saved.expiresAt, event: .allyExpired)
+                    startAllyPolling()
+                    return
+                }
+                openAllyRequest = nil
+                Task { try? await AllyCloud.shared.deleteRequest() }
+            }
             state = .locked
             // 2.3: nothing is unlocking, so drop any leftover reminders (for example from an
             // unlock that ended while Pawl was closed in a way the reminders didn't expect).

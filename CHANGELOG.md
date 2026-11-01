@@ -47,6 +47,8 @@ a time, after the rest of 2.4 below.
   link is opened, and an Ally screen (its own tab, or the whole app if they only help someone):
   "Jason wants to unlock Pawl." with Approve (Face ID) and Not now, Pawl waiting beside it, and
   a Stop button. The paywall lists ally approvals first.
+- An open ally request survives switching tabs, leaving the app and a force quit. The Unlock tab
+  comes back to "Asking Sam" with its countdown; an expired one is cleaned up.
 - The Ally page says up front that inviting needs free iCloud space, which for most free 5 GB
   accounts means a paid iCloud plan. A full iCloud gets a plain message instead of a raw error.
 - Pairing your first key is instant, even if blocks are already on. It used to wait 15 minutes
