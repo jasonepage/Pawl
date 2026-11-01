@@ -187,6 +187,10 @@ struct AllyPage: View {
             let share = try await AllyCloud.shared.share()
             invite = AllyInvite(share: share, container: AllyCloud.shared.container)
             note = nil
+        } catch let e as CKError where e.code == .quotaExceeded {
+            note = "Your iCloud storage is full, so Pawl can't save the invite there. Free up some iCloud space (Settings, your name, iCloud) and try again."
+        } catch let e as CKError where e.code == .networkUnavailable || e.code == .networkFailure {
+            note = "No connection right now. Try again when you're online."
         } catch {
             note = "Couldn't make the invite. \(error.localizedDescription)"
         }
