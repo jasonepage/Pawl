@@ -262,6 +262,7 @@ struct AllyJoinView: View {
                             .font(.system(.title2, design: .rounded).weight(.bold))
                             .foregroundStyle(PawlColor.hardwareText)
                             .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
                         Text("Pawl blocks apps \(ownerName) chose. To unlock, they need a physical key you hold, or a yes from you.")
                             .font(.body)
                             .foregroundStyle(PawlColor.hardwareText.opacity(0.78))
@@ -300,6 +301,8 @@ struct AllyJoinView: View {
                             .font(.footnote)
                             .foregroundStyle(PawlColor.dangerText)
                             .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .textSelection(.enabled)
                     }
 
                     Button {
@@ -341,6 +344,10 @@ struct AllyJoinView: View {
             _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])
             UIApplication.shared.registerForRemoteNotifications()
             dismiss()
+        } catch let e as CKError where e.code == .unknownItem || e.code == .zoneNotFound || e.code == .participantMayNeedVerification {
+            self.error = "This invite can't be opened on this phone. The two phones may be on different builds of Pawl (TestFlight and Xcode don't mix), or the invite was cancelled. Ask \(ownerName) for a new one."
+        } catch let e as CKError where e.code == .notAuthenticated {
+            self.error = "Sign in to iCloud on this phone first (Settings, your name)."
         } catch {
             self.error = "Couldn't join. \(error.localizedDescription)"
         }
