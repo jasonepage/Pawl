@@ -321,7 +321,7 @@ struct OnboardingView: View {
                         infoRow("lock.shield", "Your blocks turn on now",
                                 "Pawl starts protecting you right away. Until a key is paired you can't unblock from inside Pawl, so pair it as soon as it arrives.")
                         infoRow("arrow.clockwise", "Pair it anytime",
-                                "Open the Unlock tab and tap \u{201C}Pair security key\u{201D} once you have it in hand. The key becomes active after your cooling-off wait.")
+                                "Open the Unlock tab and tap \u{201C}Pair security key\u{201D} once you have it in hand. Your first key works right away.")
                     }
                 }
                 keyPlacesCard
@@ -330,7 +330,7 @@ struct OnboardingView: View {
                 card {
                     VStack(alignment: .leading, spacing: 14) {
                         infoRow("key.fill", "It's your only unlock",
-                                "Pawl lifts the shield only when this exact key is connected. No key in hand, no unblock.")
+                                "Pawl lifts the shield only when this exact key is connected, or when the person holding it says yes from their phone (Pawl Pro). No key, no yes, no unblock.")
                         infoRow("cable.connector", "It plugs into your iPhone",
                                 "Use a USB-C security key (the FIDO2 kind), about $30. YubiKey and Google Titan are common ones.")
                         infoRow("shippingbox.fill", "Where you keep it is the trick",
@@ -353,7 +353,7 @@ struct OnboardingView: View {
                     summaryRow("hourglass", "Unlock wait", "15 minutes")
                 }
             }
-            body("From here, lifting the shield needs your key plus the wait. Turning off Screen Time still removes protection. For a full lock, someone you trust can set a Screen Time passcode for you. That's Hard lock in Settings.")
+            body("From here, lifting the shield needs your key, or a yes from your ally with Pawl Pro, plus the wait. Turning off Screen Time still removes protection. For a full lock, someone you trust can set a Screen Time passcode for you. That's Hard lock in Settings.")
         }
     }
 
@@ -439,7 +439,7 @@ struct OnboardingView: View {
             VStack(alignment: .leading, spacing: 14) {
                 Text("Where to keep it").font(.headline)
                 infoRow("person.2.fill", "Someone you trust",
-                        "A sister, parent or close friend across town. You have to ask, and they hand it back in person.")
+                        "A sister, parent or close friend across town. You have to ask, and they hand it back in person, or say yes from their phone with Pawl Pro.")
                 infoRow("timer", "A time lock box",
                         "A box with a timer that won't open until the time runs out. Search \u{201C}time lock box\u{201D} online.")
                 infoRow("building.columns.fill", "A bank safe deposit box",
@@ -578,7 +578,7 @@ struct OnboardingView: View {
                 // 2.1: a phone that was already protecting (for example a new phone where the
                 // key didn't transfer) gets no free pairing here. It goes through Unlock and waits.
                 if model.setupWasAlreadyProtecting {
-                    message = "Pawl was already protecting you, so a new key goes through the Unlock tab and becomes active after your cooling-off wait. Tap \u{201C}I don't have a key yet\u{201D} to finish setup."
+                    message = "Pawl was already protecting you, so pair the key from the Unlock tab. Your first key works right away; a replacement waits. Tap \u{201C}I don't have a key yet\u{201D} to finish setup."
                     return
                 }
             }
