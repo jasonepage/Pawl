@@ -113,6 +113,10 @@ struct AllyPage: View {
                     }
                     .buttonStyle(PawlBigButtonStyle(background: PawlColor.brand, foreground: .white))
                     .disabled(busy)
+                    Button("Don't add \(joined.name)", role: .destructive) {
+                        Task { await cancelInvite() }
+                    }
+                    .disabled(busy)
                 }
                 .padding(.vertical, 4)
             } else if let invite {
@@ -125,6 +129,8 @@ struct AllyPage: View {
                     }
                     .buttonStyle(PawlBigButtonStyle(background: PawlColor.brand, foreground: .white))
                     Button("Check if they joined") { Task { await checkJoined() } }
+                        .disabled(busy)
+                    Button("Cancel the invite", role: .destructive) { Task { await cancelInvite() } }
                         .disabled(busy)
                 }
                 .padding(.vertical, 4)
@@ -175,6 +181,16 @@ struct AllyPage: View {
     }
 
     // MARK: Actions
+
+    /// Before an ally is active: drop the invite and the zone. Whoever joined loses access.
+    private func cancelInvite() async {
+        busy = true
+        defer { busy = false }
+        await model.removeAlly()
+        invite = nil
+        joined = nil
+        note = "Invite cancelled. Nothing was shared."
+    }
 
     private func makeInvite() async {
         busy = true
