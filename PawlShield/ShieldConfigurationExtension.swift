@@ -98,7 +98,8 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
     }
 
     private static func subtitle() -> String {
-        let base = "Open Pawl and use your security key, then wait out the cooling-off. No shortcuts, even at 1am."
+        // 2.4: say the two real ways out, plainly. Nothing else opens this.
+        let base = "To open this app, plug in the key you paired with Pawl, or turn off Screen Time for Pawl."
         switch walkedAwayThisWeek() {
         case 0: return base
         case 1: return base + "\n\nYou walked away once this week."
