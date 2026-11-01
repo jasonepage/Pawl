@@ -1,13 +1,13 @@
 # Pawl art direction: the physical key is the product
 
-Status: security-key-first correction, 2026-10-31. The initial real-cat exploration
-drifted too close to a customizable pet product. Pawl does not promise a pet feature.
-The first production pass now replaces the app icon and the paired-and-locked Unlock
-artwork. Other state artwork remains unchanged until each state has an approved asset.
+Status: Kiki plus physical-key system, updated 2026-11-01. Pawl does not promise a
+customizable pet feature; Kiki is one fixed brand character whose illustrations clarify
+specific product states.
 
-Approved security-key-first icon direction:
-`design/fido-first/icon/app-icon-candidate-v1.png`. Light, dark, and tinted variants are
-connected to `Pawl/Assets.xcassets/AppIcon.appiconset`.
+Approved app icon direction:
+`design/pawl-cat-v3/icon/app-icon-kiki-peek-v1.png`. Kiki peeks over the modern FIDO2
+key, making the character memorable without hiding the product mechanism. Default,
+dark, and tinted variants are connected to `Pawl/Assets.xcassets/AppIcon.appiconset`.
 
 The original 2D cat art style remains approved for restrained in-app illustration. The
 first corrected Unlock asset is `design/fido-first/unlock-art/locked-v1.png`: the cat is
@@ -100,8 +100,8 @@ supporting information. It does not become a status dashboard.
 
 ## Brand character role
 
-The approved cat model may be used for an app icon exploration, editorial marketing
-art, and occasional small in-app cameos. It should not drive the product structure.
+The approved cat model defines the app icon, editorial marketing art, and occasional
+state-specific in-app illustrations. It should not drive the product structure.
 
 - Adult gray-brown domestic shorthair tabby; never kitten proportions.
 - Broad, substantial body and mature face.

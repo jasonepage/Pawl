@@ -82,7 +82,7 @@ struct SettingsView: View {
 
     private var brandHeader: some View {
         VStack(spacing: 8) {
-            // 2.4: the header shows the app icon, the security key with the paw.
+            // Keep the Settings header aligned with the installed Kiki-and-key app icon.
             PawlLogoTile(size: 72)
             Text("Pawl")
                 .font(.system(size: 28, weight: .bold, design: .rounded))

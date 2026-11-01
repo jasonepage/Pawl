@@ -202,8 +202,8 @@ public struct PawlArt: View {
 }
 
 
-/// 2.4: the app icon (a green security key with a paw print) as an in-app tile, rounded
-/// like a home screen icon. Used on Home and the Settings header in place of the old mascot.
+/// The current Kiki-and-key app icon as an in-app tile, rounded like a home screen icon.
+/// Used on Home and the Settings header so the in-app brand matches the installed icon.
 struct PawlLogoTile: View {
     var size: CGFloat = 72
     var body: some View {

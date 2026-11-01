@@ -1,5 +1,8 @@
 # App icon candidate 1
 
+Status: superseded on 2026-11-01 by
+`design/pawl-cat-v3/icon/app-icon-kiki-peek-v1.png`. Retained as design history.
+
 Status: implemented in the app asset catalog on 2026-10-31, with intentional light,
 dark, and tinted variants.
 

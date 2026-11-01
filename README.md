@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Pawl/Assets.xcassets/AppIcon.appiconset/AppIcon.png?v=3" width="128" alt="The Pawl app icon: a green security key with a paw print">
+  <img src="Pawl/Assets.xcassets/AppIcon.appiconset/AppIcon.png?v=4" width="128" alt="The Pawl app icon: Kiki the tabby peeking over a green physical security key">
 </p>
 
 <h1 align="center">Pawl</h1>
