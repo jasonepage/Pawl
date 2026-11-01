@@ -47,6 +47,9 @@ a time, after the rest of 2.4 below.
   link is opened, and an Ally screen (its own tab, or the whole app if they only help someone):
   "Jason wants to unlock Pawl." with Approve (Face ID) and Not now, Pawl waiting beside it, and
   a Stop button. The paywall lists ally approvals first.
+- The Unlock tab shows the blocked apps and sites as a row of icons and names during the wait
+  ("Opening when the wait ends") and the open time ("Open right now"). iOS draws each one from
+  its token on screen; Pawl itself still never learns the names.
 - The "I'm tempted" button is gone from Home and from the block screen. The urge screen
   still exists for a handoff that may already be pending, but nothing new leads to it.
 - Home is about time back, not days clean (docs/24). The hero says "About 7 hr back this

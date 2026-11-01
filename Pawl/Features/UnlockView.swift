@@ -48,6 +48,11 @@ struct UnlockView: View {
                         timingCard(model)
                     }
                     actionArea
+                    if case .coolingOff = vm.state {
+                        BlockedStrip(title: "Opening when the wait ends", selection: SharedState.loadSelection())
+                    } else if case .unshielded = vm.state {
+                        BlockedStrip(title: "Open right now", selection: SharedState.loadSelection())
+                    }
                     if let message = vm.message {
                         Text(message)
                             .font(.body)
@@ -412,5 +417,60 @@ struct UnlockView: View {
             return String(format: "%d:%02d:%02d", remaining / 3600, (remaining % 3600) / 60, remaining % 60)
         }
         return String(format: "%d:%02d", remaining / 60, remaining % 60)
+    }
+}
+
+
+// MARK: - Blocked apps strip (2.4)
+
+/// The blocked apps, categories and sites as a row of icons and names. SwiftUI draws each one
+/// from its Screen Time token, so the person sees "Instagram" with its icon while Pawl itself
+/// still never learns the name. Shown during the wait and the open time.
+struct BlockedStrip: View {
+    let title: String
+    let selection: FamilyActivitySelection
+    @State private var expanded = false
+
+    private var isEmpty: Bool {
+        selection.applicationTokens.isEmpty && selection.categoryTokens.isEmpty && selection.webDomainTokens.isEmpty
+    }
+
+    var body: some View {
+        if !isEmpty {
+            PawlCard {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 14) {
+                            ForEach(Array(selection.applicationTokens), id: \.self) { token in
+                                Label(token)
+                                    .labelStyle(.iconOnly)
+                                    .font(.system(size: 40))
+                                    .frame(width: 44, height: 44)
+                            }
+                            ForEach(Array(selection.categoryTokens), id: \.self) { token in
+                                Label(token)
+                                    .labelStyle(.iconOnly)
+                                    .font(.system(size: 40))
+                                    .frame(width: 44, height: 44)
+                            }
+                            ForEach(Array(selection.webDomainTokens), id: \.self) { token in
+                                Label(token)
+                                    .labelStyle(.titleOnly)
+                                    .font(.subheadline)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 8)
+                                    .background(PawlColor.groupedBg)
+                                    .clipShape(Capsule())
+                            }
+                        }
+                        .padding(.vertical, 2)
+                    }
+                }
+            }
+            .accessibilityElement(children: .contain)
+        }
     }
 }
