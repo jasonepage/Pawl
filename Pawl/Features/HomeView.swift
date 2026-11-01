@@ -68,6 +68,10 @@ struct HomeView: View {
                                  onPlanSet: onShowBlocked)
                     }
                     blockedCard
+                    // 2.4: Apple's Screen Time numbers for the blocked apps, drawn by the
+                    // PawlReport extension. Shown only once the extension target exists in
+                    // the build; without it the frame is simply empty.
+                    ScreenTimeCard(selection: SharedState.loadSelection())
                     if !vm.history.isEmpty { historyCard }
                     noteLink
                 }

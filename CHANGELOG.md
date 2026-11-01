@@ -54,6 +54,10 @@ a time, after the rest of 2.4 below.
   slip" button becomes a small "Log a slip or a note" link at the bottom, for people whose slip
   is off the phone. Zero of anything is left out. The streak ring and milestones are gone from
   Home. New pure `WeekFacts` with tests.
+- Home shows Apple's own Screen Time numbers for the blocked apps: the week's total and a
+  bar per day, in a card drawn by a new report extension (`PawlReport`). The numbers never
+  reach Pawl's code, the extension has no network and cannot talk to the app, so Pawl still
+  learns nothing about which apps you use. Setup steps in `docs/25`.
 - An open ally request survives switching tabs, leaving the app and a force quit. The Unlock tab
   comes back to "Asking Sam" with its countdown; an expired one is cleaned up.
 - The Ally page says up front that inviting needs free iCloud space, which for most free 5 GB
