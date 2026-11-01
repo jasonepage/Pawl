@@ -23,6 +23,10 @@ public final class HomeViewModel {
     public private(set) var commitment: Commitment?
     /// 2.4: when the key was paired. The streak and the week start here. nil means no key yet.
     public private(set) var keyPairedAt: Date?
+    /// 2.4 (docs/24): the week as plain facts for the Home hero and tiles. nil until loaded.
+    public private(set) var facts: WeekFacts?
+    /// Setup answer, hours a day that went to the habit. Home sets it before load().
+    public var hoursPerDay: Double = 0
 
     private let repo: CommitmentRepository
 
@@ -67,6 +71,18 @@ public final class HomeViewModel {
             completedUnlocks: unlocks.filter { $0.outcome == .completed || $0.outcome == .expired }
                                      .compactMap { $0.coolingOffEndsAt ?? $0.completedAt },
             triggers: urges.compactMap { u in u.trigger.map { (date: u.occurredAt, text: $0) } },
+            now: Date()
+        )
+        facts = WeekFacts.make(
+            commitmentStart: trackedSince,
+            hoursPerDay: hoursPerDay,
+            unlocks: unlocks.compactMap { u in
+                guard u.outcome == .completed || u.outcome == .expired,
+                      let opened = u.coolingOffEndsAt ?? u.completedAt else { return nil }
+                return WeekFacts.Unlock(openedAt: opened, closedAt: u.graceEndsAt)
+            },
+            attempts: SharedState.blockAttemptStamps(),
+            urges: urges.map(\.occurredAt),
             now: Date()
         )
         cleanDays = Streak.cleanDays(

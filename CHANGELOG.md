@@ -47,6 +47,13 @@ a time, after the rest of 2.4 below.
   link is opened, and an Ally screen (its own tab, or the whole app if they only help someone):
   "Jason wants to unlock Pawl." with Approve (Face ID) and Not now, Pawl waiting beside it, and
   a Stop button. The paywall lists ally approvals first.
+- Home is about time back, not days clean (docs/24). The hero says "About 7 hr back this
+  week" (or "Blocked 6 of 7 days" when the setup answer is unknown), then plain tiles from data
+  Pawl already keeps: unlocked N times and how long apps were open, hit the wall N times, rode
+  out N urges, the hardest time of day. An unlock is the slip; nobody types one. The "Log a
+  slip" button becomes a small "Log a slip or a note" link at the bottom, for people whose slip
+  is off the phone. Zero of anything is left out. The streak ring and milestones are gone from
+  Home. New pure `WeekFacts` with tests.
 - An open ally request survives switching tabs, leaving the app and a force quit. The Unlock tab
   comes back to "Asking Sam" with its countdown; an expired one is cleaned up.
 - The Ally page says up front that inviting needs free iCloud space, which for most free 5 GB

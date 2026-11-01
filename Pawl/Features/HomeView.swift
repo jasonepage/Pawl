@@ -55,7 +55,8 @@ struct HomeView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     if screenTimeOff { screenTimeBanner }
-                    streakHero
+                    weekHero
+                    if let facts = vm.facts { factTiles(facts) }
                     urgeButton
                     if needsKey { keyNudge }
                     if let week = vm.week {
@@ -68,13 +69,13 @@ struct HomeView: View {
                     }
                     blockedCard
                     if !vm.history.isEmpty { historyCard }
-                    relapseButton
+                    noteLink
                 }
                 .padding(20)
             }
             .background(PawlColor.groupedBg)
             .toolbar(.hidden, for: .navigationBar)
-            .task { await vm.load() }
+            .task { vm.hoursPerDay = hoursPerDay; await vm.load() }
             .refreshable { await vm.refresh() }
             // A streak milestone is an earned moment: ask for a rating once per milestone.
             .onChange(of: vm.cleanDays, initial: true) { _, days in
@@ -175,6 +176,108 @@ struct HomeView: View {
     }
 
     private var ringColor: Color { screenTimeOff ? PawlColor.dangerText : PawlColor.brand }
+
+    // MARK: Week hero (2.4, docs/24): time back, not days clean
+
+    private var weekHero: some View {
+        VStack(spacing: 10) {
+            if let facts = vm.facts, let hours = facts.hoursBack {
+                Text("About \(hours) hr back")
+                    .font(.system(size: heroNumberSize * 0.72, weight: .bold, design: .rounded))
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
+                Text("this week")
+                    .font(.subheadline.weight(.medium))
+                    .opacity(0.85)
+            } else if let facts = vm.facts {
+                Text("Blocked \(facts.daysBlocked) of \(facts.daysInWindow) days")
+                    .font(.system(size: heroNumberSize * 0.55, weight: .bold, design: .rounded))
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
+                Text("this week")
+                    .font(.subheadline.weight(.medium))
+                    .opacity(0.85)
+            } else {
+                Text("Pawl is on")
+                    .font(.system(size: heroNumberSize * 0.55, weight: .bold, design: .rounded))
+            }
+            if let facts = vm.facts, facts.hoursBack != nil {
+                Text("Blocked \(facts.daysBlocked) of \(facts.daysInWindow) days.")
+                    .font(.subheadline)
+                    .opacity(0.85)
+            }
+            statusPill
+                .padding(.top, 6)
+        }
+        .foregroundStyle(PawlColor.cleanText)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 26)
+        .padding(.horizontal, 20)
+        .background(
+            LinearGradient(colors: [PawlColor.cleanBg, PawlColor.cleanBg.opacity(0.45)],
+                           startPoint: .top, endPoint: .bottom),
+            ignoresSafeAreaEdges: []
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .accessibilityElement(children: .combine)
+    }
+
+    /// Plain facts, two to a row. Zero of anything is left out.
+    @ViewBuilder
+    private func factTiles(_ facts: WeekFacts) -> some View {
+        let maybe: [(String, String, String)?] = [
+            facts.unlocks > 0
+                ? ("lock.open.fill", facts.unlocks == 1 ? "Unlocked once" : "Unlocked \(facts.unlocks) times",
+                   facts.openMinutes > 0 ? "\(DurationText.short(minutes: facts.openMinutes)) open" : "")
+                : nil,
+            facts.hitTheWall > 0
+                ? ("hand.raised.fill", facts.hitTheWall == 1 ? "Hit the wall once" : "Hit the wall \(facts.hitTheWall) times",
+                   "and walked away")
+                : nil,
+            facts.urgesRidden > 0
+                ? ("checkmark.circle.fill", facts.urgesRidden == 1 ? "Rode out 1 urge" : "Rode out \(facts.urgesRidden) urges",
+                   "with the block on")
+                : nil,
+            vm.week?.hardestTime.map { ("moon.stars.fill", "Hardest: \($0.name.lowercased())", "most urges and wall hits") },
+        ]
+        let tiles = maybe.compactMap { $0 }
+        if !tiles.isEmpty {
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
+                ForEach(Array(tiles.enumerated()), id: \.offset) { _, t in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Image(systemName: t.0)
+                            .font(.title3)
+                            .foregroundStyle(PawlColor.brand)
+                        Text(t.1)
+                            .font(.headline)
+                            .fixedSize(horizontal: false, vertical: true)
+                        if !t.2.isEmpty {
+                            Text(t.2)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 96, alignment: .topLeading)
+                    .padding(14)
+                    .background(PawlColor.cardBg)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                }
+            }
+        }
+    }
+
+    /// The old slip log, now one quiet link. For the people whose slip is off the phone.
+    private var noteLink: some View {
+        Button { showRelapseSheet = true } label: {
+            Text("Log a slip or a note")
+                .font(.subheadline.weight(.medium))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .foregroundStyle(.secondary)
+        }
+        .accessibilityHint("Opens a private note. Your blocks stay on.")
+    }
 
     private var streakHero: some View {
         VStack(spacing: 16) {
