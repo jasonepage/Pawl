@@ -63,6 +63,8 @@ a time, after the rest of 2.4 below.
 - The Unlock tab shows your wait and open time as two big numbers under the status card while
   apps are blocked ("15 min wait", "30 min open", or "Until I lock it"). Tap the card to change
   them; it opens the same Unlock timing screen as Settings, with the same rules.
+- The block screen (the "Locked by Pawl" screen iOS shows over a blocked app) shows the new
+  icon instead of the old shield drawing.
 - New app icon: a green security key with a paw print, with dark and tinted variants. The
   same icon sits in the Settings header, and nothing sits over the streak ring on Home.
 - getpawl.com: the hero shows the new painting (the tabby asleep on the key), the how-it-works

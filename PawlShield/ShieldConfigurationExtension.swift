@@ -30,10 +30,10 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
     private static let appGroup = "group.io.github.jasonepage.Pawl"
     private static let attemptsKey = "pawl.shield.attempts"
 
-    /// The Settings header mark, dressed up for a dark screen: a soft leaf-green glow, the
-    /// green gradient tile with a drop shadow, a light sheen and edge, and the white shield
-    /// lock. Drawn in code so the extension needs no asset catalog. Without an icon, iOS
-    /// shows its generic blue Screen Time hourglass.
+    /// The app icon, dressed up for a dark screen: a soft leaf-green glow, the icon on a
+    /// rounded tile with a drop shadow, and a thin light edge. The icon is a PNG in this
+    /// extension's own bundle (ShieldIcon.png), since the extension cannot read the app's
+    /// asset catalog. Without an icon, iOS shows its generic blue Screen Time hourglass.
     private static let mark: UIImage = {
         let size = CGSize(width: 120, height: 120)
         let format = UIGraphicsImageRendererFormat()
@@ -55,51 +55,28 @@ class ShieldConfigurationExtension: ShieldConfigurationDataSource {
 
             // 2. The tile, with a drop shadow.
             let tile = CGRect(x: 14, y: 14, width: 92, height: 92)
-            let tilePath = UIBezierPath(roundedRect: tile, cornerRadius: 24)
+            let tilePath = UIBezierPath(roundedRect: tile, cornerRadius: 21)
             cg.saveGState()
             cg.setShadow(offset: CGSize(width: 0, height: 4), blur: 10,
                          color: UIColor.black.withAlphaComponent(0.4).cgColor)
-            UIColor(red: 0.17, green: 0.33, blue: 0.05, alpha: 1).setFill()
+            UIColor(red: 0.08, green: 0.14, blue: 0.08, alpha: 1).setFill()
             tilePath.fill()
             cg.restoreGState()
 
-            // 3. Gradient fill and a top sheen, clipped to the tile.
+            // 3. The icon, clipped to the tile.
             cg.saveGState()
             tilePath.addClip()
-            if let fill = CGGradient(colorsSpace: space,
-                                     colors: [UIColor(red: 0.34, green: 0.56, blue: 0.14, alpha: 1).cgColor,
-                                              UIColor(red: 0.15, green: 0.30, blue: 0.04, alpha: 1).cgColor] as CFArray,
-                                     locations: [0, 1]) {
-                cg.drawLinearGradient(fill, start: tile.origin,
-                                      end: CGPoint(x: tile.maxX, y: tile.maxY), options: [])
-            }
-            if let sheen = CGGradient(colorsSpace: space,
-                                      colors: [UIColor(white: 1, alpha: 0.22).cgColor,
-                                               UIColor(white: 1, alpha: 0).cgColor] as CFArray,
-                                      locations: [0, 1]) {
-                cg.drawLinearGradient(sheen, start: CGPoint(x: tile.midX, y: tile.minY),
-                                      end: CGPoint(x: tile.midX, y: tile.midY), options: [])
+            if let path = Bundle.main.path(forResource: "ShieldIcon", ofType: "png"),
+               let icon = UIImage(contentsOfFile: path) {
+                icon.draw(in: tile)
             }
             cg.restoreGState()
 
             // 4. A thin light edge.
-            let edge = UIBezierPath(roundedRect: tile.insetBy(dx: 0.75, dy: 0.75), cornerRadius: 23.25)
+            let edge = UIBezierPath(roundedRect: tile.insetBy(dx: 0.75, dy: 0.75), cornerRadius: 20.25)
             edge.lineWidth = 1.5
             UIColor(white: 1, alpha: 0.2).setStroke()
             edge.stroke()
-
-            // 5. The white shield lock, lifted off the tile by a faint shadow.
-            let config = UIImage.SymbolConfiguration(pointSize: 44, weight: .semibold)
-            if let symbol = UIImage(systemName: "lock.shield.fill", withConfiguration: config)?
-                .withTintColor(.white, renderingMode: .alwaysOriginal) {
-                let s = symbol.size
-                cg.saveGState()
-                cg.setShadow(offset: CGSize(width: 0, height: 2), blur: 4,
-                             color: UIColor.black.withAlphaComponent(0.3).cgColor)
-                symbol.draw(in: CGRect(x: center.x - s.width / 2, y: center.y - s.height / 2,
-                                       width: s.width, height: s.height))
-                cg.restoreGState()
-            }
         }
         return image.withRenderingMode(.alwaysOriginal)
     }()
