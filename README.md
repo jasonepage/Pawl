@@ -142,7 +142,9 @@ Read this before you trust it with anything.
    iCloud, not a Pawl server, and they never see what you block. Adding an ally
    takes your key and the wait, like any change that blocks less. Removing one
    is instant. Your key always works, with or without an ally. Only you need
-   Pro; your ally pays nothing.
+   Pro; your ally pays nothing. It needs some free space in your iCloud, and
+   most free 5 GB accounts are full, so in practice it usually means a paid
+   iCloud plan.
 7. **Your clean day streak survives deleting the app.** It lives in your
    iCloud, not on the phone.
 

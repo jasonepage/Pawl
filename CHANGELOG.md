@@ -47,6 +47,8 @@ a time, after the rest of 2.4 below.
   link is opened, and an Ally screen (its own tab, or the whole app if they only help someone):
   "Jason wants to unlock Pawl." with Approve (Face ID) and Not now, Pawl waiting beside it, and
   a Stop button. The paywall lists ally approvals first.
+- The Ally page says up front that inviting needs free iCloud space, which for most free 5 GB
+  accounts means a paid iCloud plan. A full iCloud gets a plain message instead of a raw error.
 - Pairing your first key is instant, even if blocks are already on. It used to wait 15 minutes
   whenever a commitment existed. The wait stays for a phone where blocks synced from iCloud but
   the key did not (a new phone), because an instant pair there would be a way around the key.

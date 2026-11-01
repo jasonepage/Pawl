@@ -133,7 +133,7 @@ struct AllyPage: View {
                     Task { await makeInvite() }
                 } label: {
                     SettingsRows.detail("person.badge.plus", .green, "Invite an ally",
-                                        "Needs iCloud on both phones. No account, no sign-in.")
+                                        "Needs iCloud on both phones, with some free iCloud space on yours. Most free 5 GB accounts are full, so this usually means a paid iCloud plan. No account, no sign-in.")
                 }
                 .disabled(busy)
             }
