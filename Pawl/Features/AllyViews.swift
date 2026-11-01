@@ -252,37 +252,77 @@ struct AllyJoinView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                PawlLogoTile(size: 72)
-                Text("\(ownerName) asked you to be their Pawl ally")
-                    .font(.system(.title2, design: .rounded).weight(.bold))
-                    .multilineTextAlignment(.center)
-                Text("Pawl blocks apps \(ownerName) chose. To unlock, they need a physical key you hold, or a yes from you. When they ask, your phone shows it. You tap Approve or Not now. That's all. You never see what they block.")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                TextField("Your first name", text: $name)
-                    .textFieldStyle(.roundedBorder)
-                    .textContentType(.givenName)
-                    .autocorrectionDisabled()
-                if let error {
-                    Text(error).font(.footnote).foregroundStyle(PawlColor.dangerText).multilineTextAlignment(.center)
+            ScrollView {
+                VStack(spacing: 18) {
+                    // The same dark card and painting as the Unlock tab, so the ally sees the
+                    // product they are helping with, not a form.
+                    VStack(spacing: 12) {
+                        PawlLockedArtwork()
+                        Text("\(ownerName) asked you to be their Pawl ally")
+                            .font(.system(.title2, design: .rounded).weight(.bold))
+                            .foregroundStyle(PawlColor.hardwareText)
+                            .multilineTextAlignment(.center)
+                        Text("Pawl blocks apps \(ownerName) chose. To unlock, they need a physical key you hold, or a yes from you.")
+                            .font(.body)
+                            .foregroundStyle(PawlColor.hardwareText.opacity(0.78))
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 28)
+                    .padding(.horizontal, 20)
+                    .background(PawlColor.hardwareBg)
+                    .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+
+                    PawlCard {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Label("When they ask, your phone shows it.", systemImage: "bell.badge")
+                            Label("You tap Approve or Not now. That's all.", systemImage: "checkmark.circle")
+                            Label("You never see what they block.", systemImage: "eye.slash")
+                        }
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    }
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Your first name")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        TextField("", text: $name, prompt: Text("So \(ownerName) knows it's you"))
+                            .textContentType(.givenName)
+                            .autocorrectionDisabled()
+                            .padding(14)
+                            .background(PawlColor.cardBg)
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    }
+
+                    if let error {
+                        Text(error)
+                            .font(.footnote)
+                            .foregroundStyle(PawlColor.dangerText)
+                            .multilineTextAlignment(.center)
+                    }
+
+                    Button {
+                        Task { await join() }
+                    } label: {
+                        Text(busy ? "Joining…" : "Join as \(ownerName)'s ally").frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(PawlBigButtonStyle(background: PawlColor.brand, foreground: .white))
+                    .disabled(busy || name.trimmingCharacters(in: .whitespaces).isEmpty)
+
+                    Button("Not now") { dismiss() }
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .disabled(busy)
+                        .padding(.top, 2)
                 }
-                Button {
-                    Task { await join() }
-                } label: {
-                    Text(busy ? "Joining…" : "Join as \(ownerName)'s ally").frame(maxWidth: .infinity)
-                }
-                .buttonStyle(PawlBigButtonStyle(background: PawlColor.brand, foreground: .white))
-                .disabled(busy || name.trimmingCharacters(in: .whitespaces).isEmpty)
-                Button("Not now") { dismiss() }
-                    .disabled(busy)
-                Spacer()
+                .padding(20)
             }
-            .padding(24)
+            .background(PawlColor.groupedBg)
             .navigationTitle("Be an ally")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .tint(PawlColor.brand)
     }
 
     private func join() async {
