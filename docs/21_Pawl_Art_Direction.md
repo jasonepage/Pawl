@@ -239,6 +239,14 @@ the emotional temperature without turning the state into an alert.
 The first cat-heavy frame at `design/pawl-cat-v3/styleframes/unlock-waiting.png` is an
 archived composition study, not a production reference.
 
+### Asking an ally
+
+This is a human handoff, not a second hardware state. Use
+`design/fido-first/unlock-art/ally-v1.png`: Pawl waits with a phone beside one contact
+bubble, and no security key appears. A quiet pulse around the contact confirms that the
+request is active; a rare natural two-eye blink may add life without implying play.
+The countdown remains the visual hero, and Reduce Motion receives the open-eye still.
+
 ### Apps open
 
 The timer remains the hero. The green returns, but the screen is controlled rather than
@@ -256,10 +264,11 @@ Motion explains the mechanism and state, not a pet relationship.
 
 - Pairing: one restrained plug/tap cue for the generic FIDO2 key.
 - Checking: a short hardware-response indicator, never a playful character loop.
+- Ally request: one quiet contact pulse and an infrequent natural blink while waiting.
 - Waiting: the countdown and progress indicator supply the motion.
 - Open: one clear state transition, then stillness.
-- Pawl artwork is static by default. A rare blink may remain in the existing code mascot
-  during transition, but it is not a promised feature.
+- Pawl artwork is static by default. A rare natural two-eye blink is allowed only in the
+  approved open and ally-request frame pairs.
 - Paired-and-locked artwork may use a brief, infrequent `zz` overlay. Keep the painted
   cat and physical key still, provide no tap response, and disable the loop with Reduce
   Motion.

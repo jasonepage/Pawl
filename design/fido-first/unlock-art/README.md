@@ -95,3 +95,18 @@ Built-in image generation, `stylized-concept` plus `precise-object-edit`:
 > peeking over a card edge, both heavy-lidded olive eyes open, recognizable at 44–64
 > points. Then change only both eyes into a natural closed blink while preserving exact
 > alignment, anatomy, markings, whiskers, paws, color, and texture.
+
+## Asking an ally
+
+`ally-v1.png` and `ally-blink-v1.png` show Pawl waiting on a smartphone beside a
+single contact bubble. No key appears because this is the explicit alternative to the
+hardware path. `PawlAllyArtwork` adds a quiet pulse around the contact and a rare natural
+two-eye blink; Reduce Motion holds the open-eye frame without the pulse.
+
+Built-in image generation, `stylized-concept` plus `precise-object-edit`:
+
+> Create a compact transparent horizontal illustration of the same mature tabby calmly
+> holding a modern dark smartphone to one ear. Place one simple ally/contact bubble on
+> the right and leave the composition free of keys, text, ringing symbols, and baked-in
+> motion marks. Then change only both eyes into a calm closed blink while preserving the
+> exact canvas, pose, phone, contact bubble, markings, lighting, and alignment.

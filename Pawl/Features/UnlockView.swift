@@ -110,9 +110,8 @@ struct UnlockView: View {
         .accessibilityElement(children: .combine)
     }
 
-    /// The first security-key-first art pass is deliberately narrow: paired + locked only.
-    /// Every other state keeps the existing animated mascot until it has an approved asset,
-    /// so presentation work cannot accidentally blur the unlock state machine.
+    /// Every illustration is state-specific: hardware art for key states and phone/contact
+    /// art for the ally handoff. The visuals never change the unlock state machine.
     @ViewBuilder
     private var statusArtwork: some View {
         if showScreenTimeOff {
@@ -129,6 +128,8 @@ struct UnlockView: View {
                 .accessibilityHidden(true)
         } else if usesLockedArtwork {
             PawlLockedArtwork()
+        } else if isAwaitingAlly {
+            PawlAllyArtwork()
         } else if isUnshielded {
             PawlOpenArtwork()
         } else {
@@ -322,6 +323,11 @@ struct UnlockView: View {
         return false
     }
 
+    private var isAwaitingAlly: Bool {
+        if case .awaitingAlly = vm.state { return true }
+        return false
+    }
+
     /// The painting shows Pawl guarding a paired physical key, so it would be misleading
     /// in the no-key state or while Screen Time protection is unavailable.
     private var usesLockedArtwork: Bool {
@@ -342,8 +348,8 @@ struct UnlockView: View {
         guard !showScreenTimeOff else { return false }
         if usesLockedArtwork || usesNoKeyArtwork { return true }
         switch vm.state {
-        case .reading, .unshielded: return true
-        case .locked, .awaitingAlly, .coolingOff: return false
+        case .reading, .awaitingAlly, .unshielded: return true
+        case .locked, .coolingOff: return false
         }
     }
 

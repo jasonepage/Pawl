@@ -109,10 +109,86 @@ struct PawlOpenArtwork: View {
     }
 }
 
+/// The ally path is a human handoff rather than a hardware interaction. Pawl waits on
+/// the phone while a quiet pulse around the contact confirms that the request is active.
+struct PawlAllyArtwork: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    @State private var eyesClosed = false
+    @State private var pulseScale: CGFloat = 0.92
+    @State private var pulseOpacity = 0.0
+
+    var body: some View {
+        ZStack {
+            if !reduceMotion {
+                Circle()
+                    .stroke(PawlColor.brand, lineWidth: 2)
+                    .frame(width: 43, height: 43)
+                    .scaleEffect(pulseScale)
+                    .opacity(pulseOpacity)
+                    .position(x: 217, y: 54)
+            }
+
+            art("PawlUnlockAlly")
+            art("PawlUnlockAllyBlink")
+                .opacity(eyesClosed ? 1 : 0)
+        }
+        .frame(width: 250, height: 125)
+        .task(id: reduceMotion) { await runPulseLoop() }
+        .task(id: reduceMotion) { await runBlinkLoop() }
+        .accessibilityHidden(true)
+    }
+
+    private func art(_ name: String) -> some View {
+        Image(name)
+            .resizable()
+            .scaledToFit()
+    }
+
+    @MainActor
+    private func runPulseLoop() async {
+        pulseScale = 0.92
+        pulseOpacity = 0
+        guard !reduceMotion else { return }
+
+        do {
+            while !Task.isCancelled {
+                pulseScale = 0.92
+                pulseOpacity = 0.42
+                withAnimation(.easeOut(duration: 1.35)) {
+                    pulseScale = 1.55
+                    pulseOpacity = 0
+                }
+                try await Task.sleep(for: .seconds(2.25))
+            }
+        } catch {
+            // Leaving the screen or changing Reduce Motion cancels decorative motion.
+        }
+    }
+
+    @MainActor
+    private func runBlinkLoop() async {
+        eyesClosed = false
+        guard !reduceMotion else { return }
+
+        do {
+            while !Task.isCancelled {
+                try await Task.sleep(for: .seconds(6.8))
+                withAnimation(.linear(duration: 0.09)) { eyesClosed = true }
+                try await Task.sleep(for: .seconds(0.16))
+                withAnimation(.linear(duration: 0.11)) { eyesClosed = false }
+            }
+        } catch {
+            // Leaving the screen or changing Reduce Motion cancels decorative motion.
+        }
+    }
+}
+
 #Preview("State art") {
     VStack(spacing: 20) {
         PawlReadingArtwork()
         PawlOpenArtwork()
+        PawlAllyArtwork()
     }
     .padding(28)
     .background(PawlColor.hardwareBg)
