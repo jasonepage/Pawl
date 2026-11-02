@@ -52,6 +52,8 @@ struct UnlockView: View {
                         BlockedStrip(title: "Opening when the wait ends", selection: SharedState.loadSelection())
                     } else if case .unshielded = vm.state {
                         BlockedStrip(title: "Open right now", selection: SharedState.loadSelection())
+                    } else if isLocked, !showScreenTimeOff {
+                        BlockedStrip(title: "Blocked right now", selection: SharedState.loadSelection())
                     }
                     if let message = vm.message {
                         Text(message)
@@ -451,35 +453,54 @@ struct BlockedStrip: View {
                     Text(title)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.secondary)
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 14) {
-                            ForEach(Array(selection.applicationTokens), id: \.self) { token in
-                                Label(token)
-                                    .labelStyle(.iconOnly)
-                                    .font(.system(size: 40))
-                                    .frame(width: 44, height: 44)
-                            }
-                            ForEach(Array(selection.categoryTokens), id: \.self) { token in
-                                Label(token)
-                                    .labelStyle(.iconOnly)
-                                    .font(.system(size: 40))
-                                    .frame(width: 44, height: 44)
-                            }
-                            ForEach(Array(selection.webDomainTokens), id: \.self) { token in
-                                Label(token)
-                                    .labelStyle(.titleOnly)
-                                    .font(.subheadline)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 8)
-                                    .background(PawlColor.groupedBg)
-                                    .clipShape(Capsule())
-                            }
-                        }
-                        .padding(.vertical, 2)
-                    }
+                    BlockedIconRow(selection: selection, sites: nil)
                 }
             }
             .accessibilityElement(children: .contain)
+        }
+    }
+}
+
+/// One scrolling row: app icons, category icons, then site names as pills.
+struct BlockedIconRow: View {
+    let selection: FamilyActivitySelection
+    /// Typed sites to show as pills after the tokens. nil shows only the picker's web domains.
+    let sites: [String]?
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 14) {
+                ForEach(Array(selection.applicationTokens), id: \.self) { token in
+                    Label(token)
+                        .labelStyle(.iconOnly)
+                        .font(.system(size: 40))
+                        .frame(width: 44, height: 44)
+                }
+                ForEach(Array(selection.categoryTokens), id: \.self) { token in
+                    Label(token)
+                        .labelStyle(.iconOnly)
+                        .font(.system(size: 40))
+                        .frame(width: 44, height: 44)
+                }
+                ForEach(Array(selection.webDomainTokens), id: \.self) { token in
+                    Label(token)
+                        .labelStyle(.titleOnly)
+                        .font(.subheadline)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .background(PawlColor.groupedBg)
+                        .clipShape(Capsule())
+                }
+                ForEach(sites ?? [], id: \.self) { site in
+                    Text(site)
+                        .font(.subheadline)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .background(PawlColor.groupedBg)
+                        .clipShape(Capsule())
+                }
+            }
+            .padding(.vertical, 2)
         }
     }
 }

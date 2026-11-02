@@ -473,6 +473,8 @@ struct HomeView: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     } else {
+                        // 2.4: the real icons, drawn by iOS from the tokens. Pawl never learns the names.
+                        BlockedIconRow(selection: SharedState.loadSelection(), sites: nil)
                         ChipFlow(spacing: 8) {
                             ForEach(blockedItems, id: \.self) { item in
                                 Text(item)
