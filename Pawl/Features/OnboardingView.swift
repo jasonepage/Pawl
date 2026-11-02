@@ -59,8 +59,8 @@ struct OnboardingView: View {
     private var rolePicker: some View {
         ScrollView {
             VStack(spacing: 22) {
-                PawlArt("shield.lefthalf.filled", size: 110)
-                    .padding(.top, 24)
+                painting("PawlOnboarding-welcome", height: 170)
+                    .padding(.top, 16)
                 VStack(spacing: 6) {
                     Text("Welcome to Pawl")
                         .font(.system(.largeTitle, design: .rounded).weight(.bold))
@@ -194,7 +194,7 @@ struct OnboardingView: View {
     private var content: some View {
         switch step {
         case 0:
-            art("hourglass")
+            painting("PawlOnboarding-welcome", height: 120)
             heading("What it costs you", "A quick, private look.")
             body(vertical.welcomeBody)
             card {
@@ -218,7 +218,7 @@ struct OnboardingView: View {
                 }
             }
         case 1:
-            art("hand.raised.fill")
+            painting("PawlOnboarding-screentime")
             heading("Allow Screen Time", "This is how Pawl blocks apps.")
             body("Apple's Screen Time does the blocking. Pawl only ever sees anonymous tokens, never which apps you chose.")
             card {
@@ -235,7 +235,7 @@ struct OnboardingView: View {
                 Text(err).font(.footnote).foregroundStyle(.red)
             }
         case 2:
-            art("checklist")
+            painting("PawlOnboarding-choose")
             heading(categoryStepTitle, categoryStepSubtitle)
             categoryToggle(title: "Gambling sites",
                            subtitle: "Sportsbook, casino, and crypto sites we keep a list of.",
@@ -310,7 +310,7 @@ struct OnboardingView: View {
                 }
             }
         case 3:
-            art(keyPaired ? "checkmark.seal.fill" : (unlockChoice == .ally ? "person.2.fill" : "key.fill"))
+            painting("PawlOnboarding-unlock")
             heading("How will you unlock?", unlockChoice == nil ? "Pick one. You can add the other later." : keyHeadlineSub)
             if !keyPaired {
                 HStack(spacing: 12) {
@@ -369,7 +369,7 @@ struct OnboardingView: View {
                 body("Have your key handy and plug it in, then tap Pair below.")
             }
         default:
-            art("lock.fill")
+            painting("PawlOnboarding-lockin")
             heading("Lock it in", "Here's what you're turning on.")
             card {
                 VStack(alignment: .leading, spacing: 12) {
@@ -503,6 +503,17 @@ struct OnboardingView: View {
         PawlArt(symbol, size: 100)
             .frame(maxWidth: .infinity)
             .padding(.top, 8)
+    }
+
+    /// 2.4: one painting per step (design/pawl-cat-v3/onboarding-art). The cat is supporting
+    /// art; the key is the product. Transparent, so it sits on the page background.
+    private func painting(_ name: String, height: CGFloat = 150) -> some View {
+        Image(name)
+            .resizable()
+            .scaledToFit()
+            .frame(maxWidth: .infinity, maxHeight: height)
+            .padding(.top, 4)
+            .accessibilityHidden(true)
     }
 
     private func card<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
