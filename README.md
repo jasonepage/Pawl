@@ -23,9 +23,17 @@
 </p>
 
 <p align="center">
-  <img src="site/img/screens/07-blocked-current.webp" width="220" alt="Pawl Unlock screen with Kiki asleep on the physical key, Apps are blocked, Tap to unlock, and the currently blocked apps.">
-  <img src="site/img/screens/08-unlocked-current.webp" width="220" alt="Pawl Unlock screen with Kiki awake beside the key, Apps unlocked, a Lock now button, and the apps currently open.">
-  <img src="site/img/screens/09-home-current.webp" width="220" alt="Pawl Home screen showing about two hours back, protected status, the current week, and the apps and sites blocked by the key.">
+  <img src="site/img/screens/10-shield-current.webp" width="205" alt="TikTok blocked by Pawl's Screen Time shield, showing the user's reason and instructions to use the paired key or ask an ally.">
+  <img src="site/img/screens/11-welcome-current.webp" width="205" alt="Pawl welcome screen explaining that Pawl locks apps until you tap a small physical security key.">
+  <img src="site/img/screens/12-choose-current.webp" width="205" alt="Pawl onboarding screen for choosing apps and websites to block.">
+  <img src="site/img/screens/13-key-or-ally-current.webp" width="205" alt="Pawl onboarding screen offering a physical security key or a trusted ally as the unlock method.">
+</p>
+
+<p align="center">
+  <img src="site/img/screens/14-blocked-current.webp" width="205" alt="Pawl Unlock screen with Kiki asleep on the key, a 15 minute wait, a 30 minute open window, and apps currently blocked.">
+  <img src="site/img/screens/15-waiting-current.webp" width="205" alt="Pawl active cooling-off screen counting down from 14 minutes 59 seconds before apps unlock.">
+  <img src="site/img/screens/16-open-current.webp" width="205" alt="Pawl temporary open-window screen counting down until apps relock automatically, with a Lock now button.">
+  <img src="site/img/screens/17-home-current.webp" width="205" alt="Pawl Home screen showing about two hours reclaimed, the user's reason, protected status, and what is blocked.">
 </p>
 
 ---
@@ -146,6 +154,15 @@ Read this before you trust it with anything.
    iCloud plan.
 7. **Your clean day streak survives deleting the app.** It lives in your
    iCloud, not on the phone.
+
+### Scheduled sets
+
+Pawl Pro can turn a set of apps and sites on automatically at the times you
+choose. The physical key or your ally still starts the same cooling-off wait.
+
+<p align="center">
+  <img src="site/img/screens/18-schedule-current.webp" width="260" alt="Pawl scheduled set editor showing a Work set active Monday through Friday from 9 AM to 5 PM.">
+</p>
 
 Slipping up is treated as normal. The relapse log is private to you, and
 nothing in the app scolds you for using it.
