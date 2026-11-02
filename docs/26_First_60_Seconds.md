@@ -1,4 +1,4 @@
-# 26. The first 60 seconds of Pawl (ground truth, 2026-11-02)
+# 26. The first 60 seconds of Pawl (ground truth, 2026-11-02, updated after the paintings and multi-pick)
 
 This is exactly what a new person sees and taps, screen by screen, from the first open to
 blocks on. Paste this into any fresh session, with the prompt at the bottom, to get a new
@@ -10,10 +10,11 @@ No em dashes. The person reading is often having a hard time.
 
 ## Screen 1: Welcome (role picker)
 
-- Art: a shield symbol, 110 pt.
+- Art: a painting of a calm tabby cat sitting with a green USB-C security key at its paws.
 - Title: "Welcome to Pawl"
 - Subtitle: "What do you want to block?"
-- Line: "Pick one to start. You can add more later."
+- Line: "Pick one or more. You can change this later." Tap to select, tap again to unselect.
+  More than one can be picked; the first tap is the main focus.
 - Seven cards in a two-column grid, each with an icon, a title and one line:
   - Social media: "Instagram, TikTok, X, Reddit, whatever keeps pulling you back."
   - Games: "The games you open without deciding to."
@@ -26,7 +27,7 @@ No em dashes. The person reading is often having a hard time.
 
 ## Screen 2: What it costs you (step 1 of 5, dots at the top)
 
-- Art: hourglass.
+- Art: the same sitting cat, smaller.
 - Title: "What it costs you". Sub: "A quick, private look."
 - Body (changes with the pick): "Pawl blocks the social apps and sites you choose, and makes
   unblocking deliberately hard. It takes your physical security key plus a 15-minute wait. No
@@ -38,7 +39,7 @@ No em dashes. The person reading is often having a hard time.
 
 ## Screen 3: Allow Screen Time (step 2)
 
-- Art: raised hand.
+- Art: the cat holding up one paw.
 - Title: "Allow Screen Time". Sub: "This is how Pawl blocks apps."
 - Body: "Apple's Screen Time does the blocking. Pawl only ever sees anonymous tokens, never
   which apps you chose."
@@ -47,7 +48,7 @@ No em dashes. The person reading is often having a hard time.
 
 ## Screen 4: Choose what to block (step 3)
 
-- Art: checklist.
+- Art: the cat tapping one of three blank app tiles.
 - Title: "Choose what to block" (or "What are you here to block?" for gambling and adult).
   Sub changes with the pick, e.g. "Add the social apps you keep opening. Website categories
   are optional."
@@ -61,7 +62,7 @@ No em dashes. The person reading is often having a hard time.
 
 ## Screen 5: How will you unlock? (step 4)
 
-- Art: key (or two people once "An ally" is picked).
+- Art: a key alone on the left, the cat asleep on a second key on the right.
 - Title: "How will you unlock?". Sub: "Pick one. You can add the other later."
 - Two cards side by side:
   - A security key: "A small USB-C key you keep out of reach."
@@ -78,7 +79,7 @@ No em dashes. The person reading is often having a hard time.
 
 ## Screen 6: Lock it in (step 5)
 
-- Art: lock.
+- Art: the cat lying down with the key tucked under its chin.
 - Title: "Lock it in". Sub: "Here's what you're turning on."
 - A summary card: website categories, apps count, sites.
 - Body: "From here, lifting the shield needs your key or a yes from your ally, plus the wait.
