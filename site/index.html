@@ -3,286 +3,135 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pawl: App Blocker With a Key. Block any app or site behind a key you keep out of reach.</title>
-<meta name="description" content="Pawl blocks the apps and sites you choose with Apple Screen Time. Nothing on the phone can lift the block. To unblock you need a physical security key you keep somewhere else, then a 15 minute wait. Free on iPhone and iPad.">
+<title>Pawl: Block apps with a key you keep out of reach</title>
+<meta name="description" content="Pawl blocks the apps and sites you choose. Reopening them takes your physical security key or a trusted person, followed by a 15 minute wait.">
 <link rel="canonical" href="https://getpawl.com/">
-<meta name="theme-color" content="#3c6a14">
+<meta name="theme-color" content="#18340f">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Pawl">
 <meta property="og:url" content="https://getpawl.com/">
-<meta property="og:title" content="Pawl: App Blocker With a Key">
-<meta property="og:description" content="Block any app or site. Unlocking needs a physical security key you keep out of reach, then a 15 minute wait. Free on iPhone and iPad.">
-<meta property="og:image" content="https://getpawl.com/img/og-image.png?v=2">
+<meta property="og:title" content="Pawl: Put distracting apps behind a physical key">
+<meta property="og:description" content="Choose what to block. Keep the key somewhere else. Even with the key, you wait 15 minutes.">
+<meta property="og:image" content="https://getpawl.com/img/og-image.png?v=4">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="The Pawl shield icon next to the words Pawl, App Blocker With a Key. Blocks the apps and websites you choose. Unlocking needs a key you keep out of reach.">
+<meta property="og:image:alt" content="Pawl, an app blocker that uses a physical security key.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Pawl: App Blocker With a Key">
-<meta name="twitter:description" content="Block any app or site. Unlocking needs a physical security key you keep out of reach, then a 15 minute wait.">
-<meta name="twitter:image" content="https://getpawl.com/img/og-image.png?v=2">
+<meta name="twitter:title" content="Pawl: Put distracting apps behind a physical key">
+<meta name="twitter:description" content="Choose what to block. Keep the key somewhere else. Even with the key, you wait 15 minutes.">
+<meta name="twitter:image" content="https://getpawl.com/img/og-image.png?v=4">
 <meta name="apple-itunes-app" content="app-id=6783119309">
-<link rel="icon" href="/favicon.ico?v=2" sizes="48x48">
-<link rel="icon" href="/img/favicon-32.png?v=2" type="image/png" sizes="32x32">
-<link rel="apple-touch-icon" href="/img/apple-touch-icon.png?v=2">
+<link rel="icon" href="/img/favicon-32-v4.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon-v4.png">
 <link rel="stylesheet" href="/pawl.css">
-<style>
-  /* nav */
-  .top{position:sticky;top:0;z-index:10;background:var(--green-700);color:var(--on-green)}
-  .top .wrap{display:flex;align-items:center;gap:var(--s-4);height:60px}
-  .top a{color:var(--on-green);text-decoration:none}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;margin-right:auto;letter-spacing:-.01em}
-  .brand img{width:32px;height:32px;border-radius:8px}
-  .links{display:flex;align-items:center;gap:var(--s-5)}
-  .links a{opacity:.9;font-size:var(--fs-0)}
-  .links a:hover{opacity:1;text-decoration:underline}
-  .links .nav-cta{background:var(--on-green);color:var(--green-700);padding:8px 16px;border-radius:var(--r-pill);font-weight:600;opacity:1;text-decoration:none}
-  @media(max-width:640px){.links a:not(.nav-cta){display:none}}
-
-  /* hero */
-  .hero{background:var(--brand-gradient);color:var(--on-green);padding:var(--s-7) 0 0;overflow:hidden}
-  .hero .wrap{display:grid;grid-template-columns:1fr;gap:var(--s-6);align-items:center}
-  @media(min-width:860px){.hero{padding:var(--s-9) 0 0}.hero .wrap{grid-template-columns:1.1fr .9fr;gap:var(--s-8)}}
-  .hero-copy{text-align:left}
-  .kicker{display:inline-flex;align-items:center;gap:8px;font-size:var(--fs-0);font-weight:600;color:var(--on-green-muted);letter-spacing:.02em}
-  .kicker img{width:22px;height:22px;border-radius:5px}
-  .hero h1{margin-top:var(--s-4);max-width:15ch;color:var(--on-green)}
-  .hero .sub{font-size:var(--fs-2);color:#eef4e6;max-width:44ch;margin-top:var(--s-5);line-height:1.55}
-  .cta-row{margin-top:var(--s-6);display:flex;gap:var(--s-4);align-items:center;flex-wrap:wrap}
-  .badge{display:inline-block;line-height:0}
-  .badge svg{height:56px;width:auto}
-  .cta-row .gh{color:var(--on-green);font-size:var(--fs-0);opacity:.9}
-  .price{margin-top:var(--s-4);font-size:var(--fs-0);color:var(--on-green-muted);max-width:48ch;line-height:1.5}
-
-  /* hero icon */
-  .hero-mascot{width:min(300px,70vw);height:auto;margin:0 0 var(--s-3) -10px;transform-origin:50% 100%;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
-  @media(min-width:860px){.hero-mascot{width:340px;margin-left:-16px}}
-  .hero-mascot.wiggle{animation:mascot-wiggle 1s ease-in-out}
-  @keyframes mascot-wiggle{
-    0%{transform:none}
-    18%{transform:translateY(-7px) rotate(-4deg)}
-    36%{transform:translateY(-9px) rotate(4deg)}
-    54%{transform:translateY(-4px) rotate(-3deg)}
-    72%{transform:translateY(0) rotate(2deg)}
-    88%{transform:rotate(-1deg)}
-    100%{transform:none}
-  }
-
-  /* phone frame */
-  .phone-wrap{display:flex;justify-content:center;align-items:flex-end;padding-top:var(--s-4)}
-  @media(min-width:860px){.phone-wrap{padding-top:0}}
-  .phone{position:relative;width:min(300px,78vw);aspect-ratio:1179/2556;background:#0b0f09;border-radius:46px;padding:12px;
-         box-shadow:0 30px 60px rgba(0,0,0,.35),inset 0 0 0 2px #2a2f27;margin-bottom:-14%}
-  .phone .screen{width:100%;height:100%;border-radius:36px;overflow:hidden;background:#000;position:relative}
-  .phone .screen img{width:100%;height:100%;object-fit:cover}
-  .phone .screen .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--green-700);font-size:14px}
-
-  /* sections shared */
-  section{padding:var(--s-8) 0}
-  section.alt{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-  .lead{font-size:var(--fs-2);color:var(--muted);max-width:60ch;margin-top:var(--s-2)}
-
-  /* how it works */
-  .steps{display:grid;grid-template-columns:1fr;gap:var(--s-4);margin-top:var(--s-6)}
-  @media(min-width:760px){.steps{grid-template-columns:repeat(2,1fr)}}
-  @media(min-width:1100px){.steps{grid-template-columns:repeat(4,1fr)}}
-  .step{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-2);padding:var(--s-5)}
-  .step .pic{display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-4)}
-  .step .pic img{width:96px;height:auto;max-height:72px;object-fit:contain;flex:none}
-  .step .n{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--green-500);color:#fff;font-weight:700}
-  .step p{margin-top:var(--s-2);font-size:var(--fs-0);color:var(--ink)}
-
-  /* screens */
-  .screens h2{text-align:center}
-  .screens .lead{text-align:center;margin-left:auto;margin-right:auto}
-  .shots{display:grid;grid-auto-flow:column;grid-auto-columns:min(72vw,260px);gap:var(--s-4);overflow-x:auto;scroll-snap-type:x mandatory;padding:var(--s-6) var(--gutter) var(--s-4);margin:0 calc(-1*var(--gutter));-webkit-overflow-scrolling:touch;scrollbar-width:thin}
-  @media(min-width:900px){.shots{grid-auto-flow:row;grid-template-columns:repeat(3,minmax(0,280px));justify-content:center;gap:var(--s-7);grid-auto-columns:auto;overflow:visible;margin:0;padding:var(--s-6) 0 0}}
-  .shot{margin:0;scroll-snap-align:center;text-align:center}
-  .shot .frame{aspect-ratio:1179/2556;border-radius:22px;overflow:hidden;background:var(--green-100);border:1px solid var(--line);box-shadow:var(--shadow);position:relative}
-  .shot .frame img{width:100%;height:100%;object-fit:cover}
-  .shot .frame .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;font-size:13px;color:var(--green-700)}
-  .shot h3{margin-top:var(--s-4)}
-  .shot p{margin-top:var(--s-1);font-size:var(--fs-0);color:var(--muted)}
-
-  /* two short lines: privacy and limits */
-  .notes .wrap{display:grid;grid-template-columns:1fr;gap:var(--s-4)}
-  @media(min-width:760px){.notes .wrap{grid-template-columns:1fr 1fr;gap:var(--s-7)}}
-  .notes p{font-size:var(--fs-1);color:var(--ink)}
-  .notes p a{white-space:nowrap}
-
-  /* final + footer */
-  .final{background:var(--brand-gradient);color:var(--on-green);text-align:center}
-  .final h2{color:#fff}
-  .final .cta-row{justify-content:center}
-  footer{background:var(--green-900);color:var(--on-green-muted);font-size:var(--fs-0)}
-  footer .wrap{padding:var(--s-6) var(--gutter);display:flex;flex-wrap:wrap;gap:var(--s-3) var(--s-5);align-items:center}
-  footer a{color:var(--on-green);text-decoration:none;opacity:.9}
-  footer a:hover{text-decoration:underline}
-  footer .sp{margin-left:auto}
-  footer .help{width:100%;border-top:1px solid rgba(255,255,255,.14);padding-top:var(--s-4);margin-top:var(--s-2);line-height:1.5}
-</style>
+<link rel="stylesheet" href="/home.css">
 </head>
-<body>
+<body class="home-page">
 
-<nav class="top" aria-label="Main">
-  <div class="wrap">
-    <a class="brand" href="/"><img src="/img/pawl-mark.png?v=2" alt="" width="32" height="32">Pawl</a>
-    <span class="links">
+<nav class="home-nav" aria-label="Main navigation">
+  <div class="home-wrap nav-inner">
+    <a class="home-brand" href="/" aria-label="Pawl home">
+      <img src="/img/kiki-icon-192.png" alt="" width="42" height="42">
+      <span>Pawl</span>
+    </a>
+    <div class="nav-links">
       <a href="#how">How it works</a>
+      <a href="#inside">Inside the app</a>
       <a href="/about">About</a>
-      <a href="/support">Support</a>
-      <a class="nav-cta" href="https://apps.apple.com/app/id6783119309">Get Pawl</a>
-    </span>
+      <a class="nav-button" href="https://apps.apple.com/app/id6783119309">Get Pawl</a>
+    </div>
   </div>
 </nav>
 
-<header class="hero">
-  <div class="wrap">
-    <div class="hero-copy">
-      <img id="hero-mascot" class="hero-mascot" src="/img/art/locked.png?v=3" alt="A tabby cat asleep with one paw resting on a green security key." width="900" height="600">
-      <span class="kicker"><img src="/img/pawl-mark.png?v=2" alt="" width="22" height="22">Pawl: App Blocker With a Key</span>
-      <h1>Block any app. Keep the key out of reach.</h1>
-      <p class="sub">Pawl uses Apple Screen Time to block the apps and sites you choose. Nothing on the phone can lift the block. To unblock, you need a physical security key you have left somewhere else, and then a 15 minute wait.</p>
-      <div class="cta-row">
-        <a class="badge" href="https://apps.apple.com/app/id6783119309" aria-label="Download on the App Store">
-          <svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
-            <rect width="120" height="40" rx="6" fill="#000"/>
-            <rect x=".5" y=".5" width="119" height="39" rx="5.5" fill="none" stroke="#a6a6a6"/>
-            <g fill="#fff">
-              <path d="M24.77 20.3a4.95 4.95 0 0 1 2.36-4.15 5.07 5.07 0 0 0-3.99-2.16c-1.68-.18-3.31 1-4.16 1-.87 0-2.19-.98-3.61-.95a5.32 5.32 0 0 0-4.47 2.73c-1.93 3.35-.49 8.27 1.36 10.98.93 1.33 2.01 2.81 3.43 2.75 1.39-.06 1.9-.88 3.58-.88 1.66 0 2.14.88 3.59.85 1.49-.02 2.43-1.33 3.32-2.67a11 11 0 0 0 1.52-3.09 4.78 4.78 0 0 1-2.93-4.41z"/>
-              <path d="M22.04 12.21a4.87 4.87 0 0 0 1.11-3.49 4.96 4.96 0 0 0-3.21 1.66 4.64 4.64 0 0 0-1.14 3.36 4.1 4.1 0 0 0 3.24-1.53z"/>
-              <text x="35" y="15.5" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="7.2" letter-spacing=".1">Download on the</text>
-              <text x="35" y="30" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="15.5" font-weight="600" letter-spacing="-.2">App Store</text>
-            </g>
-          </svg>
-        </a>
-        <a class="gh" href="https://github.com/jasonepage/Pawl">Read the source on GitHub</a>
-      </div>
-      <p class="price">Blocking, the key, the wait and your streak are free. Pawl Pro is optional ($3.99 a month or $29.99 a year in the US, with a 7-day free trial on the yearly plan) and adds ally approvals (the person holding your key can say yes from their own phone), new scheduled sets and the full weekly report. You need a USB-C security key (FIDO2), sold separately.</p>
-    </div>
-    <div class="phone-wrap">
-      <div class="phone" aria-hidden="false">
-        <div class="screen">
-          <picture><source srcset="/img/screens/00-shield.webp" type="image/webp"><img src="/img/screens/00-shield.png" alt="The screen a blocked app shows. Chess is locked. Open Pawl and use your security key, then wait out the cooling-off. No shortcuts, even at 1am. You've walked away 12 times this week. Buttons: Close this app, I'm tempted. There is no unlock button." width="780" height="1691" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex'"></picture>
-          <div class="ph" style="display:none">img/screens/00-shield.png</div>
+<main>
+  <header class="home-hero">
+    <div class="home-wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> App blocker with a physical key</p>
+        <h1>Block the app.<br>Put away the key.</h1>
+        <p class="hero-lead">Pawl removes the easy way back in. To reopen blocked apps and sites, use your security key or ask your trusted person, then wait 15 minutes.</p>
+        <div class="hero-actions">
+          <a class="store-button" href="https://apps.apple.com/app/id6783119309" aria-label="Download Pawl on the App Store">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.05 12.54c-.02-2.25 1.84-3.34 1.93-3.39a4.15 4.15 0 0 0-3.26-1.76c-1.37-.14-2.7.82-3.4.82-.71 0-1.79-.8-2.94-.78a4.34 4.34 0 0 0-3.65 2.23c-1.58 2.73-.4 6.75 1.11 8.96.76 1.09 1.64 2.29 2.8 2.24 1.13-.05 1.55-.72 2.92-.72 1.35 0 1.75.72 2.93.69 1.22-.02 1.98-1.08 2.71-2.18a9.04 9.04 0 0 0 1.24-2.52 3.9 3.9 0 0 1-2.39-3.59ZM14.83 5.94a3.98 3.98 0 0 0 .91-2.85 4.05 4.05 0 0 0-2.62 1.36 3.79 3.79 0 0 0-.93 2.74 3.35 3.35 0 0 0 2.64-1.25Z"/></svg>
+            <span><small>Download on the</small>App Store</span>
+          </a>
+          <a class="text-link" href="#how">See how it works <span aria-hidden="true">↓</span></a>
         </div>
+        <ul class="trust-list" aria-label="Pawl privacy facts">
+          <li>No account</li><li>No tracking</li><li>No Pawl server</li>
+        </ul>
+      </div>
+      <div class="hero-art">
+        <div class="hero-orbit orbit-one" aria-hidden="true"></div>
+        <div class="hero-orbit orbit-two" aria-hidden="true"></div>
+        <img src="/img/onboarding/welcome.webp" alt="Kiki, a calm tabby cat, sitting behind a green USB-C security key." width="1536" height="1024">
+        <div class="key-note"><span class="key-note-label">The whole idea</span><strong>Your key is somewhere else.</strong></div>
       </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<section id="how" class="alt">
-  <div class="wrap">
-    <h2>How it works</h2>
-    <p class="lead">Most blockers fail at 1am because you can switch them off with one tap. Pawl moves that decision to a small object you have already put out of reach.</p>
-    <div class="steps">
-      <div class="step">
-        <div class="pic"><img src="/img/art/no-key.png?v=3" alt="A tabby cat looking at an empty spot where a key should be." width="72" height="48"><span class="n">1</span></div>
-        <h3>Pick what to block</h3>
-        <p>Choose any apps and sites you keep reaching for: betting, adult sites, social feeds, games, or the one app that eats your evenings. Apple Screen Time does the blocking and shows a calm locked screen with no unlock button.</p>
-      </div>
-      <div class="step">
-        <div class="pic"><img src="/img/art/reading.png?v=3" alt="A tabby cat watching a green security key being plugged in." width="72" height="48"><span class="n">2</span></div>
-        <h3>Put the key somewhere else</h3>
-        <p>Unblocking needs a physical USB-C security key. You plug it in once when you set Pawl up, and Pawl remembers that key and only that key. Then leave it at a friend's place, in your car, or anywhere that is not your pocket at 1am.</p>
-      </div>
-      <div class="step">
-        <div class="pic"><img src="/img/art/open.png?v=3" alt="A tabby cat with its eyes open beside a green security key." width="72" height="48"><span class="n">3</span></div>
-        <h3>Wait it out</h3>
-        <p>Even with the key in hand, unblocking starts a 15 minute wait. After a short open window (30 minutes by default), the block comes back on by itself.</p>
-      </div>
-      <div class="step">
-        <div class="pic"><img src="/img/icon-192.png?v=2" alt="" aria-hidden="true" width="72" height="72" style="width:72px;border-radius:16px"><span class="n">4</span></div>
-        <h3>Or ask your ally (Pro)</h3>
-        <p>Give the key to someone you trust. With Pawl Pro they can say yes from their own phone instead of handing it over. Their yes starts the same wait. It goes through your own iCloud, not a server, and they never see what you block.</p>
+  <section class="statement" aria-labelledby="statement-title">
+    <div class="home-wrap statement-grid">
+      <p class="section-index">01 / Why Pawl</p>
+      <div><h2 id="statement-title">Most blockers leave the exit right beside the entrance.</h2><p>Pawl adds real distance. The thing that can start an unlock is a small USB-C security key you have already left somewhere else. Even when you retrieve it, the 15 minute wait still happens.</p></div>
+    </div>
+  </section>
+
+  <section id="how" class="how-section" aria-labelledby="how-title">
+    <div class="home-wrap">
+      <div class="section-heading"><p class="section-index">02 / How it works</p><h2 id="how-title">Three deliberate steps.<br>No button to bargain with.</h2></div>
+      <div class="story-steps">
+        <article class="story-card"><div class="story-art choose-art"><img src="/img/onboarding/choose.webp" alt="Kiki tapping one of three blank app tiles." width="1536" height="1024" loading="lazy"></div><div class="story-copy"><span>1</span><h3>Choose what to block</h3><p>Pick the apps and sites you keep opening. Apple Screen Time does the blocking.</p></div></article>
+        <article class="story-card"><div class="story-art unlock-art"><img src="/img/onboarding/unlock.webp" alt="A green security key on one side and Kiki asleep with another key on the other." width="1536" height="1024" loading="lazy"></div><div class="story-copy"><span>2</span><h3>Move the decision away</h3><p>Keep the key out of reach, or let a trusted person approve from their iPhone with Pawl Pro.</p></div></article>
+        <article class="story-card"><div class="story-art lockin-art"><img src="/img/onboarding/lockin.webp" alt="Kiki asleep with the green security key tucked under its chin." width="1536" height="1024" loading="lazy"></div><div class="story-copy"><span>3</span><h3>Wait 15 minutes</h3><p>The key or your trusted person's approval starts the wait. It never skips. Your blocks return after the open window.</p></div></article>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section id="screens" class="screens">
-  <div class="wrap">
-    <h2>What it looks like</h2>
-    <p class="lead">Three screens from the app.</p>
-    <div class="shots">
-      <figure class="shot">
-        <div class="frame">
-          <picture><source srcset="/img/screens/04-block.webp" type="image/webp"><img src="/img/screens/04-block.png" alt="Pawl app screen. Pawl the cat key stands in a green box above the words Apps are blocked. Below it a Tap to unlock button, and the line: Using your key starts a 15-minute wait. Apps stay locked until it's over, then re-lock on their own." width="780" height="1691" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex'"></picture>
-          <div class="ph" style="display:none">04-block.png</div>
-        </div>
-        <figcaption><h3>Apps are blocked</h3><p>Tap to unlock starts the 15 minute wait. Apps stay locked until it is over.</p></figcaption>
-      </figure>
-      <figure class="shot">
-        <div class="frame">
-          <picture><source srcset="/img/screens/03-wait.webp" type="image/webp"><img src="/img/screens/03-wait.png" alt="Pawl app screen. Pawl the cat key, half-lidded, with a small hourglass, above Unlocking soon, 14:57 until apps unlock. Below it: Apps unlock when the timer reaches zero. Waiting it out is the whole point. A button reads Cancel: keep apps locked." width="780" height="1691" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex'"></picture>
-          <div class="ph" style="display:none">03-wait.png</div>
-        </div>
-        <figcaption><h3>Unlocking soon</h3><p>The timer counts down to zero. You can cancel and keep apps locked.</p></figcaption>
-      </figure>
-      <figure class="shot">
-        <div class="frame">
-          <picture><source srcset="/img/screens/02-streaks.webp" type="image/webp"><img src="/img/screens/02-streaks.png" alt="Pawl app screen. Home: 44 days on track inside a ring, 16 days to the 60-day milestone, resisted 1 time, Protected. Below it an I'm tempted button and What's blocked: 2 apps, locked by your key." width="780" height="1691" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling.style.display='flex'"></picture>
-          <div class="ph" style="display:none">02-streaks.png</div>
-        </div>
-        <figcaption><h3>Days on track</h3><p>Your streak, the next milestone, and an I'm tempted button for hard moments.</p></figcaption>
-      </figure>
+  <section class="moment-section" aria-labelledby="moment-title">
+    <div class="home-wrap moment-grid">
+      <div class="moment-copy"><p class="section-index">03 / In the moment</p><h2 id="moment-title">The urge can be immediate.<br>The answer does not have to be.</h2><p>At the moment you would usually tap through, Pawl gives you time instead. There is no instant unlock inside the blocked app.</p><div class="moment-rule"><strong>Key or trusted person</strong><span aria-hidden="true">→</span><strong>15 minute wait</strong><span aria-hidden="true">→</span><strong>Short open window</strong></div></div>
+      <div class="cat-pause"><img src="/img/onboarding/screentime.webp" alt="Kiki holding up one paw in a calm pause gesture." width="1536" height="1024" loading="lazy"></div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section class="alt notes">
-  <div class="wrap">
-    <p>No account, no tracking, no Pawl server. <a href="/privacy">Read the privacy policy</a></p>
-    <p>Pawl adds friction. It does not make anything impossible. <a href="/about#limits">What it does not promise</a></p>
-  </div>
-</section>
-
-<section class="final">
-  <div class="wrap">
-    <h2>Make the 1am version of you slow down.</h2>
-    <div class="cta-row">
-      <a class="badge" href="https://apps.apple.com/app/id6783119309" aria-label="Download on the App Store">
-        <svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
-          <rect width="120" height="40" rx="6" fill="#000"/>
-          <rect x=".5" y=".5" width="119" height="39" rx="5.5" fill="none" stroke="#a6a6a6"/>
-          <g fill="#fff">
-            <path d="M24.77 20.3a4.95 4.95 0 0 1 2.36-4.15 5.07 5.07 0 0 0-3.99-2.16c-1.68-.18-3.31 1-4.16 1-.87 0-2.19-.98-3.61-.95a5.32 5.32 0 0 0-4.47 2.73c-1.93 3.35-.49 8.27 1.36 10.98.93 1.33 2.01 2.81 3.43 2.75 1.39-.06 1.9-.88 3.58-.88 1.66 0 2.14.88 3.59.85 1.49-.02 2.43-1.33 3.32-2.67a11 11 0 0 0 1.52-3.09 4.78 4.78 0 0 1-2.93-4.41z"/>
-            <path d="M22.04 12.21a4.87 4.87 0 0 0 1.11-3.49 4.96 4.96 0 0 0-3.21 1.66 4.64 4.64 0 0 0-1.14 3.36 4.1 4.1 0 0 0 3.24-1.53z"/>
-            <text x="35" y="15.5" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="7.2" letter-spacing=".1">Download on the</text>
-            <text x="35" y="30" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="15.5" font-weight="600" letter-spacing="-.2">App Store</text>
-          </g>
-        </svg>
-      </a>
+  <section id="inside" class="inside-section" aria-labelledby="inside-title">
+    <div class="home-wrap">
+      <div class="section-heading light-heading"><p class="section-index">04 / Inside the app</p><h2 id="inside-title">Calm when you need it.<br>Clear about what happens next.</h2></div>
+      <div class="phone-stories">
+        <article class="phone-story"><div class="phone-frame"><img src="/img/screens/04-block.webp" alt="Pawl showing that apps are blocked and that using the key starts a 15 minute wait." width="780" height="1691" loading="lazy"></div><div class="phone-caption"><span>Blocked</span><h3>The shortcut is gone</h3><p>Open Pawl, use the key, and let the cooling-off period do its job.</p></div></article>
+        <article class="phone-story reverse"><div class="phone-frame"><img src="/img/screens/03-wait.webp" alt="Pawl showing a countdown with 14 minutes and 57 seconds remaining." width="780" height="1691" loading="lazy"></div><div class="phone-caption"><span>Waiting</span><h3>Nothing to solve</h3><p>The timer moves at one speed. You can cancel the request and keep everything blocked.</p></div></article>
+        <article class="phone-story"><div class="phone-frame"><img src="/img/screens/02-streaks.webp" alt="Pawl Home showing days on track and current protection." width="780" height="1691" loading="lazy"></div><div class="phone-caption"><span>Protected</span><h3>See the days you kept</h3><p>Your week, your streak, and what is blocked, without an account or activity sent to Pawl.</p></div></article>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<footer>
-  <div class="wrap">
-    <a href="/" style="font-weight:600">Pawl</a>
-    <a href="#how">How it works</a>
-    <a href="/about">About</a>
-    <a href="/support">Support</a>
-    <a href="/privacy">Privacy</a>
-    <a href="https://github.com/jasonepage/Pawl">GitHub</a>
-    <a href="https://apps.apple.com/app/id6783119309">App Store</a>
-    <span class="sp">&copy; 2026 Jason Page</span>
-  </div>
-</footer>
+  <section class="facts-section" aria-labelledby="facts-title">
+    <div class="home-wrap facts-grid">
+      <div><p class="section-index">05 / Plain facts</p><h2 id="facts-title">Private by construction.</h2></div>
+      <div class="fact-list"><div><strong>No account</strong><p>Download Pawl and set it up on your iPhone.</p></div><div><strong>No tracking</strong><p>Pawl does not collect your app choices or browsing activity.</p></div><div><strong>Open source</strong><p>The code is public, so the privacy claims can be checked.</p></div></div>
+      <div class="facts-links"><a href="/privacy">Read the privacy policy</a><a href="https://github.com/jasonepage/Pawl">Read the source on GitHub</a><a href="/about#limits">See what Pawl does not promise</a></div>
+    </div>
+  </section>
+
+  <section class="price-section" aria-labelledby="price-title">
+    <div class="home-wrap price-card">
+      <div class="price-art"><img src="/img/onboarding/lockin.webp" alt="Kiki sleeping peacefully with the green security key." width="1536" height="1024" loading="lazy"></div>
+      <div class="price-copy"><p class="section-index">06 / Get Pawl</p><h2 id="price-title">The block, key, wait, and streak are free.</h2><p>Pawl Pro is optional. It adds ally approvals, scheduled sets, and the full weekly report.</p><p class="price-line"><strong>$3.99</strong> a month or <strong>$29.99</strong> a year in the US. The yearly plan includes a 7-day free trial.</p><p class="key-required">A compatible USB-C FIDO2 security key is sold separately.</p>
+        <a class="store-button store-button-dark" href="https://apps.apple.com/app/id6783119309" aria-label="Download Pawl on the App Store"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.05 12.54c-.02-2.25 1.84-3.34 1.93-3.39a4.15 4.15 0 0 0-3.26-1.76c-1.37-.14-2.7.82-3.4.82-.71 0-1.79-.8-2.94-.78a4.34 4.34 0 0 0-3.65 2.23c-1.58 2.73-.4 6.75 1.11 8.96.76 1.09 1.64 2.29 2.8 2.24 1.13-.05 1.55-.72 2.92-.72 1.35 0 1.75.72 2.93.69 1.22-.02 1.98-1.08 2.71-2.18a9.04 9.04 0 0 0 1.24-2.52 3.9 3.9 0 0 1-2.39-3.59ZM14.83 5.94a3.98 3.98 0 0 0 .91-2.85 4.05 4.05 0 0 0-2.62 1.36 3.79 3.79 0 0 0-.93 2.74 3.35 3.35 0 0 0 2.64-1.25Z"/></svg><span><small>Download on the</small>App Store</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="home-footer"><div class="home-wrap footer-grid"><div class="footer-brand"><img src="/img/kiki-icon-192.png" alt="" width="52" height="52"><div><strong>Pawl</strong><span>App blocker with a key</span></div></div><div class="footer-links"><a href="#how">How it works</a><a href="/about">About</a><a href="/support">Support</a><a href="/privacy">Privacy</a><a href="https://github.com/jasonepage/Pawl">GitHub</a></div><p class="footer-note">Pawl adds friction. It does not make anything impossible.</p><p class="copyright">© 2026 Jason Page</p></div></footer>
 
 <script>
-  /* A small wiggle when the hero mascot is tapped or clicked. Nothing else. */
-  (function(){
-    var m=document.getElementById('hero-mascot');
-    if(!m)return;
-    var t;
-    m.addEventListener('click',function(){
-      m.classList.remove('wiggle');
-      void m.offsetWidth;
-      m.classList.add('wiggle');
-      clearTimeout(t);
-      t=setTimeout(function(){m.classList.remove('wiggle');},1100);
-    });
-    m.addEventListener('animationend',function(){m.classList.remove('wiggle');});
+  (function () {
+    var nav = document.querySelector('.home-nav');
+    function updateNav() { nav.classList.toggle('scrolled', window.scrollY > 16); }
+    updateNav();
+    window.addEventListener('scroll', updateNav, { passive: true });
   })();
 </script>
 </body>
