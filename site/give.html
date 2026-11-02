@@ -1,191 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Give a Pawl Kit</title>
-<meta name="description" content="A Pawl Kit is a gift for someone who wants an app blocker with a key they can give away: a Yubico security key and a setup card.">
-<link rel="canonical" href="https://getpawl.com/give">
-<meta name="theme-color" content="#3c6a14">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Pawl">
-<meta property="og:url" content="https://getpawl.com/give">
-<meta property="og:title" content="Give a Pawl Kit">
-<meta property="og:description" content="A Yubico security key and a setup card, for someone who wants an app blocker with a key they can give away.">
-<meta property="og:image" content="https://getpawl.com/img/og-image.png?v=2">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.ico?v=2" sizes="48x48">
-<link rel="icon" href="/img/favicon-32.png?v=2" type="image/png" sizes="32x32">
-<link rel="apple-touch-icon" href="/img/apple-touch-icon.png?v=2">
-<link rel="stylesheet" href="/pawl.css">
-<!--
-  The Pawl Kit has NO Pro codes on purpose. Apple's Developer Program License Agreement,
-  Schedule 2, section 3.13(c): "You shall not sell the Offer Codes or accept any form of payment,
-  trade-in-kind, or other compensation in connection with the distribution of the Offer Codes."
-  Do not add Pro codes to anything that is paid for. Free codes (like /claim) are fine.
-  Price and payment link must match the live Stripe product "Pawl Kit". Change them together.
--->
-<style>
-  .top{position:sticky;top:0;z-index:10;background:var(--green-700);color:var(--on-green)}
-  .top .wrap{display:flex;align-items:center;gap:var(--s-4);height:60px}
-  .top a{color:var(--on-green);text-decoration:none}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;margin-right:auto}
-  .brand img{width:32px;height:32px;border-radius:8px}
-  .top .nav-cta{background:var(--on-green);color:var(--green-700);padding:8px 16px;border-radius:var(--r-pill);font-weight:600;font-size:var(--fs-0)}
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Give Pawl: a key, an app, and a little distance</title>
+<meta name="description" content="Give someone a Pawl Kit: a compatible USB-C security key, the free Pawl app, and a printed setup card.">
+<link rel="canonical" href="https://getpawl.com/give"><meta name="theme-color" content="#a74632">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Pawl"><meta property="og:url" content="https://getpawl.com/give"><meta property="og:title" content="Give someone a little distance"><meta property="og:description" content="A physical security key, the Pawl app, and a setup card. $59."><meta property="og:image" content="https://getpawl.com/img/og-image.png?v=4">
+<link rel="icon" href="/img/favicon-32-v4.png" type="image/png" sizes="32x32"><link rel="apple-touch-icon" href="/img/apple-touch-icon-v4.png">
+<link rel="stylesheet" href="/pawl.css"><link rel="stylesheet" href="/home.css"><link rel="stylesheet" href="/give.css">
+<!-- Paid Pawl Kits intentionally contain no Pawl Pro offer codes. -->
+</head><body class="home-page give-page">
+<nav class="gift-nav"><div class="home-wrap gift-nav-inner"><a class="gift-brand" href="/"><img src="/img/kiki-icon-192.png" alt="" width="42" height="42"><span>Pawl</span></a><div class="gift-links"><a href="/get">Buying for yourself?</a><a href="/about">About</a><a class="gift-nav-button" href="#buy">Give Pawl</a></div></div></nav>
+<main>
+<header class="gift-hero"><div class="home-wrap gift-hero-grid"><div class="gift-copy"><p class="gift-eyebrow">A useful gift for a hard moment</p><h1>Give them<br>a little<br>distance.</h1><p class="gift-lead">For the person who keeps deleting the app, reinstalling it, and wishing the decision were not so easy.</p><p class="gift-consent">Best given when they have asked for help. Pawl is a tool they choose, not a way to watch them.</p><div class="gift-actions"><a class="gift-buy" href="https://buy.stripe.com/5kQbIU8uJc9XblX1YgenS00">Give a Pawl Kit · $59</a><a href="#inside">See what is inside</a></div></div><div class="gift-package"><div class="package-box"><div class="package-lid"><img src="/img/kiki-icon-192.png" alt="" width="82" height="82"><strong>Pawl Kit</strong><span>A key for slowing down</span></div></div><img class="loose-key" src="/img/security-key.svg" alt="A green USB-C security key." width="320" height="130"><div class="gift-card"><b>A little distance</b><span>Three steps to set up Pawl</span><i></i><i></i><i></i></div><span class="package-sticker">Key + app + guide</span></div></div></header>
 
-  /* hero */
-  .give{background:var(--brand-gradient);color:var(--on-green)}
-  .give .wrap{max-width:960px;padding:var(--s-8) var(--gutter);display:grid;grid-template-columns:1fr;gap:var(--s-6);align-items:center}
-  @media(min-width:760px){.give .wrap{grid-template-columns:1fr auto;gap:var(--s-8)}}
-  .eyebrow{font-size:var(--fs-0);font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--on-green-muted);margin:0 0 var(--s-3)}
-  .give h1{color:var(--on-green);max-width:16ch}
-  .give .lead{font-size:var(--fs-2);color:#eef4e6;margin:var(--s-4) 0 var(--s-6);max-width:36em;line-height:1.55}
-  .buy{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-4) var(--s-5)}
-  .amount{font-size:var(--fs-4);font-weight:700;line-height:1}
-  .amount small{display:block;font-size:var(--fs-0);font-weight:500;color:var(--on-green-muted);margin-top:6px}
-  .cta{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--on-green);color:var(--green-700);
-       font-weight:700;font-size:var(--fs-2);padding:16px 28px;border-radius:var(--r-pill);text-decoration:none;box-shadow:var(--shadow)}
-  .cta:hover{transform:translateY(-1px)}
-  .hint{font-size:var(--fs-0);color:var(--on-green-muted);margin:var(--s-4) 0 0;max-width:34em}
-  .hint a{color:var(--on-green)}
-  .mascot-card{display:none;background:var(--card);border-radius:var(--r-3);padding:var(--s-5);box-shadow:var(--shadow);width:220px;text-align:center}
-  .mascot-card img{width:150px;height:150px;margin:0 auto}
-  .mascot-card p{color:var(--muted);font-size:14px;line-height:1.4;margin:var(--s-2) 0 0}
-  @media(min-width:760px){.mascot-card{display:block}}
+<section id="inside" class="inside-gift"><div class="home-wrap"><div class="gift-heading"><p>01 / Inside the gift</p><h2>Three things. One clear purpose.</h2></div><div class="gift-bento">
+<article class="bento-key"><div class="bento-image"><img src="/img/give-key-phone.webp" alt="A close view of the green USB-C security key beside an iPhone." width="1536" height="1024"></div><div><span>Physical</span><h3>Yubico security key</h3><p>A compatible USB-C FIDO2 key. Pawl pairs with this key and only this key.</p></div></article>
+<article class="bento-app"><img src="/img/screens/07-blocked-current.webp" alt="Pawl showing that selected apps are blocked." width="852" height="1846"><div><span>Software</span><h3>Pawl app</h3><p>The block, key, 15-minute wait, and streak are free.</p></div></article>
+<article class="bento-guide"><div class="guide-sheet"><img src="/img/kiki-icon-192.png" alt="" width="42" height="42"><b>Set up Pawl</b><ol><li>Install the app</li><li>Pair the key</li><li>Put it away</li></ol></div><div><span>Simple</span><h3>Printed setup card</h3><p>No long manual. Just the steps and practical places to keep the key.</p></div></article>
+</div></div></section>
 
-  /* sections */
-  section{padding:var(--s-8) 0}
-  section.alt{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-  .inner{max-width:960px;margin:0 auto;padding:0 var(--gutter)}
-  .sublead{font-size:var(--fs-2);color:var(--muted);max-width:60ch;margin-top:var(--s-2)}
-  .grid3{display:grid;grid-template-columns:1fr;gap:var(--s-4);margin-top:var(--s-6)}
-  @media(min-width:760px){.grid3{grid-template-columns:repeat(3,1fr)}}
-  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-2);padding:var(--s-5)}
-  section:not(.alt) .card{background:var(--card)}
-  .card .pic{display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-4)}
-  .card .pic img{width:72px;height:72px;flex:none}
-  .card .n{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--green-500);color:#fff;font-weight:700}
-  .card .icon{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:var(--r-2);background:var(--green-100);color:var(--green-700)}
-  .card .icon svg{width:26px;height:26px}
-  .card h3{margin-top:var(--s-3)}
-  .card .pic + h3{margin-top:0}
-  .card p{margin-top:var(--s-2);font-size:var(--fs-0);color:var(--ink)}
+<section class="handoff"><div class="home-wrap handoff-grid"><div class="handoff-copy"><p>02 / The handoff</p><h2>They choose the block.<br>You can hold the key.</h2><p>The recipient installs Pawl and decides what to block. After pairing, the key goes somewhere inconvenient. That may be with you, across town, or in a time-lock box.</p><div class="privacy-pill">No monitoring. No activity report sent to you.</div></div><div class="handoff-art"><img src="/img/give-ally.webp" alt="Kiki holding a phone beside a trusted-person symbol." width="1500" height="750"></div></div></section>
 
-  /* good to know */
-  .terms{list-style:none;padding:0;margin:var(--s-5) 0 0;display:grid;gap:var(--s-3);max-width:760px}
-  .terms li{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--green-500);border-radius:var(--r-2);padding:var(--s-3) var(--s-4)}
-  .terms strong{color:var(--green-700)}
+<section class="distance"><div class="home-wrap"><div class="gift-heading"><p>03 / The point</p><h2>Make the impulsive choice take a trip.</h2></div><div class="distance-diagram"><img src="/img/key-steps.svg" alt="The key plugs into the phone, then stays at another house, far from the phone." width="900" height="300"></div><div class="distance-steps"><div><b>Pair it once</b><span>Pawl remembers that physical key.</span></div><div><b>Put it somewhere else</b><span>Distance does what another dismissible alert cannot.</span></div><div><b>Wait 15 minutes</b><span>Even with the key back, the wait never skips.</span></div></div></div></section>
 
-  footer{background:var(--green-900);color:var(--on-green-muted);font-size:var(--fs-0)}
-  footer .wrap{padding:var(--s-6) var(--gutter);display:flex;flex-wrap:wrap;gap:var(--s-3) var(--s-5);align-items:center}
-  footer a{color:var(--on-green);text-decoration:none;opacity:.9}
-  footer a:hover{text-decoration:underline}
-  footer .sp{margin-left:auto}
-</style>
-</head>
-<body>
+<section class="gift-moment"><div class="home-wrap moment-card"><div class="moment-art"><img src="/img/onboarding/lockin.webp" alt="Kiki sleeping with the green security key." width="1536" height="1024"></div><div class="moment-text"><p>04 / What you are really giving</p><h2>Not control.<br>A pause.</h2><blockquote>“I want help making this harder to do in the moment.”</blockquote><p>Pawl works best when the person using it chose the goal. You are giving them a physical boundary they asked for.</p></div></div></section>
 
-<nav class="top" aria-label="Main">
-  <div class="wrap">
-    <a class="brand" href="/"><img src="/img/kiki-icon-192.png?v=3" alt="" width="32" height="32">Pawl</a>
-    <a class="nav-cta" href="/get">Get Pawl</a>
-  </div>
-</nav>
+<section id="buy" class="gift-buy-section"><div class="home-wrap gift-buy-panel"><div><p>Pawl Kit</p><h2>Ready to give them some room?</h2><ul><li>Yubico Security Key C NFC</li><li>Free Pawl app</li><li>Printed setup card</li></ul></div><div class="gift-checkout"><strong>$59</strong><span>One payment</span><a class="gift-buy light" href="https://buy.stripe.com/5kQbIU8uJc9XblX1YgenS00">Give a Pawl Kit</a><small>Secure Stripe checkout. US shipping addresses.</small></div></div></section>
 
-<header class="give">
-  <div class="wrap">
-    <div>
-      <p class="eyebrow">Give Pawl</p>
-      <h1>Give someone an app blocker with a key</h1>
-      <p class="lead">A Pawl Kit has what a partner, friend or family member needs to start: the security key that unlocks Pawl, and a card that walks them through setup.</p>
-
-      <div class="buy">
-        <!-- Price matches the live Stripe product "Pawl Kit" ($59.00 USD). Change both together. -->
-        <p class="amount">$59<small>One payment. No account.</small></p>
-        <!-- Live Stripe Payment Link for the Pawl Kit (US shipping address collected at checkout). -->
-        <a class="cta" href="https://buy.stripe.com/5kQbIU8uJc9XblX1YgenS00">Buy a Pawl Kit</a>
-      </div>
-      <p class="hint">Checkout is on Stripe, where you enter the address to ship to. Pawl itself is free on the <a href="https://apps.apple.com/app/id6783119309">App Store</a>. The kit adds the key and the setup card.</p>
-    </div>
-    <div class="mascot-card">
-      <img src="/img/kiki-icon-192.png?v=3" alt="The Pawl app icon: a green security key with a paw print." width="150" height="150">
-      <p>The key is what unlocks Pawl. Nothing on the phone can.</p>
-    </div>
-  </div>
-</header>
-
-<section class="alt">
-  <div class="inner">
-    <h2>What's in the kit</h2>
-    <div class="grid3">
-      <div class="card">
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="14" rx="3"/><path d="M10 16v4h4v-4"/><circle cx="12" cy="8" r="2"/></svg></span>
-        <h3>A security key</h3>
-        <p>A Yubico Security Key C NFC: a USB-C FIDO2 key, the kind Pawl needs to unlock. It needs no app and no account. Pawl remembers this key and only this key.</p>
-      </div>
-      <div class="card">
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg></span>
-        <h3>The Pawl app, free</h3>
-        <p>Blocking, the key, the wait and the streak are free. Pawl Pro is optional and adds scheduled sets and the full weekly report, with a 7-day free trial on the yearly plan in the app.</p>
-      </div>
-      <div class="card">
-        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/></svg></span>
-        <h3>A setup card</h3>
-        <p>Short steps to install Pawl, pick what to block, and pair the key. It also lists good places to keep the key, like with someone across town or in a time lock box.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="inner">
-    <h2>How it works</h2>
-    <div class="grid3">
-      <div class="card">
-        <div class="pic"><img src="/img/kiki-icon-192.png?v=3" alt="" aria-hidden="true" width="72" height="72"><span class="n">1</span></div>
-        <h3>Order the kit</h3>
-        <p>Pay once on Stripe and enter where to send it. There is no Pawl account to make.</p>
-      </div>
-      <div class="card">
-        <div class="pic"><img src="/img/kiki-icon-192.png?v=3" alt="" aria-hidden="true" width="72" height="72"><span class="n">2</span></div>
-        <h3>Hand it over</h3>
-        <p>Give the kit to the person it's for. They install Pawl free from the App Store, follow the card, and pair the key once.</p>
-      </div>
-      <div class="card">
-        <div class="pic"><img src="/img/kiki-icon-192.png?v=3" alt="" aria-hidden="true" width="72" height="72"><span class="n">3</span></div>
-        <h3>Decide who keeps the key</h3>
-        <p>After setup, the key goes somewhere hard to reach. That can be with you. Whoever holds the key decides when Pawl can loosen, and even then there is a 15 minute wait.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="alt">
-  <div class="inner">
-    <h2>Good to know</h2>
-    <ul class="terms">
-      <li><strong>It works best when they ask for it.</strong> They choose what to block. Pawl is not a way to watch someone: it has no server and sends nothing to you.</li>
-      <li><strong>It adds friction, not a wall.</strong> The owner of a phone can still turn Screen Time off. Pawl makes opening a blocked app slow. It does not make it impossible. <a href="/about#limits">What Pawl does not promise</a></li>
-      <li><strong>Phones it works with.</strong> iPhone or iPad on iOS 18 or later, with a USB-C port. That means iPhone 15 or newer.</li>
-      <li><strong>Shipping.</strong> US addresses only for now. Kits ship within 3 business days.</li>
-      <li><strong>Refunds.</strong> Full refund within 30 days if the key is unopened. If the key arrives broken, we send a new one free. Email <a href="mailto:support@getpawl.com">support@getpawl.com</a>.</li>
-      <li><strong>What we keep.</strong> Stripe handles the payment. We use the name, email and shipping address from checkout only to send the kit and answer questions about your order. <a href="/privacy">Privacy policy</a></li>
-      <li><strong>Questions.</strong> Email <a href="mailto:support@getpawl.com">support@getpawl.com</a>.</li>
-    </ul>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap">
-    <a href="/" style="font-weight:600">Pawl</a>
-    <a href="/about">About</a>
-    <a href="/support">Support</a>
-    <a href="/privacy">Privacy</a>
-    <a href="https://github.com/jasonepage/Pawl">GitHub</a>
-    <a href="https://apps.apple.com/app/id6783119309">App Store</a>
-    <span class="sp">&copy; 2026 Jason Page</span>
-  </div>
-</footer>
-
-</body>
-</html>
+<section class="gift-notes"><div class="home-wrap"><h2>Before you give it</h2><div class="notes-grid"><p><strong>Ask first.</strong> Pawl is for someone who wants the friction. It is not parental control or surveillance.</p><p><strong>Check their phone.</strong> It requires iOS 18 or later and a USB-C iPhone or iPad. That means iPhone 15 or newer.</p><p><strong>Shipping.</strong> US addresses only for now. Kits ship within 3 business days.</p><p><strong>Returns.</strong> Full refund within 30 days if the key is unopened. Broken arrivals are replaced free.</p></div><p class="note-links"><a href="/privacy">Privacy</a><a href="/support">Questions</a><a href="/get">Buying for yourself?</a></p></div></section>
+</main>
+<footer class="home-footer"><div class="home-wrap footer-grid"><div class="footer-brand"><img src="/img/kiki-icon-192.png" alt="" width="52" height="52"><div><strong>Pawl</strong><span>App blocker with a key</span></div></div><div class="footer-links"><a href="/">Home</a><a href="/get">Get Pawl</a><a href="/about">About</a><a href="/support">Support</a><a href="/privacy">Privacy</a></div><p class="footer-note">Pawl adds friction. It does not make anything impossible.</p><p class="copyright">© 2026 Jason Page</p></div></footer>
+</body></html>
