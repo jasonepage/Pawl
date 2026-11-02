@@ -318,10 +318,6 @@ struct OnboardingView: View {
 
     // MARK: Footer
 
-    private var nothingSelected: Bool {
-        selection.applicationTokens.isEmpty && selection.categoryTokens.isEmpty
-            && model.customDomains.isEmpty && !blockGambling && !blockAdult
-    }
     private var unlockReady: Bool { keyPaired || allyJoined != nil }
 
     @ViewBuilder
