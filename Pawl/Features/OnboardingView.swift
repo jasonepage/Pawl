@@ -382,6 +382,13 @@ struct OnboardingView: View {
                     Text(unlockChoice == .key ? "Blocks turn on once your key is paired." : "Blocks turn on once your ally has joined.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
+                #if DEBUG
+                // Debug builds only: turn blocks on without a key so the rest of the app can be
+                // tested while onboarding pairing is being fixed. Pair from Unlock afterward.
+                Button("Debug: turn on without a key") { Task { await turnOn() } }
+                    .font(.caption).foregroundStyle(.secondary)
+                    .disabled(working || pairing)
+                #endif
             }
         default:
             primary("Go to Home") {
