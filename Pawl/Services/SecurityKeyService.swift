@@ -85,7 +85,7 @@ public final class SecurityKeyService: NSObject {
             case .simulator:
                 return "Security keys can't connect to the Simulator. Run Pawl on a real iPhone to pair or use your key."
             case .noResponse:
-                return "No key found. Plug the USB-C key in all the way, then tap Pair again."
+                return "No key found. Plug the USB-C key in all the way, then tap Pair again.\n[debug: \(SecurityKeyService.lastAnchorDebug)]"
             }
         }
     }
@@ -99,6 +99,8 @@ public final class SecurityKeyService: NSObject {
     private let relyingPartyID: String
     private var continuation: CheckedContinuation<RawCredential, Error>?
     private var controller: ASAuthorizationController?
+    /// 2.4 debug: what the last key request attached to. Shown when iOS never answers.
+    nonisolated(unsafe) public static var lastAnchorDebug = ""
 
     public init(relyingPartyID: String = PawlConfig.relyingPartyID) {
         self.relyingPartyID = relyingPartyID
@@ -287,6 +289,8 @@ extension SecurityKeyService: ASAuthorizationControllerPresentationContextProvid
     public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
         let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+        let chosen = scene?.keyWindow ?? scene?.windows.first(where: { $0.isKeyWindow }) ?? scene?.windows.first
+        Self.lastAnchorDebug = "scenes \(scenes.count), state \(scene?.activationState.rawValue ?? -9), windows \(scene?.windows.count ?? -1), keyWindow \(scene?.keyWindow == nil ? "nil" : "ok"), chosen \(chosen.map { "key=\($0.isKeyWindow) hidden=\($0.isHidden) root=\($0.rootViewController != nil)" } ?? "none")"
         // A window that is actually on screen. A fresh, unattached UIWindow makes the system
         // accept the request and then never show the key sheet, so only fall back to that
         // when the scene truly has no windows yet.
