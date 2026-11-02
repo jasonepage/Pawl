@@ -66,13 +66,20 @@ public final class SecurityKeyService: NSObject {
         case simulator
         /// 2.3: the system never answered (no sheet, no error) within the time limit.
         case noResponse
+        /// 2.4: the system still had an earlier key request open ("Request already in progress").
+        case busy
 
         public var errorDescription: String? {
             switch self {
             case .cancelled:    return "Cancelled."
             case .noCredential: return "The key didn't return a credential."
+            case .busy:
+                return "Your iPhone is still finishing the last key request. Wait a few seconds, then tap Pair again."
             case .failed(let why):
-                return "Security key error: \(why)\n(If this mentions the domain/relying party, the Associated Domain isn't set up yet. See the setup doc.)"
+                if why.localizedCaseInsensitiveContains("relying party") || why.localizedCaseInsensitiveContains("domain") {
+                    return "Security key error: \(why)\n(The Associated Domain isn't set up yet. See the setup doc.)"
+                }
+                return "Security key error: \(why)"
             case .registrationRejected(let why):
                 return "That key's pairing response didn't pass the check (\(why)). Nothing was saved. Try again."
             case .simulator:
@@ -190,7 +197,9 @@ public final class SecurityKeyService: NSObject {
         // which left the Pair button looking dead. Say so plainly instead.
         throw SecurityKeyError.simulator
         #else
-        // Only one key request at a time: end any earlier one instead of leaking it.
+        // Only one key request at a time: cancel any earlier one with the system too, not just
+        // our side, or the next request fails with "Request already in progress".
+        if let old = controller { old.cancel() }
         finish(.failure(SecurityKeyError.cancelled))
         return try await withCheckedThrowingContinuation { cont in
             self.continuation = cont
@@ -260,6 +269,8 @@ extension SecurityKeyService: ASAuthorizationControllerDelegate {
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         if let asError = error as? ASAuthorizationError, asError.code == .canceled {
             finish(.failure(SecurityKeyError.cancelled))
+        } else if (error as NSError).localizedDescription.localizedCaseInsensitiveContains("already in progress") {
+            finish(.failure(SecurityKeyError.busy))
         } else {
             finish(.failure(SecurityKeyError.failed((error as NSError).localizedDescription)))
         }
