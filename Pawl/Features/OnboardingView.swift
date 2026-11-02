@@ -43,8 +43,11 @@ struct OnboardingView: View {
     @State private var hoursPerDay: Double = 0
     @State private var goal = ""
 
-    private let security = SecurityKeyService()
-    private let keyStore = KeyStore()
+    // @State, not let: a plain `let` on a SwiftUI struct is rebuilt on every redraw, and the
+    // first redraw (working = true) threw away the service that owned the live key request.
+    // The system sheet then had no listener and the next tap got "already in progress".
+    @State private var security = SecurityKeyService()
+    @State private var keyStore = KeyStore()
 
     var body: some View {
         VStack(spacing: 0) {
