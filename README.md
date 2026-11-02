@@ -41,7 +41,7 @@ plugged in once and then put somewhere hard to reach: a friend's house, your
 car, a drawer at work. Even with the key, you wait (fifteen minutes unless you
 change it) before anything opens, and the block comes back on by itself.
 
-A real example: it is 1am and you open the app you told yourself you were
+A real example: late at night you open the app you told yourself you were
 done with. You see Pawl's block screen. The key is at your sister's place
 across town. By the time you could get it, and then wait out the fifteen
 minutes, the urge has usually passed. That is the whole idea.
@@ -98,12 +98,12 @@ Read this before you trust it with anything.
   Apple Account than yours. It cannot stop you from making a second Apple
   Account and naming yourself as your own ally. That is the same as keeping the
   key in your own pocket, and adding an ally takes the key and the wait, so it
-  is not a 1am decision. See `Pawl/Domain/AllyDecisionVerifier.swift`.
+  is not a quick decision. See `Pawl/Domain/AllyDecisionVerifier.swift`.
 - **No blocklist is complete.** The optional gambling list ships 167 domains,
   built into the app, and the adult filter is Apple's. New sites appear every week. Sites
   you type in yourself are blocked exactly as typed.
 - **A determined person can get around any blocker on a phone they own**
-  (another phone, a laptop, a friend's device). Pawl makes the 1am version
+  (another phone, a laptop, a friend's device). Pawl makes opening a blocked app
   slow. It does not make it impossible.
 - **Most of the code has no automated tests.** The unlock loop and the key
   check do. The rest was tested by hand on real phones.

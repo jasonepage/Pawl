@@ -6,7 +6,7 @@
 //  UnlockMachine.swift
 //  Pawl — Domain core
 //
-//  The heart of the loop and the feature that wins the 1am fight (SDS §2.4).
+//  The heart of the loop and the feature that makes opening a blocked app slow (SDS §2.4).
 //  Pure reducer: (state, event, now) -> (newState, [effect]). It holds NO iOS
 //  dependencies — the app layer (NFCService, ShieldService, TimerScheduler)
 //  interprets the emitted effects. This is what makes the loop unit-testable.

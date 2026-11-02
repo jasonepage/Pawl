@@ -41,13 +41,13 @@
     <text x="90" y="250" text-anchor="middle" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="16" font-weight="600" fill="#2c550d">2. Leave it somewhere else</text>
   </g>
 
-  <!-- panel 3: 1am, across town -->
+  <!-- panel 3: across town -->
   <g transform="translate(600,40)">
     <circle cx="70" cy="40" r="22" fill="#c9ddb4"/>
     <circle cx="82" cy="32" r="20" fill="#ffffff"/>
     <use href="#phone" transform="translate(0,70) scale(.5)"/>
     <path d="M52 160 C120 160 160 120 230 120" fill="none" stroke="#2c550d" stroke-width="4" stroke-dasharray="8 8" stroke-linecap="round"/>
     <use href="#house" transform="translate(190,50) scale(.5)"/>
-    <text x="140" y="250" text-anchor="middle" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="16" font-weight="600" fill="#2c550d">3. At 1am it is across town</text>
+    <text x="140" y="250" text-anchor="middle" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="16" font-weight="600" fill="#2c550d">3. The key is across town</text>
   </g>
 </svg>
