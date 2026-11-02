@@ -18,7 +18,10 @@ struct OnboardingView: View {
 
     @State private var role: AppRole?          // nil → show the role/focus picker first
     @State private var vertical: Vertical = .custom     // set when the person picks a focus
-    @State private var pickedFocus: Vertical?            // 2.2: nothing selected until they choose
+    /// 2.4: one or more focuses, in the order tapped. The first is the main one (it names the
+    /// steps and is saved as the vertical); the rest add their categories and suggestions.
+    @State private var pickedFocuses: [Vertical] = []
+    private var pickedFocus: Vertical? { pickedFocuses.first }
     @State private var hoursPerDay: Double = 2           // welcome-screen estimate, never stored
     @State private var step = 0
     @State private var selection = FamilyActivitySelection()
@@ -69,7 +72,7 @@ struct OnboardingView: View {
                         .foregroundStyle(PawlColor.cleanText)
                 }
                 .multilineTextAlignment(.center)
-                Text("Pick one to start. You can add more later.")
+                Text("Pick one or more. You can change this later.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -77,8 +80,11 @@ struct OnboardingView: View {
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
                           spacing: 12) {
                     ForEach(Vertical.allCases, id: \.self) { v in
-                        Button { pickedFocus = v } label: {
-                            focusCard(v, selected: pickedFocus == v)
+                        Button {
+                            if let i = pickedFocuses.firstIndex(of: v) { pickedFocuses.remove(at: i) }
+                            else { pickedFocuses.append(v) }
+                        } label: {
+                            focusCard(v, selected: pickedFocuses.contains(v))
                         }
                         .buttonStyle(.plain)
                     }
@@ -128,8 +134,9 @@ struct OnboardingView: View {
     /// hands Pawl opaque tokens), so every other focus starts with the picker on the next step.
     private func chooseFocus(_ v: Vertical) {
         vertical = v
-        blockGambling = v.defaultBlockGambling
-        blockAdult = v.defaultBlockAdult
+        // 2.4: every picked focus contributes its website category.
+        blockGambling = pickedFocuses.contains { $0.defaultBlockGambling }
+        blockAdult = pickedFocuses.contains { $0.defaultBlockAdult }
         // 2.3: setup again on a phone that was already protecting can only add. Show a category
         // that is already on as on (and locked below), instead of an off switch that gets ignored.
         if model.setupWasAlreadyProtecting {
@@ -196,7 +203,7 @@ struct OnboardingView: View {
         case 0:
             painting("PawlOnboarding-welcome", height: 120)
             heading("What it costs you", "A quick, private look.")
-            body(vertical.welcomeBody)
+            body(pickedFocuses.count > 1 ? Vertical.custom.welcomeBody : vertical.welcomeBody)
             card {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("How many hours a day does this take?")
@@ -260,7 +267,7 @@ struct OnboardingView: View {
                         .buttonStyle(.bordered)
                 }
                 // 2.3: names only. Screen Time can't tell Pawl what's installed or pre-pick apps.
-                if let line = vertical.suggestedAppsLine {
+                if let line = suggestedAppsLine {
                     Text(line)
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -290,10 +297,10 @@ struct OnboardingView: View {
                             .disabled(siteEntry.trimmingCharacters(in: .whitespaces).isEmpty)
                     }
                     // 2.3: popular sites for this focus, one tap each. Nothing is pre-picked.
-                    if !vertical.suggestedSites.filter({ !model.customDomains.contains($0) }).isEmpty {
+                    if !suggestedSites.filter({ !model.customDomains.contains($0) }).isEmpty {
                         Text("Tap to block").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
                             .padding(.top, 2)
-                        SiteSuggestionChips(sites: vertical.suggestedSites,
+                        SiteSuggestionChips(sites: suggestedSites,
                                             alreadyAdded: model.customDomains) { site in
                             model.addCustomDomains(site)
                         }
@@ -583,14 +590,27 @@ struct OnboardingView: View {
         !blockGambling && !blockAdult && selectionIsEmpty && model.customDomains.isEmpty
     }
 
+    /// 2.4: suggestions from every picked focus, first pick first, no repeats.
+    private var suggestedSites: [String] {
+        var out: [String] = []
+        for v in pickedFocuses { for site in v.suggestedSites where !out.contains(site) { out.append(site) } }
+        return out
+    }
+    private var suggestedAppsLine: String? {
+        let lines = pickedFocuses.compactMap(\.suggestedAppsLine)
+        return lines.isEmpty ? nil : lines.joined(separator: " ")
+    }
+
     /// Categories-step copy, tailored to the chosen focus.
     private var categoryStepTitle: String {
+        if pickedFocuses.count > 1 { return "Choose what to block" }
         switch vertical {
         case .gambling, .adultContent: return "What are you here to block?"
         default:                       return "Choose what to block"
         }
     }
     private var categoryStepSubtitle: String {
+        if pickedFocuses.count > 1 { return "Add the apps you keep opening. Website categories are optional." }
         switch vertical {
         case .social:       return "Add the social apps you keep opening. Website categories are optional."
         case .games:        return "Add the games you keep opening. Website categories are optional."

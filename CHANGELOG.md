@@ -47,6 +47,8 @@ a time, after the rest of 2.4 below.
   link is opened, and an Ally screen (its own tab, or the whole app if they only help someone):
   "Jason wants to unlock Pawl." with Approve (Face ID) and Not now, Pawl waiting beside it, and
   a Stop button. The paywall lists ally approvals first.
+- The first setup screen lets you pick more than one focus (social and games, say). Each adds
+  its website category and its suggested sites; the first pick names the steps.
 - Setup has a painting at the top of each step (the tabby and the green key), in place of the
   symbols.
 - Setup asks "How will you unlock?" with two cards: a security key, or an ally (Pawl Pro). Pick
