@@ -22,6 +22,8 @@ struct ContentView: View {
     @State private var tab: AppTab = .home
     /// Set by Home's "What's blocked" card; Settings pushes that page and clears it.
     @State private var openBlockedItems = false
+    /// 2.4: setup chose an ally; Settings pushes the Ally page and clears it.
+    @State private var openAlly = false
     @Environment(\.scenePhase) private var scenePhase
     /// Set when someone pressed "I need a minute" on the block screen (FR-SHACT-004).
     /// Owned here rather than in HomeView: sibling tabs stay alive in a TabView, so a
@@ -73,6 +75,14 @@ struct ContentView: View {
             await model.restorePendingSetsChange()           // 2.2: scheduled sets, their activities, gated edits
             await model.restorePendingAlly()                 // 2.4: ally pairing, and one waiting to become active
             checkPendingUrge()                               // FR-SHACT-004 pickup on cold launch
+        }
+        .onChange(of: model.didOnboard) { _, done in
+            // 2.4: setup picked "an ally" with no key. Take them straight to the Ally page.
+            if done, model.openAllyAfterSetup {
+                model.openAllyAfterSetup = false
+                tab = .settings
+                openAlly = true
+            }
         }
         .onChange(of: scenePhase) { _, phase in
             // Re-read Screen Time auth on resume so the Home/Settings banner reflects reality
@@ -132,7 +142,7 @@ struct ContentView: View {
                     .tag(AppTab.ally)
             }
 
-            SettingsView(model: model, openBlockedItems: $openBlockedItems,
+            SettingsView(model: model, openBlockedItems: $openBlockedItems, openAlly: $openAlly,
                          onOpenUnlock: { tab = .unlock })
                 .tabItem { Label("Settings", systemImage: "gearshape") }
                 .tag(AppTab.settings)

@@ -27,6 +27,9 @@ struct OnboardingView: View {
     @State private var isPickerPresented = false
     @State private var keyPaired = false
     @State private var pairLater = false        // "I don't have a key yet" → set up now, pair later
+    /// 2.4: how they plan to unlock. nil until they pick. An ally is set up after setup.
+    enum UnlockChoice { case key, ally }
+    @State private var unlockChoice: UnlockChoice? = nil
     @State private var working = false
     @State private var message: String?
     @State private var siteEntry = ""            // 2.2: typed websites, added right from setup
@@ -307,9 +310,35 @@ struct OnboardingView: View {
                 }
             }
         case 3:
-            art(keyPaired ? "checkmark.seal.fill" : "key.fill")
-            heading("Pair your key", keyHeadlineSub)
-            if keyPaired {
+            art(keyPaired ? "checkmark.seal.fill" : (unlockChoice == .ally ? "person.2.fill" : "key.fill"))
+            heading("How will you unlock?", unlockChoice == nil ? "Pick one. You can add the other later." : keyHeadlineSub)
+            if !keyPaired {
+                HStack(spacing: 12) {
+                    choiceCard("key.fill", "A security key",
+                               "A small USB-C key you keep out of reach.",
+                               selected: unlockChoice == .key) { unlockChoice = .key }
+                    choiceCard("person.2.fill", "An ally",
+                               "Someone you trust says yes from their phone. Pawl Pro.",
+                               selected: unlockChoice == .ally) { unlockChoice = .ally; pairLater = false }
+                }
+            }
+            if unlockChoice == .ally && !keyPaired {
+                body("Your blocks turn on now. Right after setup, Pawl opens the Ally page so you can invite them. Until they join, nothing can unlock.")
+                card {
+                    VStack(alignment: .leading, spacing: 14) {
+                        infoRow("paperplane.fill", "You send one link",
+                                "By Messages or any way you like. They open it, Pawl asks them to join.")
+                        infoRow("checkmark.circle.fill", "They tap Approve",
+                                "When you ask to unlock, their phone shows it. Their yes starts your wait, the same as a key would.")
+                        infoRow("eye.slash.fill", "They see almost nothing",
+                                "Only that you are asking. Never what you block, your streak or your notes.")
+                        infoRow("icloud.fill", "Needs iCloud on both phones",
+                                "And some free iCloud space on yours. Most free 5 GB accounts are full, so this usually means a paid iCloud plan. Only you need Pawl Pro.")
+                    }
+                }
+            } else if unlockChoice == nil && !keyPaired {
+                EmptyView()
+            } else if keyPaired {
                 body("Now put the key out of reach. That distance is the whole point. Whoever holds your key decides when Pawl can open.")
                 keyPlacesCard
             } else if pairLater {
@@ -353,7 +382,7 @@ struct OnboardingView: View {
                     summaryRow("hourglass", "Unlock wait", "15 minutes")
                 }
             }
-            body("From here, lifting the shield needs your key, or a yes from your ally with Pawl Pro, plus the wait. Turning off Screen Time still removes protection. For a full lock, someone you trust can set a Screen Time passcode for you. That's Hard lock in Settings.")
+            body("From here, lifting the shield needs your key or a yes from your ally, plus the wait. Turning off Screen Time still removes protection. For a full lock, someone you trust can set a Screen Time passcode for you. That's Hard lock in Settings.")
         }
     }
 
@@ -399,16 +428,17 @@ struct OnboardingView: View {
             }
         case 3:
             VStack(spacing: 10) {
-                if !pairLater {
+                if unlockChoice == .key, !pairLater {
                     secondary(working ? "Waiting for your key\u{2026}" : (keyPaired ? "Re-pair key" : "Pair security key")) {
                         Task { await pairKey() }
                     }
                     .disabled(working)
                 }
+                let canContinue = keyPaired || pairLater || unlockChoice == .ally
                 primary("Continue") { step = 4 }
-                    .disabled(!(keyPaired || pairLater))
-                    .opacity((keyPaired || pairLater) ? 1 : 0.5)
-                if !keyPaired {
+                    .disabled(!canContinue)
+                    .opacity(canContinue ? 1 : 0.5)
+                if unlockChoice == .key, !keyPaired {
                     Button(pairLater ? "Actually, I'll pair a key now" : "I don't have a key yet") {
                         pairLater.toggle()
                     }
@@ -423,6 +453,7 @@ struct OnboardingView: View {
                     working = true
                     model.setOnboardingWebCategories(gambling: blockGambling, adult: blockAdult)
                     model.hoursPerDay = hoursPerDay
+                    model.openAllyAfterSetup = (unlockChoice == .ally && !keyPaired)   // 2.4
                     await model.activate(selection: selection, vertical: vertical)   // flips didOnboard → main app
                 }
             }
@@ -492,6 +523,32 @@ struct OnboardingView: View {
         Text(text).font(.body).foregroundStyle(.secondary).lineSpacing(3)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
+    }
+
+    /// 2.4: one of the two unlock choices, as a tappable card.
+    private func choiceCard(_ symbol: String, _ title: String, _ text: String, selected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 8) {
+                Image(systemName: symbol)
+                    .font(.title2)
+                    .foregroundStyle(selected ? PawlColor.cleanText : PawlColor.brand)
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(selected ? PawlColor.cleanText : .primary)
+                Text(text)
+                    .font(.footnote)
+                    .foregroundStyle(selected ? PawlColor.cleanText.opacity(0.85) : .secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, minHeight: 130, alignment: .topLeading)
+            .padding(14)
+            .background(selected ? PawlColor.cleanBg : PawlColor.cardBg)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(selected ? PawlColor.brand : .clear, lineWidth: 2))
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
     private func primary(_ label: String, action: @escaping () -> Void) -> some View {

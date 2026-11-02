@@ -47,6 +47,9 @@ a time, after the rest of 2.4 below.
   link is opened, and an Ally screen (its own tab, or the whole app if they only help someone):
   "Jason wants to unlock Pawl." with Approve (Face ID) and Not now, Pawl waiting beside it, and
   a Stop button. The paywall lists ally approvals first.
+- Setup asks "How will you unlock?" with two cards: a security key, or an ally (Pawl Pro). Pick
+  the key and the old pair-now-or-later flow follows. Pick an ally and setup finishes without
+  a key, then opens Settings > Ally so you can send the invite.
 - Ally without a key. Making someone your ally no longer needs a key tap, only the wait: the
   hurdle is that another person had to join. So a person with no key can have an ally as their
   way to unlock. The Unlock tab shows "Ask Sam" as the main button when there is an ally and no

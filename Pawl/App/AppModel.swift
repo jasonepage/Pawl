@@ -577,6 +577,8 @@ final class AppModel {
 
     // MARK: - Ally approvals (2.4, docs/18)
 
+    /// 2.4: setup chose "an ally" with no key. ContentView opens Settings > Ally once, then clears it.
+    var openAllyAfterSetup = false
     /// The owner's one ally, mirrored from the Keychain so views update. nil: no ally.
     private(set) var allyPairing: AllyPairing?
     /// This phone's ally role (it helps someone else). nil: not an ally.

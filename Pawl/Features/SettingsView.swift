@@ -24,6 +24,8 @@ struct SettingsView: View {
     let model: AppModel
     /// Flipped by Home to land straight on What's blocked.
     var openBlockedItems: Binding<Bool> = .constant(false)
+    /// 2.4: pushes the Ally page (from setup's "an ally" choice).
+    var openAlly: Binding<Bool> = .constant(false)
     /// Switches to the Unlock tab, where the key is paired and used.
     var onOpenUnlock: () -> Void = {}
 
@@ -61,6 +63,9 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(isPresented: openBlockedItems) {
                 BlockedItemsView(model: model)
+            }
+            .navigationDestination(isPresented: openAlly) {
+                AllyPage(model: model, onShowPaywall: { showPaywall = true })
             }
             .sheet(isPresented: $showPaywall,
                    onDismiss: { Task { await model.pro.refreshEntitlements(); syncPro() } }) {
