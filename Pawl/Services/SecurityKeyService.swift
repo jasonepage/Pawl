@@ -281,7 +281,11 @@ extension SecurityKeyService: ASAuthorizationControllerPresentationContextProvid
     public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
         let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+        // A window that is actually on screen. A fresh, unattached UIWindow makes the system
+        // accept the request and then never show the key sheet, so only fall back to that
+        // when the scene truly has no windows yet.
         if let window = scene?.keyWindow { return window }
+        if let window = scene?.windows.first(where: { $0.isKeyWindow }) ?? scene?.windows.first { return window }
         if let scene { return UIWindow(windowScene: scene) }      // iOS 26: init() is deprecated
         return UIWindow(frame: .zero)
     }
