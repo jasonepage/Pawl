@@ -205,6 +205,13 @@ struct HomeView: View {
                     Text("Pawl is on")
                         .font(.system(size: heroNumberSize * 0.6, weight: .bold, design: .rounded))
                 }
+                // 2.4: the reason, in the person's words. Set at the payoff screen or in Settings.
+                if let goal = SharedState.goal(), !goal.isEmpty {
+                    Text("You wanted \(goal) back.")
+                        .font(.headline)
+                        .padding(.top, 8)
+                        .multilineTextAlignment(.center)
+                }
             }
 
             if let facts = vm.facts, !stats(facts).isEmpty {
