@@ -4,185 +4,66 @@
 
 //
 //  OnboardingView.swift
-//  Pawl — first-run flow
+//  Pawl: first run (v2, docs/26 and docs/27)
 //
-//  Honest, staged onboarding (FR-ONBOARD-001/002/003): explain → authorize → choose
-//  targets → pair key → activate. Themed for calm + accessibility.
+//  Four screens, then the payoff. Explain first, then one permission, then choose what to
+//  block (website chips that block at once, toggles, and Apple's picker only as the way to add
+//  apps), then the unlock. Blocks turn on only once a key is paired or an ally has joined,
+//  so Pawl never makes a lock with no exit. The hours question is a reward after the block,
+//  not homework before it.
 //
 
 import SwiftUI
 import FamilyControls
+import CloudKit
 
 struct OnboardingView: View {
     let model: AppModel
 
-    @State private var role: AppRole?          // nil → show the role/focus picker first
-    @State private var vertical: Vertical = .custom     // set when the person picks a focus
-    /// 2.4: one or more focuses, in the order tapped. The first is the main one (it names the
-    /// steps and is saved as the vertical); the rest add their categories and suggestions.
-    @State private var pickedFocuses: [Vertical] = []
-    private var pickedFocus: Vertical? { pickedFocuses.first }
-    @State private var hoursPerDay: Double = 2           // welcome-screen estimate, never stored
-    @State private var step = 0
+    @State private var step = 0                  // 0 welcome, 1 permission, 2 choose, 3 unlock, 4 done
     @State private var selection = FamilyActivitySelection()
-    @State private var blockGambling = true     // gambling is the default category (D6)
+    @State private var blockGambling = false
     @State private var blockAdult = false
     @State private var isPickerPresented = false
-    @State private var keyPaired = false
-    @State private var pairLater = false        // "I don't have a key yet" → set up now, pair later
-    /// 2.4: how they plan to unlock. nil until they pick. An ally is set up after setup.
+    @State private var siteEntry = ""
+    @State private var moreSites = false
+
     enum UnlockChoice { case key, ally }
     @State private var unlockChoice: UnlockChoice? = nil
+    @State private var keyPaired = false
     @State private var working = false
     @State private var message: String?
-    @State private var siteEntry = ""            // 2.2: typed websites, added right from setup
+
+    // Ally during setup
+    @State private var invite: AllyInvite?
+    @State private var allyJoined: AllyPairing?
+    @State private var showPaywall = false
+
+    // Payoff
+    @State private var hoursPerDay: Double = 0
 
     private let security = SecurityKeyService()
     private let keyStore = KeyStore()
 
-    private let totalSteps = 5
-
     var body: some View {
-        Group {
-            if role == nil {
-                rolePicker
-            } else {
-                blockerFlow
-            }
-        }
-        .frame(maxWidth: 600)              // keep a readable centered column on iPad
-        .frame(maxWidth: .infinity)        // …with the background still filling the screen
-        .background(PawlColor.groupedBg)
-        .tint(PawlColor.brand)
-        .task { await model.noteSetupStarted() }
-    }
-
-    // MARK: Role picker (first screen)
-
-    private var rolePicker: some View {
-        ScrollView {
-            VStack(spacing: 22) {
-                painting("PawlOnboarding-welcome", height: 170)
-                    .padding(.top, 16)
-                VStack(spacing: 6) {
-                    Text("Welcome to Pawl")
-                        .font(.system(.largeTitle, design: .rounded).weight(.bold))
-                    Text("What do you want to block?")
-                        .font(.title3)
-                        .foregroundStyle(PawlColor.cleanText)
-                }
-                .multilineTextAlignment(.center)
-                Text("Pick one or more. You can change this later.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-
-                LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)],
-                          spacing: 12) {
-                    ForEach(Vertical.allCases, id: \.self) { v in
-                        Button {
-                            if let i = pickedFocuses.firstIndex(of: v) { pickedFocuses.remove(at: i) }
-                            else { pickedFocuses.append(v) }
-                        } label: {
-                            focusCard(v, selected: pickedFocuses.contains(v))
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-
-                primary("Continue") { if let v = pickedFocus { chooseFocus(v) } }
-                    .disabled(pickedFocus == nil)
-                    .opacity(pickedFocus == nil ? 0.5 : 1)
-            }
-            .padding(20)
-        }
-    }
-
-    /// One focus choice: icon on top, title, one short line. Selected gets the green fill.
-    private func focusCard(_ v: Vertical, selected: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            ZStack {
-                Circle().fill(selected ? PawlColor.brand : PawlColor.cleanBg)
-                Image(systemName: v.icon)
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(selected ? Color.white : PawlColor.brand)
-            }
-            .frame(width: 44, height: 44)
-            Text(v.title)
-                .font(.headline)
-                .foregroundStyle(.primary)
-                .fixedSize(horizontal: false, vertical: true)
-            Text(v.cardSubtitle)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .lineLimit(3)
-                .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 0)
-        }
-        .padding(14)
-        .frame(maxWidth: .infinity, minHeight: 150, alignment: .topLeading)
-        .background(selected ? PawlColor.cleanBg : PawlColor.cardBg)
-        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous)
-            .strokeBorder(selected ? PawlColor.brand : .clear, lineWidth: 2))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(selected ? .isSelected : [])
-    }
-
-    /// Become a blocker and preset the website categories for the chosen focus. Only gambling
-    /// and adult content have a website preset; the app picker cannot be pre-filled (Apple
-    /// hands Pawl opaque tokens), so every other focus starts with the picker on the next step.
-    private func chooseFocus(_ v: Vertical) {
-        vertical = v
-        // 2.4: every picked focus contributes its website category.
-        blockGambling = pickedFocuses.contains { $0.defaultBlockGambling }
-        blockAdult = pickedFocuses.contains { $0.defaultBlockAdult }
-        // 2.3: setup again on a phone that was already protecting can only add. Show a category
-        // that is already on as on (and locked below), instead of an off switch that gets ignored.
-        if model.setupWasAlreadyProtecting {
-            blockGambling = blockGambling || model.gamblingOn
-            blockAdult = blockAdult || model.adultOn
-        }
-        role = .blocker
-    }
-
-    /// A small icon + title + explanation row — used by the "what's a security key?" explainer.
-    private func infoRow(_ icon: String, _ title: String, _ text: String) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: icon)
-                .font(.headline).foregroundStyle(PawlColor.brand).frame(width: 26)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.subheadline.weight(.semibold))
-                Text(text).font(.caption).foregroundStyle(.secondary).lineSpacing(2)
-            }
-            Spacer(minLength: 0)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    // MARK: Blocker flow (the full setup)
-
-    private var blockerFlow: some View {
         VStack(spacing: 0) {
-            PawlStepDots(current: step, total: totalSteps)
-                .padding(.top, 14)
-
+            if (1...3).contains(step) {
+                PawlStepDots(current: step - 1, total: 3)
+                    .padding(.top, 14)
+            }
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     content
                 }
                 .padding(20)
             }
-
-            // 2.3: the message sits right above the buttons, not at the bottom of the scroll.
-            // It used to land below the key info card, off screen, so tapping "Pair security
-            // key" on a phone that was already protecting looked like nothing happened.
             VStack(spacing: 10) {
                 if let message {
                     Label(message, systemImage: "info.circle")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
                         .padding(12)
                         .background(PawlColor.cardBg)
                         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
@@ -191,43 +72,53 @@ struct OnboardingView: View {
             }
             .padding(20)
         }
+        .frame(maxWidth: 600)
+        .frame(maxWidth: .infinity)
+        .background(PawlColor.groupedBg)
+        .tint(PawlColor.brand)
         .familyActivityPicker(isPresented: $isPickerPresented, selection: $selection)
-        .onChange(of: step) { _, _ in message = nil }   // a note belongs to the step it came from
+        .sheet(isPresented: $showPaywall, onDismiss: { Task { await model.pro.refreshEntitlements() } }) {
+            PaywallView(pro: model.pro)
+        }
+        .onChange(of: step) { _, _ in message = nil }
+        .onChange(of: model.auth.isApproved) { _, ok in if ok, step == 1 { step = 2 } }
+        .task { await model.noteSetupStarted() }
     }
 
-    // MARK: Step content
+    // MARK: Screens
 
     @ViewBuilder
     private var content: some View {
         switch step {
-        case 0:
-            painting("PawlOnboarding-welcome", height: 120)
-            heading("What it costs you", "A quick, private look.")
-            body(pickedFocuses.count > 1 ? Vertical.custom.welcomeBody : vertical.welcomeBody)
+        case 0: welcome
+        case 1: permission
+        case 2: choose
+        case 3: unlock
+        default: payoff
+        }
+    }
+
+    private var welcome: some View {
+        VStack(spacing: 18) {
+            painting("PawlOnboarding-welcome", height: 190)
+                .padding(.top, 12)
+            heading("Pawl locks apps until you tap a small key.", "")
+            body("Pick the apps and sites. Pawl blocks them with Apple's Screen Time. To open one again you tap a security key you keep somewhere else, then wait 15 minutes.")
             card {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("How many hours a day does this take?")
-                        .font(.headline)
-                    HStack {
-                        Slider(value: $hoursPerDay, in: 0...8, step: 0.5)
-                        Text(hoursPerDay == hoursPerDay.rounded() ? "\(Int(hoursPerDay)) h" : String(format: "%.1f h", hoursPerDay))
-                            .font(.body.monospacedDigit())
-                            .frame(width: 44, alignment: .trailing)
-                    }
-                    if let line = TimeCost.sentence(hoursPerDay: hoursPerDay) {
-                        Text(line)
-                            .font(.title3.weight(.semibold))
-                            .foregroundStyle(PawlColor.cleanText)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    Text("Stays on your phone. Pawl uses it to show you the time you keep.")
-                        .font(.caption).foregroundStyle(.tertiary)
+                    infoRow("key.fill", "The key is about $30", "Any USB-C security key works. You buy it once.")
+                    infoRow("person.2.fill", "Or an ally, with Pawl Pro", "Someone you trust says yes from their phone instead.")
+                    infoRow("hand.raised.fill", "No account, nothing collected", "Your choices stay on this iPhone.")
                 }
             }
-        case 1:
+        }
+    }
+
+    private var permission: some View {
+        VStack(spacing: 18) {
             painting("PawlOnboarding-screentime")
-            heading("Allow Screen Time", "This is how Pawl blocks apps.")
-            body("Apple's Screen Time does the blocking. Pawl only ever sees anonymous tokens, never which apps you chose.")
+            heading("One permission", "Pawl needs Screen Time to do the blocking.")
+            body("It never sees which apps you pick. Your choices stay on this iPhone.")
             card {
                 HStack {
                     Image(systemName: model.auth.isApproved ? "checkmark.circle.fill" : "circle.dashed")
@@ -239,48 +130,60 @@ struct OnboardingView: View {
                 }
             }
             if let err = model.auth.lastErrorMessage {
-                Text(err).font(.footnote).foregroundStyle(.red)
+                Text(err).font(.footnote).foregroundStyle(PawlColor.dangerText)
             }
-        case 2:
-            painting("PawlOnboarding-choose")
-            heading(categoryStepTitle, categoryStepSubtitle)
-            categoryToggle(title: "Gambling sites",
-                           subtitle: "Sportsbook, casino, and crypto sites we keep a list of.",
-                           isOn: $blockGambling,
-                           locked: model.setupWasAlreadyProtecting && model.gamblingOn)
-            categoryToggle(title: "Adult sites",
-                           subtitle: "Turns on Apple's built-in adult-website filter.",
-                           isOn: $blockAdult,
-                           locked: model.setupWasAlreadyProtecting && model.adultOn)
+        }
+    }
+
+    private static let popularSites = ["tiktok.com", "instagram.com", "x.com", "youtube.com", "reddit.com", "facebook.com", "snapchat.com"]
+    private static let gamblingSites = ["draftkings.com", "fanduel.com", "kalshi.com", "polymarket.com"]
+    private static let moreSiteGroups: [(String, [String])] = [
+        ("Games", ["roblox.com", "twitch.tv", "chess.com", "poki.com"]),
+        ("Shopping", ["amazon.com", "temu.com", "shein.com", "ebay.com"]),
+        ("News", ["news.google.com", "cnn.com", "foxnews.com", "nytimes.com"]),
+    ]
+
+    private var choose: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            painting("PawlOnboarding-choose", height: 120)
+            heading("What should Pawl block?", "Tap a site to block it right now.")
+
+            chipGroup("Social", Self.popularSites)
+
             card {
-              VStack(alignment: .leading, spacing: 0) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Apps").font(.headline)
-                        Text(selection.applicationTokens.isEmpty
-                             ? "None added yet"
-                             : (selection.applicationTokens.count == 1 ? "1 app added" : "\(selection.applicationTokens.count) apps added"))
-                            .font(.caption).foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Apps").font(.headline)
+                            Text(selection.applicationTokens.isEmpty
+                                 ? "The TikTok app, the Instagram app, any app."
+                                 : (selection.applicationTokens.count == 1 ? "1 app picked" : "\(selection.applicationTokens.count) apps picked"))
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                        Spacer(minLength: 8)
+                        Button(selection.applicationTokens.isEmpty ? "Add apps" : "Change") { isPickerPresented = true }
+                            .buttonStyle(.borderedProminent)
                     }
-                    Spacer(minLength: 8)
-                    Button(selection.applicationTokens.isEmpty ? "Add" : "Edit") { isPickerPresented = true }
-                        .buttonStyle(.bordered)
-                }
-                // 2.3: names only. Screen Time can't tell Pawl what's installed or pre-pick apps.
-                if let line = suggestedAppsLine {
-                    Text(line)
+                    Text("Apple's list shows every app on your phone. Search for the one you want, tap the circle next to it, then tap Done in the top right.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
-                        .padding(.top, 6)
                 }
-              }
             }
+
+            categoryToggle(title: "Gambling sites",
+                           subtitle: "Pawl's list of sportsbook and casino sites. Off unless you turn it on.",
+                           isOn: $blockGambling,
+                           locked: model.setupWasAlreadyProtecting && model.gamblingOn)
+            if blockGambling { chipGroup("Also block", Self.gamblingSites) }
+            categoryToggle(title: "Adult sites",
+                           subtitle: "Apple's adult website filter. Off unless you turn it on.",
+                           isOn: $blockAdult,
+                           locked: model.setupWasAlreadyProtecting && model.adultOn)
+
             card {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Websites").font(.headline)
-                    Text("Type a site to block it, like example.com.")
-                        .font(.caption).foregroundStyle(.secondary)
+                    Text("Any website").font(.headline)
                     HStack(spacing: 8) {
                         TextField("example.com", text: $siteEntry)
                             .textInputAutocapitalization(.never)
@@ -296,111 +199,179 @@ struct OnboardingView: View {
                             .buttonStyle(.bordered)
                             .disabled(siteEntry.trimmingCharacters(in: .whitespaces).isEmpty)
                     }
-                    // 2.3: popular sites for this focus, one tap each. Nothing is pre-picked.
-                    if !suggestedSites.filter({ !model.customDomains.contains($0) }).isEmpty {
-                        Text("Tap to block").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-                            .padding(.top, 2)
-                        SiteSuggestionChips(sites: suggestedSites,
-                                            alreadyAdded: model.customDomains) { site in
-                            model.addCustomDomains(site)
+                    Button(moreSites ? "Fewer suggestions" : "More sites: games, shopping, news") { withAnimation { moreSites.toggle() } }
+                        .font(.footnote.weight(.medium))
+                    if moreSites {
+                        ForEach(Self.moreSiteGroups, id: \.0) { group in
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(group.0).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                                SiteSuggestionChips(sites: group.1, alreadyAdded: model.customDomains) { model.addCustomDomains($0) }
+                            }
                         }
                     }
-                    if !model.customDomains.isEmpty {
-                        Text(model.customDomains.sorted().joined(separator: ", "))
-                            .font(.footnote)
-                            .foregroundStyle(PawlColor.cleanText)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    if let m = model.blockChangeMessage {
-                        Text(m).font(.caption).foregroundStyle(.secondary)
-                    }
                 }
             }
-        case 3:
-            painting("PawlOnboarding-unlock")
-            heading("How will you unlock?", unlockChoice == nil ? "Pick one. You can add the other later." : keyHeadlineSub)
-            if !keyPaired {
-                HStack(spacing: 12) {
-                    choiceCard("key.fill", "A security key",
-                               "A small USB-C key you keep out of reach.",
-                               selected: unlockChoice == .key) { unlockChoice = .key }
-                    choiceCard("person.2.fill", "An ally",
-                               "Someone you trust says yes from their phone. Pawl Pro.",
-                               selected: unlockChoice == .ally) { unlockChoice = .ally; pairLater = false }
-                }
+
+            if !blockedLine.isEmpty {
+                Text("Blocking: \(blockedLine)")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(PawlColor.cleanText)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            if unlockChoice == .ally && !keyPaired {
-                body("Your blocks turn on now. Right after setup, Pawl opens the Ally page so you can invite them. Until they join, nothing can unlock.")
-                card {
-                    VStack(alignment: .leading, spacing: 14) {
-                        infoRow("paperplane.fill", "You send one link",
-                                "By Messages or any way you like. They open it, Pawl asks them to join.")
-                        infoRow("checkmark.circle.fill", "They tap Approve",
-                                "When you ask to unlock, their phone shows it. Their yes starts your wait, the same as a key would.")
-                        infoRow("eye.slash.fill", "They see almost nothing",
-                                "Only that you are asking. Never what you block, your streak or your notes.")
-                        infoRow("icloud.fill", "Needs iCloud on both phones",
-                                "And some free iCloud space on yours. Most free 5 GB accounts are full, so this usually means a paid iCloud plan. Only you need Pawl Pro.")
-                    }
-                }
-            } else if unlockChoice == nil && !keyPaired {
-                EmptyView()
-            } else if keyPaired {
-                body("Now put the key out of reach. That distance is the whole point. Whoever holds your key decides when Pawl can open.")
-                keyPlacesCard
-            } else if pairLater {
-                body("No problem. Set up Pawl now and pair your key when it arrives.")
-                card {
-                    VStack(alignment: .leading, spacing: 14) {
-                        infoRow("cart.fill", "Get a USB-C security key",
-                                "Any FIDO2 USB-C key works. Search \u{201C}FIDO2 USB-C security key,\u{201D} or look at the YubiKey 5C or Google Titan, about $30.")
-                        infoRow("lock.shield", "Your blocks turn on now",
-                                "Pawl starts protecting you right away. Until a key is paired you can't unblock from inside Pawl, so pair it as soon as it arrives.")
-                        infoRow("arrow.clockwise", "Pair it anytime",
-                                "Open the Unlock tab and tap \u{201C}Pair security key\u{201D} once you have it in hand. Your first key works right away.")
-                    }
-                }
-                keyPlacesCard
-            } else {
-                body("A security key is a small device, about the size of a USB stick, that proves it's really you. Banks and Google use the same kind for their strongest protection.")
-                card {
-                    VStack(alignment: .leading, spacing: 14) {
-                        infoRow("key.fill", "It's your only unlock",
-                                "Pawl lifts the shield only when this exact key is connected, or when the person holding it says yes from their phone (Pawl Pro). No key, no yes, no unblock.")
-                        infoRow("cable.connector", "It plugs into your iPhone",
-                                "Use a USB-C security key (the FIDO2 kind), about $30. YubiKey and Google Titan are common ones.")
-                        infoRow("shippingbox.fill", "Where you keep it is the trick",
-                                "You give it to someone you trust or lock it away, so it's never in your pocket at 1am.")
-                    }
-                }
-                body("Have your key handy and plug it in, then tap Pair below.")
-            }
-        default:
-            painting("PawlOnboarding-lockin")
-            heading("Lock it in", "Here's what you're turning on.")
-            card {
-                VStack(alignment: .leading, spacing: 12) {
-                    summaryRow("globe", "Website categories", categorySummary)
-                    summaryRow("apps.iphone", "Apps",
-                               selection.applicationTokens.isEmpty ? "None" : "\(selection.applicationTokens.count)")
-                    summaryRow("link", "Typed sites",
-                               model.customDomains.isEmpty ? "None" : "\(model.customDomains.count)")
-                    summaryRow("key.fill", "Security key", keyPaired ? "Paired" : "Pair later")
-                    summaryRow("hourglass", "Unlock wait", "15 minutes")
-                }
-            }
-            body("From here, lifting the shield needs your key or a yes from your ally, plus the wait. Turning off Screen Time still removes protection. For a full lock, someone you trust can set a Screen Time passcode for you. That's Hard lock in Settings.")
         }
     }
 
-    private var categorySummary: String {
-        switch (blockGambling, blockAdult) {
-        case (true, true):   return "Gambling, Adult"
-        case (true, false):  return "Gambling"
-        case (false, true):  return "Adult"
-        case (false, false): return "None"
+    private func chipGroup(_ title: String, _ sites: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+            SiteSuggestionChips(sites: sites, alreadyAdded: model.customDomains) { site in
+                model.addCustomDomains(site)
+            }
+            if let m = model.blockChangeMessage, title == "Social" {
+                Text(m).font(.caption).foregroundStyle(.secondary)
+            }
         }
     }
+
+    /// The running summary: sites, categories, apps.
+    private var blockedLine: String {
+        var parts = model.customDomains
+        if blockGambling { parts.append("Gambling sites") }
+        if blockAdult { parts.append("Adult sites") }
+        let n = selection.applicationTokens.count
+        if n > 0 { parts.append(n == 1 ? "1 app" : "\(n) apps") }
+        return parts.joined(separator: ", ")
+    }
+
+    private var unlock: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            painting("PawlOnboarding-unlock", height: 130)
+            heading("Lock it with your key", "Or with an ally. One has to be ready before blocks turn on.")
+            if !keyPaired && allyJoined == nil {
+                HStack(spacing: 12) {
+                    choiceCard("key.fill", "Security key", "Plug it in and touch it. About 3 taps.",
+                               selected: unlockChoice == .key) { unlockChoice = .key }
+                    choiceCard("person.2.fill", "Ally (Pro)", "They say yes from their phone. You send one link.",
+                               selected: unlockChoice == .ally) { unlockChoice = .ally }
+                }
+            }
+            if keyPaired {
+                card {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Label("Key paired", systemImage: "checkmark.circle.fill").font(.headline)
+                        Text("Now put it somewhere that takes real effort to reach: a friend across town, a time lock box, your desk at work. More ideas in Settings.")
+                            .font(.subheadline).foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            } else if let joined = allyJoined {
+                card {
+                    Label("\(joined.name) is your ally", systemImage: "person.fill.checkmark").font(.headline)
+                }
+            } else if unlockChoice == .key {
+                body("Plug in your USB-C security key and tap Pair. When your iPhone asks, touch the key. To open a blocked app later you tap the key again, then wait 15 minutes.")
+            } else if unlockChoice == .ally {
+                VStack(alignment: .leading, spacing: 10) {
+                    body("Send one link to someone you trust. When they open it, Pawl asks them to join. They cannot see which apps or sites you block. Needs iCloud on both phones and Pawl Pro for you only.")
+                    if let invite {
+                        ShareLink(item: invite, preview: SharePreview("Be my Pawl ally")) {
+                            Label("Send the invite", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(PawlBigButtonStyle(background: PawlColor.brand, foreground: .white))
+                        Button("Check if they joined") { Task { await checkAllyJoined() } }
+                            .disabled(working)
+                    }
+                }
+            }
+        }
+    }
+
+    private var payoff: some View {
+        VStack(spacing: 18) {
+            painting("PawlOnboarding-lockin", height: 170)
+                .padding(.top, 12)
+            heading("Blocks are on", blockedLine.isEmpty ? "" : "Blocking \(blockedLine).")
+            body("Open one of them and watch it bounce. To get back in: \(keyPaired ? "tap your key" : "ask \(allyJoined?.name ?? "your ally")"), then wait 15 minutes.")
+            card {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("How many hours a day did this take?").font(.headline)
+                    HStack {
+                        Slider(value: $hoursPerDay, in: 0...8, step: 0.5)
+                        Text(hoursPerDay == hoursPerDay.rounded() ? "\(Int(hoursPerDay)) h" : String(format: "%.1f h", hoursPerDay))
+                            .font(.body.monospacedDigit())
+                            .frame(width: 44, alignment: .trailing)
+                    }
+                    if hoursPerDay > 0 {
+                        Text("That's about \(hoursPerDay == hoursPerDay.rounded() ? "\(Int(hoursPerDay))" : String(format: "%.1f", hoursPerDay)) hours a day back. Home will count it.")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(PawlColor.cleanText)
+                    } else {
+                        Text("Optional. Home uses it to show what you get back.")
+                            .font(.caption).foregroundStyle(.tertiary)
+                    }
+                }
+            }
+            Text("Turning off Screen Time for Pawl removes the blocks. For a firmer lock, someone you trust can set a Screen Time passcode. That is in Settings.")
+                .font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
+        }
+    }
+
+    // MARK: Footer
+
+    private var nothingSelected: Bool {
+        selection.applicationTokens.isEmpty && selection.categoryTokens.isEmpty
+            && model.customDomains.isEmpty && !blockGambling && !blockAdult
+    }
+    private var unlockReady: Bool { keyPaired || allyJoined != nil }
+
+    @ViewBuilder
+    private var footer: some View {
+        switch step {
+        case 0:
+            primary("Block my first app") { step = model.auth.isApproved ? 2 : 1 }
+        case 1:
+            if model.auth.isApproved {
+                primary("Continue") { step = 2 }
+            } else {
+                primary("Allow Screen Time") { Task { await model.auth.requestAuthorization() } }
+            }
+        case 2:
+            VStack(spacing: 6) {
+                primary("Continue") { step = 3 }
+                    .disabled(nothingSelected)
+                    .opacity(nothingSelected ? 0.5 : 1)
+                if nothingSelected {
+                    Text("Tap a site or add an app to continue.").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+        case 3:
+            VStack(spacing: 10) {
+                if !unlockReady {
+                    if unlockChoice == .key {
+                        secondary(working ? "Waiting for your key\u{2026}" : "Pair security key") { Task { await pairKey() } }
+                            .disabled(working)
+                    } else if unlockChoice == .ally, invite == nil {
+                        secondary(working ? "One moment\u{2026}" : "Invite my ally") { Task { await makeInvite() } }
+                            .disabled(working)
+                    }
+                }
+                primary(working ? "Turning on blocks\u{2026}" : "Turn on blocks") { Task { await turnOn() } }
+                    .disabled(!unlockReady || working)
+                    .opacity(unlockReady ? 1 : 0.5)
+                if !unlockReady, unlockChoice != nil {
+                    Text(unlockChoice == .key ? "Blocks turn on once your key is paired." : "Blocks turn on once your ally has joined.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            }
+        default:
+            primary("Go to Home") {
+                model.hoursPerDay = hoursPerDay
+                model.setupPayoffPending = false
+            }
+        }
+    }
+
+    // MARK: Actions
 
     private func addTypedSite() {
         let text = siteEntry.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -408,89 +379,48 @@ struct OnboardingView: View {
         if model.addCustomDomains(text) > 0 { siteEntry = "" }
     }
 
-    // MARK: Footer button
+    private func turnOn() async {
+        working = true
+        model.setOnboardingWebCategories(gambling: blockGambling, adult: blockAdult)
+        model.setupPayoffPending = true
+        await model.activate(selection: selection, vertical: blockGambling ? .gambling : (blockAdult ? .adultContent : .custom))
+        working = false
+        step = 4
+    }
 
-    @ViewBuilder
-    private var footer: some View {
-        switch step {
-        case 0:
-            primary("Get started") { step = 1 }
-        case 1:
-            if model.auth.isApproved {
-                primary("Continue") { step = 2 }
-            } else {
-                primary("Allow Screen Time") {
-                    Task { await model.auth.requestAuthorization() }
-                }
-            }
-        case 2:
-            VStack(spacing: 10) {
-                primary("Continue") { step = 3 }
-                    .disabled(nothingSelected)
-                    .opacity(nothingSelected ? 0.5 : 1)
-                if nothingSelected {
-                    Text("Pick a category, add an app, or type a site, so Pawl protects something.")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
-            }
-        case 3:
-            VStack(spacing: 10) {
-                if unlockChoice == .key, !pairLater {
-                    secondary(working ? "Waiting for your key\u{2026}" : (keyPaired ? "Re-pair key" : "Pair security key")) {
-                        Task { await pairKey() }
-                    }
-                    .disabled(working)
-                }
-                let canContinue = keyPaired || pairLater || unlockChoice == .ally
-                primary("Continue") { step = 4 }
-                    .disabled(!canContinue)
-                    .opacity(canContinue ? 1 : 0.5)
-                if unlockChoice == .key, !keyPaired {
-                    Button(pairLater ? "Actually, I'll pair a key now" : "I don't have a key yet") {
-                        pairLater.toggle()
-                    }
-                    .font(.footnote)
-                    .foregroundStyle(PawlColor.brand)
-                    .padding(.top, 2)
-                }
-            }
-        default:
-            primary(working ? "Activating…" : "Lock it in") {
-                Task {
-                    working = true
-                    model.setOnboardingWebCategories(gambling: blockGambling, adult: blockAdult)
-                    model.hoursPerDay = hoursPerDay
-                    model.openAllyAfterSetup = (unlockChoice == .ally && !keyPaired)   // 2.4
-                    await model.activate(selection: selection, vertical: vertical)   // flips didOnboard → main app
-                }
-            }
-            .disabled(working)
+    private func makeInvite() async {
+        guard model.pro.isPro else { showPaywall = true; return }
+        working = true
+        defer { working = false }
+        guard await AllyCloud.shared.isSignedIn() else {
+            message = "Sign in to iCloud on this phone first (Settings, your name)."
+            return
+        }
+        do {
+            let share = try await AllyCloud.shared.share()
+            invite = AllyInvite(share: share, container: AllyCloud.shared.container)
+            message = nil
+        } catch let e as CKError where e.code == .quotaExceeded {
+            message = "Your iCloud storage is full, so Pawl can't save the invite there. Free up some iCloud space and try again, or use a key."
+        } catch {
+            message = "Couldn't make the invite. \(error.localizedDescription)"
         }
     }
 
-    // MARK: Where to keep the key
-
-    /// 2.3: the key is the accountability now, so setup gives real places to put it. Each one
-    /// makes getting it back take a person, a trip, or a wait, which is what beats 1am.
-    private var keyPlacesCard: some View {
-        card {
-            VStack(alignment: .leading, spacing: 14) {
-                Text("Where to keep it").font(.headline)
-                infoRow("person.2.fill", "Someone you trust",
-                        "A sister, parent or close friend across town. You have to ask, and they hand it back in person, or say yes from their phone with Pawl Pro.")
-                infoRow("timer", "A time lock box",
-                        "A box with a timer that won't open until the time runs out. Search \u{201C}time lock box\u{201D} online.")
-                infoRow("building.columns.fill", "A bank safe deposit box",
-                        "It only opens during bank hours, never late at night.")
-                infoRow("briefcase.fill", "Your desk at work",
-                        "Getting it means a trip, and the office is closed at night.")
-                infoRow("envelope.fill", "Mail it to a friend",
-                        "Ask them to mail it back only when you ask. That takes days.")
-                Text("Pick a place far enough that a late-night urge would have to wait until morning.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+    private func checkAllyJoined() async {
+        working = true
+        defer { working = false }
+        do {
+            let pairing = try await AllyCloud.shared.fetchAllyLink()
+            await model.activateAllyDuringSetup(pairing)
+            allyJoined = pairing
+            message = nil
+        } catch AllyCloudError.allyNotJoined {
+            message = "Nobody has joined yet. Ask them to open the link."
+        } catch AllyCloudError.allyIsOwner {
+            message = "That link was opened on a phone signed in to your own Apple Account. An ally needs their own."
+        } catch {
+            message = "Couldn't check. \(error.localizedDescription)"
         }
     }
 
@@ -499,7 +429,11 @@ struct OnboardingView: View {
     private func heading(_ title: String, _ sub: String) -> some View {
         VStack(spacing: 6) {
             Text(title).font(.system(.largeTitle, design: .rounded).weight(.bold))
-            Text(sub).font(.title3).foregroundStyle(PawlColor.cleanText)
+                .fixedSize(horizontal: false, vertical: true)
+            if !sub.isEmpty {
+                Text(sub).font(.title3).foregroundStyle(PawlColor.cleanText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)
@@ -525,6 +459,21 @@ struct OnboardingView: View {
 
     private func card<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
         PawlCard(content: content)
+    }
+
+    /// A small icon, a title and one line of explanation.
+    private func infoRow(_ icon: String, _ title: String, _ text: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.headline).foregroundStyle(PawlColor.brand).frame(width: 26)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.subheadline.weight(.semibold))
+                Text(text).font(.caption).foregroundStyle(.secondary).lineSpacing(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func summaryRow(_ icon: String, _ title: String, _ value: String) -> some View {
@@ -590,44 +539,6 @@ struct OnboardingView: View {
         !blockGambling && !blockAdult && selectionIsEmpty && model.customDomains.isEmpty
     }
 
-    /// 2.4: suggestions from every picked focus, first pick first, no repeats.
-    private var suggestedSites: [String] {
-        var out: [String] = []
-        for v in pickedFocuses { for site in v.suggestedSites where !out.contains(site) { out.append(site) } }
-        return out
-    }
-    private var suggestedAppsLine: String? {
-        let lines = pickedFocuses.compactMap(\.suggestedAppsLine)
-        return lines.isEmpty ? nil : lines.joined(separator: " ")
-    }
-
-    /// Categories-step copy, tailored to the chosen focus.
-    private var categoryStepTitle: String {
-        if pickedFocuses.count > 1 { return "Choose what to block" }
-        switch vertical {
-        case .gambling, .adultContent: return "What are you here to block?"
-        default:                       return "Choose what to block"
-        }
-    }
-    private var categoryStepSubtitle: String {
-        if pickedFocuses.count > 1 { return "Add the apps you keep opening. Website categories are optional." }
-        switch vertical {
-        case .social:       return "Add the social apps you keep opening. Website categories are optional."
-        case .games:        return "Add the games you keep opening. Website categories are optional."
-        case .shopping:     return "Add the shopping apps you keep opening. Website categories are optional."
-        case .news:         return "Add the news and feed apps you keep opening. Website categories are optional."
-        case .custom:       return "Add the apps you keep reaching for. Website categories are optional."
-        case .adultContent: return "Adult sites are on. Add apps, or gambling sites too, if you want."
-        case .gambling:     return "Pick one or both. Pawl handles the websites."
-        }
-    }
-
-    /// Subtitle on the key step: paired / get-one-later / explainer.
-    private var keyHeadlineSub: String {
-        if keyPaired { return "Paired ✓" }
-        return pairLater ? "No key yet? That's OK." : "What's a security key?"
-    }
-
     /// A filled, tappable category card with a toggle, matching the app's card style.
     /// `locked`: already on from before, so setup can't turn it off (that needs the key, in
     /// Settings). Shown on and disabled, with a line saying so.
@@ -666,7 +577,7 @@ struct OnboardingView: View {
                 // 2.1: a phone that was already protecting (for example a new phone where the
                 // key didn't transfer) gets no free pairing here. It goes through Unlock and waits.
                 if model.setupWasAlreadyProtecting {
-                    message = "Pawl was already protecting you, so pair the key from the Unlock tab. Your first key works right away; a replacement waits. Tap \u{201C}I don't have a key yet\u{201D} to finish setup."
+                    message = "Pawl was already protecting you, so pair the key from the Unlock tab after setup. Your first key works right away; a replacement waits."
                     return
                 }
             }

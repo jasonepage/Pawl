@@ -1,112 +1,94 @@
-# 26. The first 60 seconds of Pawl (ground truth, 2026-11-02, updated after the paintings and multi-pick)
+# 26. The first 60 seconds of Pawl (v2, branch onboarding-v2, 2026-11-02)
 
-This is exactly what a new person sees and taps, screen by screen, from the first open to
-blocks on. Paste this into any fresh session, with the prompt at the bottom, to get a new
-perspective. Keep this file updated after every change so every reviewer sees the same thing.
+Ground truth for the redesigned first run. Four screens, then the payoff. Paste into any
+fresh session with the prompt at the bottom to get a new perspective.
 
-The rules that do not bend: no account, no server, no data collected. The block cannot be
-lifted from the phone alone. The wait is never skipped. Copy is plain and kind, never shaming.
-No em dashes. The person reading is often having a hard time.
+Rules that do not bend: no account, no server, no data collected. The block cannot be lifted
+from the phone alone. The wait is never skipped. Blocks turn on only once a working unlock
+exists (a paired key or a joined ally). Copy is plain and kind. No em dashes.
 
-## Screen 1: Welcome (role picker)
+One iOS fact that shapes screen 3: Pawl cannot block an app by name. Apple only hands an app
+over through its own picker. Websites can be blocked by name, instantly. So the chips are
+sites, and the picker is the only way to add an app.
 
-- Art: a painting of a calm tabby cat sitting with a green USB-C security key at its paws.
-- Title: "Welcome to Pawl"
-- Subtitle: "What do you want to block?"
-- Line: "Pick one or more. You can change this later." Tap to select, tap again to unselect.
-  More than one can be picked; the first tap is the main focus.
-- Seven cards in a two-column grid, each with an icon, a title and one line:
-  - Social media: "Instagram, TikTok, X, Reddit, whatever keeps pulling you back."
-  - Games: "The games you open without deciding to."
-  - Shopping: "Shopping apps and sites you keep browsing."
-  - News and doomscrolling: "News and feed apps you check too often."
-  - Adult content: "Apple's adult-site filter, plus any apps you pick."
-  - Gambling: "Sportsbook, casino, and crypto apps and sites."
-  - Something else: "Any mix of apps and sites you choose."
-- Button: "Continue" (dim until a card is picked).
+## Screen 1: Welcome
 
-## Screen 2: What it costs you (step 1 of 5, dots at the top)
+- Painting: the tabby sitting with the green key.
+- Title: "Pawl locks apps until you tap a small key."
+- Body: "Pick the apps and sites. Pawl blocks them with Apple's Screen Time. To open one again
+  you tap a security key you keep somewhere else, then wait 15 minutes."
+- Card, three rows: "The key is about $30" (Any USB-C security key works. You buy it once.) /
+  "Or an ally, with Pawl Pro" (Someone you trust says yes from their phone instead.) /
+  "No account, nothing collected" (Your choices stay on this iPhone.)
+- Button: "Block my first app".
 
-- Art: the same sitting cat, smaller.
-- Title: "What it costs you". Sub: "A quick, private look."
-- Body (changes with the pick): "Pawl blocks the social apps and sites you choose, and makes
-  unblocking deliberately hard. It takes your physical security key plus a 15-minute wait. No
-  shortcuts in the moment."
-- Card: "How many hours a day does this take?" Slider 0 to 8 in half hours, default 2.
-  Under it: "2 hours a day is about 730 hours a year, or 30 full days."
-  Small: "Stays on your phone. Pawl uses it to show you the time you keep."
-- Button: "Get started".
+## Screen 2: One permission (dot 1 of 3)
 
-## Screen 3: Allow Screen Time (step 2)
+- Painting: the cat with one paw up.
+- Title: "One permission". Sub: "Pawl needs Screen Time to do the blocking."
+- Body: "It never sees which apps you pick. Your choices stay on this iPhone."
+- Status card: "Not allowed yet" / "Screen Time allowed".
+- Button: "Allow Screen Time" (Apple's sheet). The flow moves on by itself once allowed.
+  If permission was already given, screen 1 goes straight to screen 3.
 
-- Art: the cat holding up one paw.
-- Title: "Allow Screen Time". Sub: "This is how Pawl blocks apps."
-- Body: "Apple's Screen Time does the blocking. Pawl only ever sees anonymous tokens, never
-  which apps you chose."
-- Card: "Not allowed yet" with a dashed circle; becomes "Screen Time allowed" with a check.
-- Button: "Allow Screen Time" (shows Apple's system prompt), then "Continue".
+## Screen 3: What should Pawl block? (dot 2 of 3)
 
-## Screen 4: Choose what to block (step 3)
+- Painting: the cat tapping a tile.
+- Title: "What should Pawl block?". Sub: "Tap a site to block it right now."
+- "Social" chips: tiktok.com, instagram.com, x.com, youtube.com, reddit.com, facebook.com,
+  snapchat.com. Tap one: it disappears from the row and "Added. It's blocked right away."
+- Apps card: "The TikTok app, the Instagram app, any app." with an "Add apps" button, and one
+  line: "Apple's list shows every app on your phone. Search for the one you want, tap the
+  circle next to it, then tap Done in the top right."
+- Toggle "Gambling sites": "Pawl's list of sportsbook and casino sites. Off unless you turn it
+  on." When on, an "Also block" row of chips: draftkings.com, fanduel.com, kalshi.com,
+  polymarket.com.
+- Toggle "Adult sites": "Apple's adult website filter. Off unless you turn it on."
+- "Any website" card: a field and Add, plus "More sites: games, shopping, news" which opens
+  three more chip rows.
+- Running line at the bottom: "Blocking: tiktok.com, Gambling sites, 1 app".
+- Button: "Continue" (dim with "Tap a site or add an app to continue." until something is on).
 
-- Art: the cat tapping one of three blank app tiles.
-- Title: "Choose what to block" (or "What are you here to block?" for gambling and adult).
-  Sub changes with the pick, e.g. "Add the social apps you keep opening. Website categories
-  are optional."
-- Two toggles: "Gambling sites" ("Sportsbook, casino, and crypto sites we keep a list of.")
-  and "Adult sites" ("Turns on Apple's built-in adult-website filter."). Gambling is on by
-  default for the gambling pick; adult is on for the adult pick.
-- Card "Apps": a count and an "Add" button that opens Apple's app picker (a system sheet).
-- Card "Websites": "Type a site to block it, like example.com." with a field and "Add".
-- Button: "Continue" (dim until something is chosen; small line: "Pick a category, add an
-  app, or type a site, so Pawl protects something.").
+## Screen 4: Lock it with your key (dot 3 of 3)
 
-## Screen 5: How will you unlock? (step 4)
+- Painting: key alone on the left, cat asleep on a key on the right.
+- Title: "Lock it with your key". Sub: "Or with an ally. One has to be ready before blocks
+  turn on."
+- Two cards: "Security key" (Plug it in and touch it. About 3 taps.) and "Ally (Pro)" (They
+  say yes from their phone. You send one link.)
+- Key picked: "Plug in your USB-C security key and tap Pair. When your iPhone asks, touch the
+  key. To open a blocked app later you tap the key again, then wait 15 minutes." Button
+  "Pair security key". After: a card "Key paired" with one line about where to keep it.
+- Ally picked: one paragraph (send one link; they cannot see which apps or sites you block;
+  needs iCloud on both phones and Pro for you only). Button "Invite my ally" (paywall first
+  if no Pro), then "Send the invite" and "Check if they joined". After: "Karen is your ally".
+  During setup the ally is active at once; nothing is blocked yet, so nothing is loosened.
+- Button: "Turn on blocks", dim until a key is paired or the ally has joined, with "Blocks
+  turn on once your key is paired." under it.
 
-- Art: a key alone on the left, the cat asleep on a second key on the right.
-- Title: "How will you unlock?". Sub: "Pick one. You can add the other later."
-- Two cards side by side:
-  - A security key: "A small USB-C key you keep out of reach."
-  - An ally: "Someone you trust says yes from their phone. Pawl Pro."
-- Pick the key: an explainer card (It's your only unlock / It plugs into your iPhone / Where
-  you keep it is the trick), a "Pair security key" button, and a small "I don't have a key
-  yet" link that swaps in a "No key yet? That's OK." card (Get a USB-C security key / Your
-  blocks turn on now / Pair it anytime) plus a "Where to keep it" card with five places.
-- Pick the ally: "Your blocks turn on now. Right after setup, Pawl opens the Ally page so you
-  can invite them. Until they join, nothing can unlock." Then four rows: You send one link /
-  They tap Approve / They see almost nothing / Needs iCloud on both phones.
-- Button: "Continue" (dim until a key is paired, "I don't have a key yet" is on, or ally is
-  picked).
+## Screen 5: Blocks are on (the payoff)
 
-## Screen 6: Lock it in (step 5)
+- Painting: the cat with the key under its chin.
+- Title: "Blocks are on". Sub: "Blocking tiktok.com, 1 app."
+- Body: "Open one of them and watch it bounce. To get back in: tap your key, then wait
+  15 minutes." (or "ask Karen").
+- Card: "How many hours a day did this take?" slider, optional. "That's about 2 hours a day
+  back. Home will count it."
+- Small: "Turning off Screen Time for Pawl removes the blocks. For a firmer lock, someone you
+  trust can set a Screen Time passcode. That is in Settings."
+- Button: "Go to Home".
 
-- Art: the cat lying down with the key tucked under its chin.
-- Title: "Lock it in". Sub: "Here's what you're turning on."
-- A summary card: website categories, apps count, sites.
-- Body: "From here, lifting the shield needs your key or a yes from your ally, plus the wait.
-  Turning off Screen Time still removes protection. For a full lock, someone you trust can
-  set a Screen Time passcode for you. That's Hard lock in Settings."
-- Button: "Lock it in" (shows "Activating…" while it works).
+## Taps to blocks on, shortest path (a site plus a key)
 
-## Then: Home
+Block my first app, Allow Screen Time, Apple's Allow, tap tiktok.com, Continue, Security key,
+Pair security key, touch the key, Turn on blocks. Nine taps, one system sheet, no picker.
+With the app too: add Add apps, search, tap, Done. The parent test: after screen 1 they can say
+"it locks apps until I tap a key I keep somewhere else."
 
-- Hero: "About 4 hr back, this week, with 2 of 7 days blocked" (or "0 of 7 days blocked
-  this week" on day one), a row of plain stats when there are any, and a "Protected" pill.
-- If no key and no ally: a nudge, "Pair your security key: Your blocks are on, but nothing
-  can unlock them yet. Pair a key, or add an ally in Settings (Pro)."
-- The week card with a day strip.
-- "What's blocked" card.
-- Screen Time card (needs the PawlReport target).
-- "Log a slip or a note" link.
-- Tabs: Home, Unlock, Settings (and Ally, if this phone is someone's ally).
+## Not done in this flow
 
-If setup chose the ally, the app lands on Settings > Ally instead, ready to "Invite an ally".
-
-## Counts
-
-Taps to blocks on, shortest path (social, one app, no key): pick a card, Continue, Get
-started, Allow Screen Time, system Allow, Continue, Add, pick an app, Done, Continue, A
-security key, I don't have a key yet, Continue, Lock it in. About 14 taps and two system
-sheets. Reading: roughly 330 words if they read everything.
+"Where to keep it" (five places) and "What's a security key" live in Settings now. The old
+focus cards (social, games, gambling...) are gone; their site suggestions are the chips.
 
 ## The prompt to paste into a fresh session
 
@@ -114,10 +96,10 @@ sheets. Reading: roughly 330 words if they read everything.
 > Screen Time and can only be unlocked with a physical security key or a yes from a trusted
 > person, then a wait. Below is the exact current flow, screen by screen. Play the role of
 > [a 24 year old who just deleted TikTok for the third time / a 50 year old father trying to
-> stop sports betting / a product designer at a top app studio / a person who has never heard
-> of a security key / an App Store reviewer]. Walk the flow in that role. Tell me: where you
-> would bail and why, which words you did not understand, what you expected to happen that
-> did not, and the three changes that would most improve the first minute. Be specific: quote
-> the line and give the replacement. Do not suggest accounts, servers, data collection,
-> analytics, or anything that lets the person unlock without the key or the ally. Keep the
-> tone plain and kind. No em dashes.
+> stop sports betting / a parent who has never heard of a security key / a product designer /
+> an App Store reviewer]. Walk the flow in that role. Where would you bail and why, which
+> words did you not understand, what did you expect that did not happen, and the three
+> changes that would most improve the first minute. Quote the line and give the replacement.
+> Hard rules: no accounts, no servers, no data collection, nothing that unlocks without the
+> key or the ally, the wait is never skipped, Pawl cannot block an app by name (only through
+> Apple's picker), tone plain and kind, no em dashes.

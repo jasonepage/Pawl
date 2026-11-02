@@ -37,7 +37,7 @@ struct ContentView: View {
 
     var body: some View {
         Group {
-            if model.didOnboard {
+            if model.didOnboard, !model.setupPayoffPending {
                 mainTabs
             } else if model.allyRole != nil, !wantsOwnSetup {
                 // 2.4: this phone only helps someone else. No blocking, no setup, just the ally screen.
@@ -78,7 +78,7 @@ struct ContentView: View {
         }
         .onChange(of: model.didOnboard) { _, done in
             // 2.4: setup picked "an ally" with no key. Take them straight to the Ally page.
-            if done, model.openAllyAfterSetup {
+            if done, model.openAllyAfterSetup, !model.setupPayoffPending {
                 model.openAllyAfterSetup = false
                 tab = .settings
                 openAlly = true

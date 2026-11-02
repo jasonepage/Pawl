@@ -579,6 +579,19 @@ final class AppModel {
 
     /// 2.4: setup chose "an ally" with no key. ContentView opens Settings > Ally once, then clears it.
     var openAllyAfterSetup = false
+    /// Onboarding v2: blocks are on, and the "Blocks are on" payoff screen is still showing.
+    /// ContentView keeps OnboardingView up until this clears.
+    var setupPayoffPending = false
+
+    /// Onboarding v2: the ally joined during setup, before any block was on. Nothing is being
+    /// loosened, so they become active at once (no wait). After setup, adding one waits.
+    func activateAllyDuringSetup(_ pairing: AllyPairing) async {
+        pendingAllyCtl.clear()
+        AllyStore.shared.savePairing(pairing)
+        allyPairing = pairing
+        try? await AllyCloud.shared.subscribeOwner()
+        UIApplication.shared.registerForRemoteNotifications()
+    }
     /// The owner's one ally, mirrored from the Keychain so views update. nil: no ally.
     private(set) var allyPairing: AllyPairing?
     /// This phone's ally role (it helps someone else). nil: not an ally.
