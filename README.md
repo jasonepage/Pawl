@@ -4,7 +4,9 @@
 
 <h1 align="center">Pawl</h1>
 
-<p align="center"><b>An app and website blocker you unlock with a physical key.</b></p>
+<p align="center"><b>Block the app. Hide the key.</b></p>
+
+<p align="center">An app and website blocker you cannot undo from your phone alone.</p>
 
 <p align="center">
   <a href="LICENSE"><img alt="MPL 2.0" src="https://img.shields.io/badge/license-MPL_2.0-4A5A3C"></a>
@@ -21,12 +23,9 @@
 </p>
 
 <p align="center">
-  <img src="site/img/screens/00-shield.png" width="130" alt="What a blocked app shows: Chess is locked, open Pawl and use your security key, then wait out the cooling-off. You've walked away 12 times this week. Buttons: Close this app, I'm tempted. No unlock button.">
-  <img src="site/img/screens/01-friction.png" width="130" alt="Urge screen: a 10 minute wait timer that says don't decide yet, days on track, hours kept, and the person's own notes from past moments">
-  <img src="site/img/screens/02-streaks.png" width="130" alt="Home: 44 days on track inside a ring, resisted 1 time, Protected, an I'm tempted button, and What's blocked: 2 apps">
-  <img src="site/img/screens/03-wait.png" width="130" alt="Unlocking soon: a 14 minute 59 second countdown until apps unlock, with a cancel button that keeps them locked">
-  <img src="site/img/screens/04-block.png" width="130" alt="Apps are blocked: a tap to unlock button and a note that using the key starts a 15 minute wait">
-  <img src="site/img/screens/05-choose.png" width="130" alt="Setup: Welcome to Pawl, what do you want to block? Cards for social media, games, shopping, news, adult content and gambling">
+  <img src="site/img/screens/07-blocked-current.webp" width="220" alt="Pawl Unlock screen with Kiki asleep on the physical key, Apps are blocked, Tap to unlock, and the currently blocked apps.">
+  <img src="site/img/screens/08-unlocked-current.webp" width="220" alt="Pawl Unlock screen with Kiki awake beside the key, Apps unlocked, a Lock now button, and the apps currently open.">
+  <img src="site/img/screens/09-home-current.webp" width="220" alt="Pawl Home screen showing about two hours back, protected status, the current week, and the apps and sites blocked by the key.">
 </p>
 
 ---
