@@ -47,13 +47,16 @@ a time, after the rest of 2.4 below.
   link is opened, and an Ally screen (its own tab, or the whole app if they only help someone):
   "Jason wants to unlock Pawl." with Approve (Face ID) and Not now, Pawl waiting beside it, and
   a Stop button. The paywall lists ally approvals first.
-- The first setup screen lets you pick more than one focus (social and games, say). Each adds
-  its website category and its suggested sites; the first pick names the steps.
-- Setup has a painting at the top of each step (the tabby and the green key), in place of the
-  symbols.
-- Setup asks "How will you unlock?" with two cards: a security key, or an ally (Pawl Pro). Pick
-  the key and the old pair-now-or-later flow follows. Pick an ally and setup finishes without
-  a key, then opens Settings > Ally so you can send the invite.
+- Setup is rebuilt (docs/26, docs/27). Four screens, then the payoff. Screen one says what Pawl
+  is and what it costs (a key, about $30, or an ally with Pro) before asking anything. One
+  permission screen that moves on by itself. Then "What should Pawl block?": website chips
+  that block the moment you tap them (tiktok.com, instagram.com and so on), Apple's picker as
+  the one way to add apps with a plain instruction, Gambling and Adult toggles off by default
+  with a reason, and a running "Blocking:" line. Then "Lock it with your key": pair a key, or
+  invite an ally right there; "Turn on blocks" stays off until one is ready, so Pawl never
+  makes a lock with no exit. Then "Blocks are on" with the hours question as an optional
+  reward. Gone: the focus cards, the "What it costs you" screen, the key essays, "I don't have
+  a key yet", and the Lock it in summary. Each step has a painting at the top.
 - Ally without a key. Making someone your ally no longer needs a key tap, only the wait: the
   hurdle is that another person had to join. So a person with no key can have an ally as their
   way to unlock. The Unlock tab shows "Ask Sam" as the main button when there is an ally and no

@@ -25,3 +25,12 @@ before submitting (docs/18 section 5 lists this as unconfirmed).
 
 - CloudKit Dashboard: deploy the schema to Production (docs/20).
 - Test on two phones with two Apple Accounts (docs/18 section 7, steps 2 to 4).
+
+
+## App Review notes: "What you can test without the key" (replaces the old steps)
+
+1. Launch. On the first screen, tap "Block my first app."
+2. On "One permission," tap "Allow Screen Time" and approve the system prompt. The flow moves on by itself.
+3. On "What should Pawl block?", tap a site chip such as tiktok.com (it is blocked right away), or tap "Add apps" and pick an app in Apple's picker, or turn on "Gambling sites." Then "Continue."
+4. On "Lock it with your key," the "Turn on blocks" button stays disabled until a security key is paired or an ally has joined, by design. Pairing needs the hardware key and the ally path needs a second device on another Apple Account, so setup cannot be completed in review; see the video.
+5. Settings, Unlock and Home can be reached only after setup. The video shows them.
