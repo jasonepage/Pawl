@@ -44,6 +44,9 @@ struct OnboardingView: View {
     // Payoff
     @State private var hoursPerDay: Double = 0
     @State private var goal = ""
+    /// 2.4: the goal as the on-device model phrased it, when a phone has Apple Intelligence.
+    @State private var tidiedGoal: String?
+    @State private var tidyTask: Task<Void, Never>?
 
     // @State, not let: a plain `let` on a SwiftUI struct is rebuilt on every redraw, and the
     // first redraw (working = true) threw away the service that owned the live key request.
@@ -305,9 +308,10 @@ struct OnboardingView: View {
                         .padding(12)
                         .background(Color(uiColor: .tertiarySystemGroupedBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .onChange(of: goal) { _, new in scheduleTidy(new) }
                     Text(goal.trimmingCharacters(in: .whitespaces).isEmpty
                          ? "Optional. The block screen will say it back to you."
-                         : "The block screen will say: You wanted \(goal.trimmingCharacters(in: .whitespaces)) back.")
+                         : "The block screen will say: You wanted \(finalGoal) back.")
                         .font(.caption).foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -393,13 +397,31 @@ struct OnboardingView: View {
         default:
             primary("Go to Home") {
                 model.hoursPerDay = hoursPerDay
-                SharedState.setGoal(goal)
+                SharedState.setGoal(finalGoal)
                 model.setupPayoffPending = false
             }
         }
     }
 
     // MARK: Actions
+
+    /// What gets saved: the on-device rewrite when there is one, else the text as typed.
+    private var finalGoal: String { tidiedGoal ?? goal.trimmingCharacters(in: .whitespaces) }
+
+    /// Rewrites the goal on the phone once typing pauses. Phones without Apple Intelligence
+    /// never get here past the availability check and keep the raw text.
+    private func scheduleTidy(_ text: String) {
+        tidiedGoal = nil
+        tidyTask?.cancel()
+        guard OnDeviceAI.isAvailable, !text.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        tidyTask = Task {
+            try? await Task.sleep(for: .milliseconds(700))
+            guard !Task.isCancelled else { return }
+            let result = await OnDeviceAI.tidyGoal(text)
+            guard !Task.isCancelled, goal == text else { return }
+            tidiedGoal = result
+        }
+    }
 
     private func addTypedSite() {
         let text = siteEntry.trimmingCharacters(in: .whitespacesAndNewlines)
