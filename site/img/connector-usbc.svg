@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 260" role="img" aria-labelledby="title desc">
+  <title id="title">USB-C iPhone port and matching USB-C plug</title>
+  <desc id="desc">The rounded oval USB-C port on the bottom of an iPhone with the matching rounded USB-C plug directly beneath it.</desc>
+  <rect width="640" height="260" rx="28" fill="#17350e"/>
+  <text x="32" y="42" fill="#aada69" font-family="Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="2">USB-C</text>
+  <path d="M111 64h418c23 0 42 19 42 42v38H69v-38c0-23 19-42 42-42Z" fill="#f7f2e4" stroke="#d9cfb4" stroke-width="5"/>
+  <circle cx="126" cy="123" r="6" fill="#718068"/><circle cx="151" cy="123" r="6" fill="#718068"/><circle cx="176" cy="123" r="6" fill="#718068"/>
+  <circle cx="464" cy="123" r="6" fill="#718068"/><circle cx="489" cy="123" r="6" fill="#718068"/><circle cx="514" cy="123" r="6" fill="#718068"/>
+  <rect x="265" y="108" width="110" height="34" rx="17" fill="#15220f"/>
+  <rect x="282" y="117" width="76" height="16" rx="8" fill="none" stroke="#8b9a81" stroke-width="4"/>
+  <path d="M320 151v22" stroke="#e2ad31" stroke-width="5" stroke-linecap="round"/>
+  <path d="m310 166 10 10 10-10" fill="none" stroke="#e2ad31" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="259" y="184" width="122" height="46" rx="23" fill="#d9ddd4" stroke="#7e8a78" stroke-width="5"/>
+  <rect x="278" y="195" width="84" height="24" rx="12" fill="none" stroke="#53604e" stroke-width="4"/>
+  <path d="M292 230v16h56v-16" fill="#3c6a14"/>
+  <text x="408" y="211" fill="#f7f2e4" font-family="Arial, sans-serif" font-size="16" font-weight="700">ROUNDED OVAL</text>
+</svg>

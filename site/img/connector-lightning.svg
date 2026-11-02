@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 260" role="img" aria-labelledby="title desc">
+  <title id="title">Lightning iPhone port and matching Lightning plug</title>
+  <desc id="desc">The narrow Lightning port on the bottom of an iPhone with the matching flat Lightning plug and visible gold contacts directly beneath it.</desc>
+  <rect width="640" height="260" rx="28" fill="#17350e"/>
+  <text x="32" y="42" fill="#e2ad31" font-family="Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="2">LIGHTNING</text>
+  <path d="M111 64h418c23 0 42 19 42 42v38H69v-38c0-23 19-42 42-42Z" fill="#f7f2e4" stroke="#d9cfb4" stroke-width="5"/>
+  <circle cx="126" cy="123" r="6" fill="#718068"/><circle cx="151" cy="123" r="6" fill="#718068"/><circle cx="176" cy="123" r="6" fill="#718068"/>
+  <circle cx="464" cy="123" r="6" fill="#718068"/><circle cx="489" cy="123" r="6" fill="#718068"/><circle cx="514" cy="123" r="6" fill="#718068"/>
+  <rect x="272" y="111" width="96" height="29" rx="8" fill="#15220f"/>
+  <path d="M320 151v22" stroke="#e2ad31" stroke-width="5" stroke-linecap="round"/>
+  <path d="m310 166 10 10 10-10" fill="none" stroke="#e2ad31" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M277 188c0-7 6-13 13-13h60c7 0 13 6 13 13v34c0 7-6 13-13 13h-60c-7 0-13-6-13-13v-34Z" fill="#d9ddd4" stroke="#7e8a78" stroke-width="5"/>
+  <g fill="#d8a82d"><rect x="291" y="182" width="6" height="24" rx="3"/><rect x="302" y="182" width="6" height="24" rx="3"/><rect x="313" y="182" width="6" height="24" rx="3"/><rect x="324" y="182" width="6" height="24" rx="3"/><rect x="335" y="182" width="6" height="24" rx="3"/></g>
+  <path d="M299 235v13h42v-13" fill="#3c6a14"/>
+  <text x="398" y="211" fill="#f7f2e4" font-family="Arial, sans-serif" font-size="16" font-weight="700">NARROW + FLAT</text>
+</svg>
