@@ -37,8 +37,14 @@ struct ScreenTimeCard: View {
         )
     }
 
+    /// Flip to true once the PawlReport extension target is in the Xcode project
+    /// (docs/25). Until then the report frame draws as an empty gap, so keep it off.
+    static let extensionInstalled = false
+
     var body: some View {
-        if selection.applicationTokens.isEmpty && selection.categoryTokens.isEmpty && selection.webDomainTokens.isEmpty {
+        if !Self.extensionInstalled {
+            EmptyView()
+        } else if selection.applicationTokens.isEmpty && selection.categoryTokens.isEmpty && selection.webDomainTokens.isEmpty {
             EmptyView()
         } else {
             DeviceActivityReport(.weekUsage, filter: filter)
