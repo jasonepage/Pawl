@@ -74,7 +74,7 @@ public final class SecurityKeyService: NSObject {
             case .cancelled:    return "Cancelled."
             case .noCredential: return "The key didn't return a credential."
             case .busy:
-                return "Your iPhone is still finishing the last key request. Wait a few seconds, then tap Pair again."
+                return "Your iPhone thinks a key request is still open. Tap Pair again in a few seconds. If that keeps happening, restart your iPhone and try again. This is an iPhone issue, not your key."
             case .failed(let why):
                 if why.localizedCaseInsensitiveContains("relying party") || why.localizedCaseInsensitiveContains("domain") {
                     return "Security key error: \(why)\n(The Associated Domain isn't set up yet. See the setup doc.)"
@@ -85,7 +85,7 @@ public final class SecurityKeyService: NSObject {
             case .simulator:
                 return "Security keys can't connect to the Simulator. Run Pawl on a real iPhone to pair or use your key."
             case .noResponse:
-                return "No key found. Plug the USB-C key in all the way, then tap Pair again.\n[debug: \(SecurityKeyService.lastAnchorDebug)]"
+                return "No key found. Plug the USB-C key in all the way, then tap Pair again. If your iPhone never asks for the key, restart your iPhone and try again."
             }
         }
     }
