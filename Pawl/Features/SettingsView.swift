@@ -218,12 +218,6 @@ struct SettingsView: View {
                                     hasPro ? "Active" : "Ally approvals, scheduled sets and the weekly report")
             }
             NavigationLink {
-                GoalEditView()
-            } label: {
-                SettingsRows.detail("quote.bubble.fill", .mint, "What you want back",
-                                    SharedState.goal().map { "\"\($0)\" shows on the block screen." } ?? "Optional. The block screen says it back to you.")
-            }
-            NavigationLink {
                 ProtectionInfoView(showGamblingHelp: model.showGamblingHelp)
             } label: {
                 SettingsRows.label("info.circle.fill", .gray, "How Pawl works")
@@ -297,21 +291,3 @@ struct SettingsView: View {
 }
 
 
-/// 2.4: edit the goal line the block screen shows ("You wanted my evenings back.").
-struct GoalEditView: View {
-    @State private var goal = SharedState.goal() ?? ""
-    var body: some View {
-        List {
-            Section {
-                TextField("my evenings, my focus, my money", text: $goal)
-            } header: {
-                Text("What do you want back?")
-            } footer: {
-                Text("Stays on your phone. The block screen shows it above the lock, in your words. Leave it empty to show nothing.")
-            }
-        }
-        .navigationTitle("What you want back")
-        .navigationBarTitleDisplayMode(.inline)
-        .onDisappear { SharedState.setGoal(goal) }
-    }
-}
