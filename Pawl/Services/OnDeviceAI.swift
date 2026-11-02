@@ -34,14 +34,14 @@ enum OnDeviceAI {
         #if canImport(FoundationModels)
         guard #available(iOS 26, *), isAvailable else { return nil }
         let instructions = """
-        You rewrite a short phrase so it fits the sentence "You wanted ___ back."
-        Reply with only the phrase, 2 to 5 plain words, lowercase, starting with "my" or "our".
-        No punctuation. No explanation. Keep the person's own meaning.
-        Examples:
-        tiktok at night -> my evenings
-        stop wasting money on slots -> my money
-        focus for school -> my focus
-        time with my kids -> my time with my kids
+        You tidy a short phrase so it fits the sentence "You wanted ___ back."
+        Reply with only the phrase, 1 to 5 plain lowercase words, starting with "my" or "our".
+        Rules:
+        - Never add a person, place, thing or reason the person did not type. "my time" stays "my time". Do not turn it into "my time with family" or anything else.
+        - Only remove filler like "I want", "get", "back", "to have", and add "my" when it is missing.
+        - If the phrase already fits, return it unchanged.
+        - If you are not sure, return it unchanged.
+        - No punctuation. No explanation.
         """
         do {
             let session = LanguageModelSession(instructions: instructions)
@@ -50,8 +50,13 @@ enum OnDeviceAI {
                 .trimmingCharacters(in: .whitespacesAndNewlines)
                 .trimmingCharacters(in: .punctuationCharacters)
                 .lowercased()
-            let words = cleaned.split(separator: " ")
+            let words = cleaned.split(separator: " ").map(String.init)
             guard (1...6).contains(words.count), cleaned.count <= 40 else { return nil }
+            // Belt and braces: the model may only drop words or add "my"/"our". Any other new
+            // word means it invented something, so keep what the person typed instead.
+            let allowedNew: Set<String> = ["my", "our"]
+            let typed = Set(text.lowercased().split(whereSeparator: { !$0.isLetter }).map(String.init))
+            for w in words where !typed.contains(w) && !allowedNew.contains(w) { return nil }
             return cleaned
         } catch {
             return nil
