@@ -104,8 +104,12 @@ iVBORw0KGgoAAAANSUhEUgAAAPAAAADwCAIAAACxN37FAAEAAElEQVR42nz9d5xl13UeiO6100k338pV
     }
 
     private static func subtitle() -> String {
-        // 2.4: say the two real ways out, plainly. Nothing else opens this.
-        let base = "To open this app, use the key you paired with Pawl or ask your ally in Pawl. Or turn off Screen Time for Pawl."
+        // 2.4: say the two real ways out, plainly. Nothing else opens this. If the person wrote
+        // down what they wanted back, that comes first, in their own words.
+        var base = "To open this app, use the key you paired with Pawl or ask your ally in Pawl. Or turn off Screen Time for Pawl."
+        if let goal = UserDefaults(suiteName: appGroup)?.string(forKey: "pawl.goal"), !goal.isEmpty {
+            base = "You wanted \(goal) back.\n\n" + base
+        }
         switch walkedAwayThisWeek() {
         case 0: return base
         case 1: return base + "\n\nYou walked away once this week."

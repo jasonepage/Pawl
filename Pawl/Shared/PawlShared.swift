@@ -102,6 +102,15 @@ public enum SharedState {
 
     // Web blocking config, shared so the extension re-applies it on relock. `enabled` =
     // block the gambling/crypto domain list; `adult` = also turn on Apple's adult filter.
+    // 2.4: the person's goal in their own words ("my evenings"). The block screen shows it
+    // back: "You wanted your evenings back." Optional, local, never leaves the phone.
+    private nonisolated static let goalKey = "pawl.goal"
+    public nonisolated static func setGoal(_ goal: String?) {
+        let g = goal?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if g.isEmpty { AppGroup.defaults.removeObject(forKey: goalKey) } else { AppGroup.defaults.set(String(g.prefix(60)), forKey: goalKey) }
+    }
+    public nonisolated static func goal() -> String? { AppGroup.defaults.string(forKey: goalKey) }
+
     private nonisolated static let webEnabledKey = "pawl.web.enabled"
     private nonisolated static let webAdultKey = "pawl.web.adult"
     private nonisolated static let webDomainsKey = "pawl.web.domains"

@@ -41,6 +41,7 @@ struct OnboardingView: View {
 
     // Payoff
     @State private var hoursPerDay: Double = 0
+    @State private var goal = ""
 
     private let security = SecurityKeyService()
     private let keyStore = KeyStore()
@@ -293,6 +294,20 @@ struct OnboardingView: View {
             heading("Blocks are on", blockedLine.isEmpty ? "" : "Blocking \(blockedLine).")
             body("Open one of them and watch it bounce. To get back in: \(keyPaired ? "tap your key" : "ask \(allyJoined?.name ?? "your ally")"), then wait 15 minutes.")
             card {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("What do you want back?").font(.headline)
+                    TextField("", text: $goal, prompt: Text("my evenings, my focus, my money"))
+                        .padding(12)
+                        .background(Color(uiColor: .tertiarySystemGroupedBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    Text(goal.trimmingCharacters(in: .whitespaces).isEmpty
+                         ? "Optional. The block screen will say it back to you."
+                         : "The block screen will say: You wanted \(goal.trimmingCharacters(in: .whitespaces)) back.")
+                        .font(.caption).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            card {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("How many hours a day did this take?").font(.headline)
                     HStack {
@@ -362,6 +377,7 @@ struct OnboardingView: View {
         default:
             primary("Go to Home") {
                 model.hoursPerDay = hoursPerDay
+                SharedState.setGoal(goal)
                 model.setupPayoffPending = false
             }
         }

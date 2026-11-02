@@ -47,6 +47,9 @@ a time, after the rest of 2.4 below.
   link is opened, and an Ally screen (its own tab, or the whole app if they only help someone):
   "Jason wants to unlock Pawl." with Approve (Face ID) and Not now, Pawl waiting beside it, and
   a Stop button. The paywall lists ally approvals first.
+- The block screen can say your goal back to you. On the "Blocks are on" screen (and in
+  Settings) there is one optional line, "What do you want back?". Type "my evenings" and the
+  block screen reads "You wanted my evenings back." above the lock. Stays on the phone.
 - Setup is rebuilt (docs/26, docs/27). Four screens, then the payoff. Screen one says what Pawl
   is and what it costs (a key, about $30, or an ally with Pro) before asking anything. One
   permission screen that moves on by itself. Then "What should Pawl block?": website chips
