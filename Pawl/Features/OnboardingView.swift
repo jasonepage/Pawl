@@ -32,6 +32,8 @@ struct OnboardingView: View {
     @State private var unlockChoice: UnlockChoice? = nil
     @State private var keyPaired = false
     @State private var working = false
+    /// True only while the key sheet is open, so Turn on blocks does not claim to be working.
+    @State private var pairing = false
     @State private var message: String?
 
     // Ally during setup
@@ -362,15 +364,19 @@ struct OnboardingView: View {
             VStack(spacing: 10) {
                 if !unlockReady {
                     if unlockChoice == .key {
-                        secondary(working ? "Waiting for your key\u{2026}" : "Pair security key") { Task { await pairKey() } }
-                            .disabled(working)
+                        if pairing {
+                            secondary("Cancel") { security.cancelCurrent() }
+                        } else {
+                            secondary("Pair security key") { Task { await pairKey() } }
+                                .disabled(working)
+                        }
                     } else if unlockChoice == .ally, invite == nil {
                         secondary(working ? "One moment\u{2026}" : "Invite my ally") { Task { await makeInvite() } }
                             .disabled(working)
                     }
                 }
                 primary(working ? "Turning on blocks\u{2026}" : "Turn on blocks") { Task { await turnOn() } }
-                    .disabled(!unlockReady || working)
+                    .disabled(!unlockReady || working || pairing)
                     .opacity(unlockReady ? 1 : 0.5)
                 if !unlockReady, unlockChoice != nil {
                     Text(unlockChoice == .key ? "Blocks turn on once your key is paired." : "Blocks turn on once your ally has joined.")
@@ -575,8 +581,8 @@ struct OnboardingView: View {
 
     private func pairKey() async {
         message = nil
-        working = true
-        defer { working = false }
+        pairing = true
+        defer { pairing = false }
         do {
             switch keyStore.state() {
             case .unavailable:
@@ -597,7 +603,7 @@ struct OnboardingView: View {
                 }
             }
             // 2.3: say right away what to do, so the tap visibly did something.
-            message = "Plug in your key now. When your iPhone asks, touch the key."
+            message = "Waiting for your iPhone to ask for the key. Touch the key when it does."
             let newKey = try await security.pairNewKey(displayName: "Pawl key")
             guard keyStore.save(newKey) else {
                 message = "Couldn't save the key. Try again."
@@ -606,6 +612,8 @@ struct OnboardingView: View {
             keyStore.clearPending()
             message = nil
             keyPaired = true
+        } catch SecurityKeyService.SecurityKeyError.cancelled {
+            message = nil
         } catch {
             message = error.localizedDescription
         }

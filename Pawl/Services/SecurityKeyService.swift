@@ -85,7 +85,7 @@ public final class SecurityKeyService: NSObject {
             case .simulator:
                 return "Security keys can't connect to the Simulator. Run Pawl on a real iPhone to pair or use your key."
             case .noResponse:
-                return "No key answered. Plug the USB-C key in all the way, tap again, and touch the key when your iPhone asks."
+                return "No key found. Plug the USB-C key in all the way, then tap Pair again."
             }
         }
     }
@@ -212,7 +212,7 @@ public final class SecurityKeyService: NSObject {
             // so the button comes back with a reason instead of staying stuck.
             let requestID = ObjectIdentifier(controller)   // Sendable stand-in for the controller
             Task { @MainActor [weak self] in
-                try? await Task.sleep(for: .seconds(90))
+                try? await Task.sleep(for: .seconds(30))
                 guard let self, let current = self.controller,
                       ObjectIdentifier(current) == requestID else { return }
                 self.finish(.failure(SecurityKeyError.noResponse))
@@ -220,6 +220,12 @@ public final class SecurityKeyService: NSObject {
             }
         }
         #endif
+    }
+
+    /// Stop the open key request, if any. The caller gets `.cancelled`.
+    public func cancelCurrent() {
+        controller?.cancel()
+        finish(.failure(SecurityKeyError.cancelled))
     }
 
     private func finish(_ result: Result<RawCredential, Error>) {
