@@ -22,6 +22,9 @@
 </head>
 <body class="home-page get-page">
 
+<div id="order-received" role="status" hidden style="position:fixed;z-index:50;left:50%;top:92px;transform:translateX(-50%);width:min(560px,calc(100% - 32px));padding:18px 22px;border-radius:18px;color:#18340f;background:#d8f08a;box-shadow:0 18px 40px rgba(0,0,0,.25);font-size:15px;line-height:1.5"><strong style="display:block;font-size:18px;margin-bottom:4px">Order received. Thank you.</strong>Your Pawl Kit ships within 3 business days to your US address. Questions? <a href="/support" style="color:#18340f;font-weight:800">Contact support</a>.<button type="button" aria-label="Close" onclick="this.parentElement.hidden=true" style="position:absolute;top:8px;right:10px;border:0;background:none;font-size:22px;line-height:1;color:#18340f;cursor:pointer">&times;</button></div>
+<script>if(new URLSearchParams(location.search).get('ordered')==='1'){document.getElementById('order-received').hidden=false;}</script>
+
 <nav class="get-nav" aria-label="Main navigation">
   <div class="home-wrap get-nav-inner">
     <a class="home-brand" href="/" aria-label="Pawl home"><img src="/img/kiki-icon-192.png" alt="" width="42" height="42"><span>Pawl</span></a>
@@ -77,7 +80,7 @@
       <div class="buy-heading"><p>04 / Choose your kit</p><h2 id="buy-title">Look at the port on the bottom of your iPhone.</h2><p>Not sure? USB-C is a small rounded oval. Lightning is narrower with visible metal contacts.</p></div>
       <aside class="self-callout" aria-label="Buy Pawl for yourself">
         <div><p>A favor to your future self</p><h3>Do this for yourself.</h3><span>You already know which app you open when you wish you would not. Buy the right kit, set it up once, and hide the key the day it arrives.</span></div>
-        <div class="self-actions"><a href="https://buy.stripe.com/5kQ8wIfXb0rfcq1fP6enS01">I have USB-C. Buy mine.</a><a href="https://buy.stripe.com/7sY4gs7qFb5T75HeL2enS02">I have Lightning. Buy mine.</a></div>
+        <div class="self-actions"><a href="https://buy.stripe.com/7sY28keT72zn4XzfP6enS03">I have USB-C. Buy mine.</a><a href="https://buy.stripe.com/9B600c6mBgqdey9gTaenS04">I have Lightning. Buy mine.</a></div>
       </aside>
       <div class="kit-options">
         <article id="usb-c-kit" class="product-card usb-kit">
@@ -88,7 +91,7 @@
           <ul><li>Plugs directly into USB-C</li><li>FIDO2 security key</li><li>No Pawl account</li></ul>
           <div class="price-breakdown"><strong>How the $49 is priced</strong><div><span>Yubico key at current retail</span><b>$29</b></div><div><span>Printed guide and packing</span><b>$5</b></div><div><span>Checkout, fulfillment, support and continued app work</span><b>$15</b></div></div>
           <div class="product-purchase"><strong>$49</strong><span>plus $5.95 shipping</span></div>
-          <a class="buy-button" href="https://buy.stripe.com/5kQ8wIfXb0rfcq1fP6enS01">Buy this kit for myself</a>
+          <a class="buy-button" href="https://buy.stripe.com/7sY28keT72zn4XzfP6enS03">Buy this kit for myself</a>
         </article>
         <article id="lightning-kit" class="product-card lightning-kit">
           <img class="connector-image" src="/img/connector-lightning.svg" alt="Lightning: a narrow flat port on the bottom of the iPhone with the matching Lightning plug and visible gold contacts beneath it." width="640" height="260" style="display:block;width:100%;height:auto;margin-bottom:27px;border-radius:20px">
@@ -98,7 +101,7 @@
           <ul><li>Plugs directly into Lightning</li><li>Also works with USB-C</li><li>No Pawl account</li></ul>
           <div class="price-breakdown"><strong>How the $119 is priced</strong><div><span>YubiKey 5Ci at current retail</span><b>$85</b></div><div><span>Printed guide and packing</span><b>$5</b></div><div><span>Checkout, fulfillment, support and continued app work</span><b>$29</b></div></div>
           <div class="product-purchase"><strong>$119</strong><span>plus $5.95 shipping</span></div>
-          <a class="buy-button lightning-order" href="https://buy.stripe.com/7sY4gs7qFb5T75HeL2enS02">Buy this kit for myself</a>
+          <a class="buy-button lightning-order" href="https://buy.stripe.com/9B600c6mBgqdey9gTaenS04">Buy this kit for myself</a>
         </article>
       </div>
       <p class="connector-note">Both kits require iOS 18 or later. Checkout is on Stripe. The $5.95 shipping charge covers US postage and the mailer. Key retail prices are based on Yubico's listed US prices and may change.</p>
