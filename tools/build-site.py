@@ -12,7 +12,7 @@ def head_of(name, extra_fix=None):
     s = open(f"{site}/{name}", encoding="utf-8").read()
     h = s[:s.index("</head>")]
     h = re.sub(r'<link rel="stylesheet"[^>]*>\s*', '', h)
-    h = h.rstrip() + '\n<link rel="stylesheet" href="/pawl.css">\n<link rel="stylesheet" href="/home.css?v=5">\n</head>\n'
+    h = h.rstrip() + '\n<link rel="stylesheet" href="/pawl.css">\n<link rel="stylesheet" href="/home.css?v=6">\n</head>\n'
     if extra_fix: h = extra_fix(h)
     return h
 
@@ -156,7 +156,7 @@ get = head_of("get.html") + '<body class="home-page">\n\n' + banner + '\n' + NAV
 get += hero("Pawl kits", "Pick your kit.",
   "Each kit has a Yubico key that plugs into your iPhone, a printed setup card, and the free Pawl app. No subscription.",
   '<a class="store-button" href="#kits"><span><small>From $49</small>See the kits</span></a>',
-  "/img/onboarding/welcome.webp", "Kiki, a calm tabby cat, sitting behind a green USB-C security key.", small=True)
+  "/img/scenes/kit-open.webp", "An open Pawl kit with the green security key and setup card inside while Kiki peeks over the box.", small=True)
 get += '\n' + kits("Which iPhone do you have?", "Pick your phone and we send the right key.", PRICE)
 get += '\n' + questions(Q) + '</main>\n\n' + FOOTER
 
@@ -165,7 +165,7 @@ give = head_of("give.html", lambda h: h.replace('content="#a74632"', 'content="#
 give += hero("A gift for someone who asked", "Give someone<br>a little distance.",
   "For a friend who wants help. They pick what to block. You can hold the key.",
   '<a class="store-button" href="#kits"><span><small>From $49</small>Get a kit</span></a>',
-  "/img/give-ally.webp", "Kiki holding a phone beside a trusted-person symbol.",
+  "/img/scenes/handoff.webp", "One person hands the green Pawl security key to another while Kiki watches beside a face-down phone.",
   note='\n        <p class="give-note">No monitoring. Pawl sends you nothing about what they do.</p>', small=True)
 give += '\n' + kits("Which iPhone do they have?", "Pick their phone and we send the right key.")
 give += '\n' + questions([
