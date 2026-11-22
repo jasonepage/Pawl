@@ -174,6 +174,7 @@ give += '\n' + questions([
   ("Shipping and returns", "Kits ship to US addresses within 3 business days. Full refund within 30 days if the key is unopened."),
 ], links=False) + '</main>\n\n' + FOOTER
 
+give = give.replace(">Pick your iPhone</label>", ">Pick their iPhone</label>")
 for name, body in [("index.html", home), ("get.html", get), ("give.html", give)]:
     open(f"{site}/{name}", "w", encoding="utf-8").write(body)
 print("ok")
