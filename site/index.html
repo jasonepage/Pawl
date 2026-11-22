@@ -24,21 +24,19 @@
 <link rel="icon" href="/img/favicon-32-v4.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/img/apple-touch-icon-v4.png">
 <link rel="stylesheet" href="/pawl.css">
-<link rel="stylesheet" href="/home.css">
+<link rel="stylesheet" href="/home.css?v=5">
 </head>
 <body class="home-page">
 
 <nav class="home-nav" aria-label="Main navigation">
   <div class="home-wrap nav-inner">
-    <a class="home-brand" href="/" aria-label="Pawl home">
-      <img src="/img/kiki-icon-192.png" alt="" width="42" height="42">
-      <span>Pawl</span>
-    </a>
+    <a class="home-brand" href="/" aria-label="Pawl home"><img src="/img/kiki-icon-192.png" alt="" width="42" height="42"><span>Pawl</span></a>
     <div class="nav-links">
-      <a href="#how">How it works</a>
-      <a href="#inside">Inside the app</a>
+      <a href="/#how">How it works</a>
+      <a href="/get">Get a kit</a>
+      <a href="/give">Give one</a>
       <a href="/about">About</a>
-      <a class="nav-button" href="#choose-kit">Choose your kit</a>
+      <a class="nav-button" href="https://apps.apple.com/app/id6783119309">Get the app</a>
     </div>
   </div>
 </nav>
@@ -50,93 +48,61 @@
         <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> The app blocker with a key</p>
         <h1>Block the app.<br>Hide the key.</h1>
         <p class="hero-lead">The blocker you cannot undo from your phone. Keep the physical key somewhere inconvenient. If you go get it, Pawl still makes you wait 15 minutes.</p>
-        <div class="hero-actions">
-          <a class="store-button" href="https://apps.apple.com/app/id6783119309"><span>Get the free app</span></a>
-          <a class="text-link" href="#choose-kit" aria-label="Choose a USB-C or Lightning Pawl Kit">Choose your kit</a>
-          <a class="text-link" href="https://apps.apple.com/app/id6783119309">Already have a key? Get the app</a>
-        </div>
-        <ul class="trust-list" aria-label="Pawl privacy facts">
-          <li>One-time purchase</li><li>No account</li><li>No tracking</li>
-        </ul>
+        <div class="hero-actions"><a class="store-button" href="https://apps.apple.com/app/id6783119309"><span><small>Free on the</small>App Store</span></a>
+          <a class="text-link" href="#kits">Get a kit</a></div>
+        <ul class="trust-list" aria-label="Pawl privacy facts"><li>One-time purchase</li><li>No account</li><li>No tracking</li></ul>
       </div>
       <div class="hero-art">
         <div class="hero-orbit orbit-one" aria-hidden="true"></div>
         <div class="hero-orbit orbit-two" aria-hidden="true"></div>
         <img src="/img/onboarding/welcome.webp" alt="Kiki, a calm tabby cat, sitting behind a green USB-C security key." width="1536" height="1024">
         <div class="key-note"><span class="key-note-label">The whole idea</span><strong>No key nearby. No instant unlock.</strong></div>
-        <div class="campaign-poster" aria-label="Pawl can block endless scrolling, betting apps and porn sites">
-          <p>Take back the phone</p>
-          <div class="campaign-line">Whatever you keep opening, endless scroll, betting, porn sites, your call.</div>
-          <strong>Your apps. Your sites. Your boundary.</strong>
-        </div>
       </div>
     </div>
   </header>
 
-  <section class="statement" aria-labelledby="statement-title">
-    <div class="home-wrap statement-grid">
-      <p class="section-index">01 / Why Pawl</p>
-      <div><h2 id="statement-title">You cannot willpower your way through a button designed to be tapped.</h2><p>Other blockers leave their off switch on the same phone as the temptation. Pawl moves that decision into a physical key. Put it in the garage, at work, or with someone you trust. Your impulsive self cannot tap through what is not there.</p></div>
-    </div>
-  </section>
-
   <section id="how" class="how-section" aria-labelledby="how-title">
     <div class="home-wrap">
-      <div class="section-heading"><p class="section-index">02 / How it works</p><h2 id="how-title">Three deliberate steps.<br>No button to bargain with.</h2></div>
+      <div class="section-heading"><p class="section-index">How it works</p><h2 id="how-title">Three steps.</h2></div>
       <div class="story-steps">
-        <article class="story-card"><div class="story-art choose-art"><img src="/img/onboarding/choose.webp" alt="Kiki tapping one of three blank app tiles." width="1536" height="1024" loading="lazy"></div><div class="story-copy"><span>1</span><h3>Choose what to block</h3><p>Pick the apps and sites you keep opening. Apple Screen Time does the blocking.</p></div></article>
-        <article class="story-card"><div class="story-art unlock-art"><img src="/img/onboarding/unlock.webp" alt="A green security key on one side and Kiki asleep with another key on the other." width="1536" height="1024" loading="lazy"></div><div class="story-copy"><span>2</span><h3>Move the decision away</h3><p>Keep the key out of reach, or let a trusted person approve from their iPhone with Pawl Pro.</p></div></article>
-        <article class="story-card"><div class="story-art lockin-art"><img src="/img/onboarding/lockin.webp" alt="Kiki asleep with the green security key tucked under its chin." width="1536" height="1024" loading="lazy"></div><div class="story-copy"><span>3</span><h3>Wait 15 minutes</h3><p>The key or your trusted person's approval starts the wait. It never skips. Your blocks return after the open window.</p></div></article>
+        <article class="story-card"><div class="story-art"><img src="/img/onboarding/choose.webp" alt="Kiki tapping one of three blank app tiles." width="1536" height="1024" loading="lazy"></div><div class="story-copy"><span>1</span><h3>Pick what to block</h3><p>The apps and sites you keep opening.</p></div></article>
+        <article class="story-card"><div class="story-art"><img src="/img/onboarding/unlock.webp" alt="A green security key on one side and Kiki asleep with another key on the other." width="1536" height="1024" loading="lazy"></div><div class="story-copy"><span>2</span><h3>Hide the key</h3><p>Somewhere inconvenient, or with someone you trust.</p></div></article>
+        <article class="story-card"><div class="story-art"><img src="/img/onboarding/lockin.webp" alt="Kiki asleep with the green security key tucked under its chin." width="1536" height="1024" loading="lazy"></div><div class="story-copy"><span>3</span><h3>Wait 15 minutes</h3><p>Even with the key, you wait. Then your apps open for a while and block again.</p></div></article>
       </div>
     </div>
   </section>
 
-  <section id="inside" class="inside-section" aria-labelledby="inside-title">
-    <div class="home-wrap">
-      <div class="section-heading light-heading"><p class="section-index">03 / Inside the app</p><div><h2 id="inside-title">Calm when you need it.<br>Clear about what happens next.</h2><p class="inside-line">Blocked until you fetch the key, a clear open window after the wait, and a weekly look at the time you kept.</p></div></div>
-    </div>
-  </section>
-
-  <section id="choose-kit" class="quick-buy" aria-labelledby="quick-buy-title">
+  <section id="kits" class="quick-buy" aria-labelledby="kits-title">
     <div class="home-wrap">
       <div class="quick-buy-heading">
-        <div><p class="section-index">Choose your Pawl</p><h2 id="quick-buy-title">Match the port on your iPhone.</h2></div>
-        <p>Every kit has the compatible Yubico key, the free Pawl app, and a printed setup card. No subscription.</p>
+        <div><p class="section-index">Kits</p><h2 id="kits-title">Match the port on your iPhone.</h2></div>
+        <p>Each kit has a Yubico key, a printed setup card, and the free Pawl app. No subscription.</p>
       </div>
       <div class="quick-products">
-        <article class="quick-product featured-product">
+        <article id="usb-c-kit" class="quick-product featured-product">
           <div class="product-badge">Most iPhones sold now</div>
           <img src="/img/connector-usbc.svg" alt="USB-C is a small rounded oval connector." width="640" height="260">
           <div class="quick-product-copy"><p class="phone-fit">iPhone 15 or newer</p><h3>USB-C Kit</h3><div class="quick-price"><strong>$49</strong><span>+ $5.95 shipping</span></div><a href="https://buy.stripe.com/7sY28keT72zn4XzfP6enS03" class="buy-now">Buy the USB-C Kit</a></div>
         </article>
-        <article class="quick-product">
+        <article id="lightning-kit" class="quick-product">
           <img src="/img/connector-lightning.svg" alt="Lightning is a narrow flat connector with visible metal contacts." width="640" height="260">
           <div class="quick-product-copy"><p class="phone-fit">iPhone 14 or earlier</p><h3>Lightning Kit</h3><div class="quick-price"><strong>$119</strong><span>+ $5.95 shipping</span></div><a href="https://buy.stripe.com/9B600c6mBgqdey9gTaenS04" class="buy-now">Buy the Lightning Kit</a></div>
         </article>
       </div>
-      <p class="quick-buy-note"><strong>Not ready to buy?</strong> <a href="/get">See exactly what comes in the kit</a> or <a href="https://apps.apple.com/app/id6783119309">try the free app with a key you own</a>.</p>
+      <p class="quick-buy-note">US shipping only. Needs iOS 18 or newer.</p>
     </div>
   </section>
 
   <section class="facts-section" aria-labelledby="facts-title">
     <div class="home-wrap facts-grid">
-      <div><p class="section-index">04 / Plain facts</p><h2 id="facts-title">Private by construction.</h2></div>
-      <div class="fact-list"><div><strong>No account</strong><p>Download Pawl and set it up on your iPhone.</p></div><div><strong>No tracking</strong><p>Pawl does not collect your app choices or browsing activity.</p></div><div><strong>Open source</strong><p>The code is public, so the privacy claims can be checked.</p></div></div>
-      <div class="facts-links"><a href="/privacy">Read the privacy policy</a><a href="https://github.com/jasonepage/Pawl">Read the source on GitHub</a><a href="/about#limits">See what Pawl does not promise</a></div>
-    </div>
-  </section>
-
-  <section class="price-section" aria-labelledby="price-title">
-    <div class="home-wrap price-card">
-      <div class="price-art"><img src="/img/onboarding/lockin.webp" alt="Kiki sleeping peacefully with the green security key." width="1536" height="1024" loading="lazy"></div>
-      <div class="price-copy"><p class="section-index">05 / Start now</p><h2 id="price-title">Make the next impulse harder today.</h2><p>Choose the connector that matches your iPhone. Set it up once, hide the key, and stop keeping the escape hatch in your pocket.</p>
-        <a class="store-button store-button-dark" href="#choose-kit" aria-label="Choose a Pawl Kit"><span><small>From $49</small>Choose your kit</span></a>
-      </div>
+      <div><p class="section-index">Questions</p><h2 id="facts-title">Plain facts.</h2></div>
+      <div class="fact-list"><div><strong>What if I lose the key?</strong><p>Pair a new key in the Pawl app. It takes over after a wait of at least 15 minutes, so a spare key is never a shortcut.</p></div><div><strong>How long do apps stay open?</strong><p>30 minutes by default, then they block again. You can change that time in the app.</p></div><div><strong>Do I need an account?</strong><p>No account and no tracking. Pawl does not collect what you block or browse. The code is public.</p></div><div><strong>Shipping and returns</strong><p>Kits ship to US addresses within 3 business days. Full refund within 30 days if the key is unopened.</p></div></div>
+      <div class="facts-links"><a href="/privacy">Privacy policy</a><a href="https://github.com/jasonepage/Pawl">Source on GitHub</a><a href="/about#limits">See what Pawl does not promise</a></div>
     </div>
   </section>
 </main>
 
-<footer class="home-footer"><div class="home-wrap footer-grid"><div class="footer-brand"><img src="/img/kiki-icon-192.png" alt="" width="52" height="52"><div><strong>Pawl</strong><span>App blocker with a key</span></div></div><div class="footer-links"><a href="#how">How it works</a><a href="/about">About</a><a href="/support">Support</a><a href="/privacy">Privacy</a><a href="https://github.com/jasonepage/Pawl">GitHub</a></div><p class="footer-note">Pawl adds friction. It does not make anything impossible.</p><p class="copyright">© 2026 Jason Page</p></div></footer>
+<footer class="home-footer"><div class="home-wrap footer-grid"><div class="footer-brand"><img src="/img/kiki-icon-192.png" alt="" width="52" height="52"><div><strong>Pawl</strong><span>App blocker with a key</span></div></div><div class="footer-links"><a href="/#how">How it works</a><a href="/get">Get a kit</a><a href="/give">Give one</a><a href="/about">About</a><a href="/support">Support</a><a href="/privacy">Privacy</a><a href="https://github.com/jasonepage/Pawl">GitHub</a></div><p class="footer-note">Pawl adds friction. It does not make anything impossible.</p><p class="copyright">&copy; 2026 Jason Page</p></div></footer>
 
 <script>
   (function () {

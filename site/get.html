@@ -17,102 +17,83 @@
 <link rel="icon" href="/img/favicon-32-v4.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/img/apple-touch-icon-v4.png">
 <link rel="stylesheet" href="/pawl.css">
-<link rel="stylesheet" href="/home.css">
-<link rel="stylesheet" href="/get.css?v=2">
+<link rel="stylesheet" href="/home.css?v=5">
 </head>
-<body class="home-page get-page">
+<body class="home-page">
 
 <div id="order-received" role="status" hidden style="position:fixed;z-index:50;left:50%;top:92px;transform:translateX(-50%);width:min(560px,calc(100% - 32px));padding:18px 22px;border-radius:18px;color:#18340f;background:#d8f08a;box-shadow:0 18px 40px rgba(0,0,0,.25);font-size:15px;line-height:1.5"><strong style="display:block;font-size:18px;margin-bottom:4px">Order received. Thank you.</strong>Your Pawl Kit ships within 3 business days to your US address. Questions? <a href="/support" style="color:#18340f;font-weight:800">Contact support</a>.<button type="button" aria-label="Close" onclick="this.parentElement.hidden=true" style="position:absolute;top:8px;right:10px;border:0;background:none;font-size:22px;line-height:1;color:#18340f;cursor:pointer">&times;</button></div>
 <script>if(new URLSearchParams(location.search).get('ordered')==='1'){document.getElementById('order-received').hidden=false;}</script>
 
-<nav class="get-nav" aria-label="Main navigation">
-  <div class="home-wrap get-nav-inner">
+<nav class="home-nav" aria-label="Main navigation">
+  <div class="home-wrap nav-inner">
     <a class="home-brand" href="/" aria-label="Pawl home"><img src="/img/kiki-icon-192.png" alt="" width="42" height="42"><span>Pawl</span></a>
-    <div class="get-nav-links"><a href="/#how">How it works</a><a href="/about">About</a><a class="get-nav-button" href="#buy">Get the kit</a></div>
+    <div class="nav-links">
+      <a href="/#how">How it works</a>
+      <a href="/get">Get a kit</a>
+      <a href="/give">Give one</a>
+      <a href="/about">About</a>
+      <a class="nav-button" href="https://apps.apple.com/app/id6783119309">Get the app</a>
+    </div>
   </div>
 </nav>
 
 <main>
-  <header class="get-hero">
-    <div class="home-wrap get-hero-grid">
-      <div class="get-copy">
-        <p class="get-eyebrow">Everything you need</p>
-        <h1>One kit.<br>For your<br>iPhone.</h1>
-        <p class="get-lead">Pick the kit that fits your iPhone. Each one comes with a small key that plugs into your phone, a printed how-to card, and the free Pawl app.</p>
-        <a class="buy-button" href="#buy">Buy a kit for yourself</a>
-        <p class="checkout-note">From $49 plus $5.95 shipping. US only.</p>
+  <header class="home-hero page-hero">
+    <div class="home-wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> Pawl kits</p>
+        <h1>Pick your kit.</h1>
+        <p class="hero-lead">Each kit has a Yubico key that plugs into your iPhone, a printed setup card, and the free Pawl app. No subscription.</p>
+        <div class="hero-actions"><a class="store-button" href="#kits"><span><small>From $49</small>See the kits</span></a></div>
       </div>
-      <div class="get-hero-art">
-        <div class="get-art-ring" aria-hidden="true"></div>
-        <img src="/img/onboarding/welcome.webp" alt="Kiki the tabby sitting behind a green USB-C security key." width="1536" height="1024">
-        <div class="box-label"><span>Inside</span><strong>Security key</strong><strong>Pawl app</strong><strong>Setup card</strong></div>
+      <div class="hero-art">
+        <div class="hero-orbit orbit-one" aria-hidden="true"></div>
+        <div class="hero-orbit orbit-two" aria-hidden="true"></div>
+        <img src="/img/onboarding/welcome.webp" alt="Kiki, a calm tabby cat, sitting behind a green USB-C security key." width="1536" height="1024">
       </div>
     </div>
   </header>
 
-  <section class="kit-section" aria-labelledby="kit-title">
+  <section id="kits" class="quick-buy" aria-labelledby="kits-title">
     <div class="home-wrap">
-      <div class="get-heading"><p>01 / Inside</p><h2 id="kit-title">What's in the box.</h2></div>
-      <div class="kit-grid">
-        <article><span class="kit-number">1</span><div class="kit-visual key-visual"><img src="/img/onboarding/unlock.webp" alt="A green physical security key." width="1536" height="1024" loading="lazy"></div><h3>The key</h3><p>A small key made by Yubico. It plugs into the bottom of your iPhone, where the charger goes. No extra app or account.</p></article>
-        <article><span class="kit-number">2</span><div class="kit-visual icon-visual"><img src="/img/kiki-icon-512.png" alt="The Pawl app icon." width="512" height="512" loading="lazy"></div><h3>The Pawl app</h3><p>Free on the App Store. You pick the apps and websites to block. To open them again, you need the key, then a 15-minute wait.</p></article>
-        <article><span class="kit-number">3</span><div class="kit-visual card-visual" aria-hidden="true"><div class="setup-card"><b>Set up Pawl</b><i></i><i></i><i></i><small>Three plain steps</small></div></div><h3>Printed setup card</h3><p>A short card that walks you through setup and helps you pick a good hiding spot for the key.</p></article>
+      <div class="quick-buy-heading">
+        <div><p class="section-index">Kits</p><h2 id="kits-title">Match the port on your iPhone.</h2></div>
+        <p>Look at the charging hole. USB-C is a rounded oval. Lightning is thinner and flat.</p>
       </div>
-    </div>
-  </section>
-
-  <section class="why-kit" aria-labelledby="why-title">
-    <div class="home-wrap why-grid">
-      <div class="why-art"><img src="/img/onboarding/lockin.webp" alt="Kiki asleep with the green security key tucked under its chin." width="1536" height="1024" loading="lazy"></div>
-      <div class="why-copy"><p>02 / Why the key</p><h2 id="why-title">If the key isn't with you, the apps stay blocked.</h2><ul><li>Set up the key once.</li><li>Put it somewhere out of the way.</li><li>To unblock, go get the key.</li><li>Then wait 15 minutes. No skipping.</li></ul></div>
-    </div>
-  </section>
-
-  <section class="steps-section" aria-labelledby="steps-title">
-    <div class="home-wrap">
-      <div class="get-heading"><p>03 / Start</p><h2 id="steps-title">Set up in three steps.</h2></div>
-      <ol class="order-steps"><li><span>1</span><div><h3>Check the bottom of your iPhone</h3><p>Choose USB-C for iPhone 15 or newer. Choose Lightning for iPhone 14 or earlier.</p></div></li><li><span>2</span><div><h3>Install Pawl</h3><p>Download the free app from the App Store and choose what to block.</p></div></li><li><span>3</span><div><h3>Set up the key and hide it</h3><p>Plug in the key, follow the card, then put the key somewhere hard to get to.</p></div></li></ol>
-    </div>
-  </section>
-
-  <section id="buy" class="buy-section" aria-labelledby="buy-title">
-    <div class="home-wrap">
-      <div class="buy-heading"><p>04 / Choose your kit</p><h2 id="buy-title">Which iPhone do you have?</h2><p>iPhone 15 and newer use USB-C. iPhone 14 and older use Lightning. Not sure? Look at the charging hole: USB-C is a rounded oval, Lightning is thinner.</p></div>
-      <aside class="self-callout" aria-label="Buy Pawl for yourself">
-        <div><p>A favor to your future self</p><h3>Do this for yourself.</h3><span>You know which app pulls you in. Get the kit, set it up once, and hide the key the day it shows up.</span></div>
-        <div class="self-actions"><a href="https://buy.stripe.com/7sY28keT72zn4XzfP6enS03">I have USB-C. Buy mine.</a><a href="https://buy.stripe.com/9B600c6mBgqdey9gTaenS04">I have Lightning. Buy mine.</a></div>
-      </aside>
-      <div class="kit-options">
-        <article id="usb-c-kit" class="product-card usb-kit">
-          <img class="connector-image" src="/img/connector-usbc.svg" alt="USB-C: a rounded oval port on the bottom of the iPhone with the matching rounded USB-C plug beneath it." width="640" height="260" style="display:block;width:100%;height:auto;margin-bottom:27px;border-radius:20px">
-          <p class="product-label">iPhone 15 or newer</p>
-          <h3>Pawl USB-C Kit</h3>
-          <p class="product-description">A Yubico key that plugs into USB-C, the free Pawl app, and a printed setup card.</p>
-          <ul><li>Plugs right into your iPhone</li><li>Key made by Yubico</li><li>No account to sign up for</li></ul>
-          <div class="price-breakdown"><strong>How the $49 is priced</strong><div><span>The Yubico key (store price)</span><b>$29</b></div><div><span>Printed card and packing</span><b>$5</b></div><div><span>Payment fees, sending it out, help, and app updates</span><b>$15</b></div></div>
-          <div class="product-purchase"><strong>$49</strong><span>plus $5.95 shipping</span></div>
-          <a class="buy-button" href="https://buy.stripe.com/7sY28keT72zn4XzfP6enS03">Buy this kit for myself</a>
+      <div class="quick-products">
+        <article id="usb-c-kit" class="quick-product featured-product">
+          <div class="product-badge">Most iPhones sold now</div>
+          <img src="/img/connector-usbc.svg" alt="USB-C is a small rounded oval connector." width="640" height="260">
+          <div class="quick-product-copy"><p class="phone-fit">iPhone 15 or newer</p><h3>USB-C Kit</h3><div class="quick-price"><strong>$49</strong><span>+ $5.95 shipping</span></div><a href="https://buy.stripe.com/7sY28keT72zn4XzfP6enS03" class="buy-now">Buy the USB-C Kit</a></div>
         </article>
-        <article id="lightning-kit" class="product-card lightning-kit">
-          <img class="connector-image" src="/img/connector-lightning.svg" alt="Lightning: a narrow flat port on the bottom of the iPhone with the matching Lightning plug and visible gold contacts beneath it." width="640" height="260" style="display:block;width:100%;height:auto;margin-bottom:27px;border-radius:20px">
-          <p class="product-label">iPhone 14 or earlier</p>
-          <h3>Pawl Lightning Kit</h3>
-          <p class="product-description">A Yubico key with a Lightning plug on one end and USB-C on the other, the free Pawl app, and a printed setup card.</p>
-          <ul><li>Plugs right into your iPhone</li><li>Also fits USB-C</li><li>No account to sign up for</li></ul>
-          <div class="price-breakdown"><strong>How the $119 is priced</strong><div><span>The Yubico key (store price)</span><b>$85</b></div><div><span>Printed card and packing</span><b>$5</b></div><div><span>Payment fees, sending it out, help, and app updates</span><b>$29</b></div></div>
-          <div class="product-purchase"><strong>$119</strong><span>plus $5.95 shipping</span></div>
-          <a class="buy-button lightning-order" href="https://buy.stripe.com/9B600c6mBgqdey9gTaenS04">Buy this kit for myself</a>
+        <article id="lightning-kit" class="quick-product">
+          <img src="/img/connector-lightning.svg" alt="Lightning is a narrow flat connector with visible metal contacts." width="640" height="260">
+          <div class="quick-product-copy"><p class="phone-fit">iPhone 14 or earlier</p><h3>Lightning Kit</h3><div class="quick-price"><strong>$119</strong><span>+ $5.95 shipping</span></div><a href="https://buy.stripe.com/9B600c6mBgqdey9gTaenS04" class="buy-now">Buy the Lightning Kit</a></div>
         </article>
       </div>
-      <p class="connector-note">Your iPhone needs iOS 18 or newer (iPhone software from 2024 on). You pay through Stripe, a well-known payment company. The $5.95 covers postage and the envelope. Key prices are Yubico's store prices and can change.</p>
+      <p class="quick-buy-note">US shipping only. Needs iOS 18 or newer.</p>
+      <details class="price-details"><summary>Why does the Lightning Kit cost more?</summary><p>The key is most of the price. Yubico sells the Lightning key for $85 and the USB-C key for $29. The rest covers the card, packing, payment fees, shipping it out, help, and app updates. Key prices are Yubico's and can change.</p></details>
     </div>
   </section>
 
-  <section class="fine-print" aria-labelledby="know-title">
-    <div class="home-wrap"><h2 id="know-title">Good to know</h2><div class="fine-grid"><p><strong>Compatibility</strong> Your iPhone needs iOS 18 or newer. Pick the kit that fits the charging hole on your phone.</p><p><strong>Shipping</strong> US addresses only for now. Shipping is $5.95. Kits ship within 3 business days.</p><p><strong>Returns</strong> Full refund within 30 days if the key is unopened. Broken arrivals are replaced free.</p><p><strong>Privacy</strong> Stripe handles the payment. We only use your order info to ship your kit and answer your questions.</p></div><p class="fine-links"><a href="/privacy">Privacy policy</a><a href="/support">Support</a><a href="/give">Giving Pawl to someone?</a></p></div>
+  <section class="facts-section" aria-labelledby="facts-title">
+    <div class="home-wrap facts-grid">
+      <div><p class="section-index">Questions</p><h2 id="facts-title">Plain facts.</h2></div>
+      <div class="fact-list"><div><strong>What if I lose the key?</strong><p>Pair a new key in the Pawl app. It takes over after a wait of at least 15 minutes, so a spare key is never a shortcut.</p></div><div><strong>How long do apps stay open?</strong><p>30 minutes by default, then they block again. You can change that time in the app.</p></div><div><strong>Do I need an account?</strong><p>No account and no tracking. Pawl does not collect what you block or browse. The code is public.</p></div><div><strong>Shipping and returns</strong><p>Kits ship to US addresses within 3 business days. Full refund within 30 days if the key is unopened.</p></div></div>
+      <div class="facts-links"><a href="/privacy">Privacy policy</a><a href="https://github.com/jasonepage/Pawl">Source on GitHub</a><a href="/about#limits">See what Pawl does not promise</a></div>
+    </div>
   </section>
 </main>
 
-<footer class="home-footer"><div class="home-wrap footer-grid"><div class="footer-brand"><img src="/img/kiki-icon-192.png" alt="" width="52" height="52"><div><strong>Pawl</strong><span>App blocker with a key</span></div></div><div class="footer-links"><a href="/">Home</a><a href="/about">About</a><a href="/support">Support</a><a href="/privacy">Privacy</a><a href="https://apps.apple.com/app/id6783119309">App Store</a></div><p class="footer-note">Pawl adds friction. It does not make anything impossible.</p><p class="copyright">© 2026 Jason Page</p></div></footer>
+<footer class="home-footer"><div class="home-wrap footer-grid"><div class="footer-brand"><img src="/img/kiki-icon-192.png" alt="" width="52" height="52"><div><strong>Pawl</strong><span>App blocker with a key</span></div></div><div class="footer-links"><a href="/#how">How it works</a><a href="/get">Get a kit</a><a href="/give">Give one</a><a href="/about">About</a><a href="/support">Support</a><a href="/privacy">Privacy</a><a href="https://github.com/jasonepage/Pawl">GitHub</a></div><p class="footer-note">Pawl adds friction. It does not make anything impossible.</p><p class="copyright">&copy; 2026 Jason Page</p></div></footer>
+
+<script>
+  (function () {
+    var nav = document.querySelector('.home-nav');
+    function updateNav() { nav.classList.toggle('scrolled', window.scrollY > 16); }
+    updateNav();
+    window.addEventListener('scroll', updateNav, { passive: true });
+  })();
+</script>
 </body>
 </html>
