@@ -53,18 +53,20 @@
   footer .sp{margin-left:auto}
   footer .help{width:100%;border-top:1px solid rgba(255,255,255,.14);padding-top:var(--s-4);margin-top:var(--s-2);line-height:1.5}
 </style>
+<link rel="stylesheet" href="/home.css?v=5">
 </head>
-<body>
+<body class="home-page solid-page">
 
-<nav class="top" aria-label="Main">
-  <div class="wrap">
-    <a class="brand" href="/"><img src="/img/kiki-icon-192.png?v=3" alt="" width="32" height="32">Pawl</a>
-    <span class="links">
+<nav class="home-nav" aria-label="Main navigation">
+  <div class="home-wrap nav-inner">
+    <a class="home-brand" href="/" aria-label="Pawl home"><img src="/img/kiki-icon-192.png" alt="" width="42" height="42"><span>Pawl</span></a>
+    <div class="nav-links">
       <a href="/#how">How it works</a>
+      <a href="/get">Get a kit</a>
+      <a href="/give">Give one</a>
       <a href="/about">About</a>
-      <a href="/support">Support</a>
-      <a class="nav-cta" href="/get">Get Pawl</a>
-    </span>
+      <a class="nav-button" href="https://apps.apple.com/app/id6783119309">Get the app</a>
+    </div>
   </div>
 </nav>
 
@@ -169,19 +171,23 @@
   <p>Questions or deletion requests: <a href="mailto:privacy@getpawl.com">privacy@getpawl.com</a>.</p>
 </main>
 
-<footer>
-  <div class="wrap">
-    <a href="/" style="font-weight:600">Pawl</a>
-    <a href="/#how">How it works</a>
-    <a href="/about">About</a>
-    <a href="/support">Support</a>
-    <a href="/privacy">Privacy</a>
-    <a href="https://github.com/jasonepage/Pawl">GitHub</a>
-    <a href="https://apps.apple.com/app/id6783119309">App Store</a>
-    <span class="sp">&copy; 2026 Jason Page</span>
-    <div class="help">If gambling is hurting you or someone you know, free and confidential help is available 24 hours a day. Call or text 1-800-GAMBLER (US).</div>
-  </div>
-</footer>
+<footer class="home-footer"><div class="home-wrap footer-grid"><div class="footer-brand"><img src="/img/kiki-icon-192.png" alt="" width="52" height="52"><div><strong>Pawl</strong><span>App blocker with a key</span></div></div><div class="footer-links"><a href="/#how">How it works</a><a href="/get">Get a kit</a><a href="/give">Give one</a><a href="/about">About</a><a href="/support">Support</a><a href="/privacy">Privacy</a><a href="https://github.com/jasonepage/Pawl">GitHub</a></div><p class="footer-note">Pawl adds friction. It does not make anything impossible.</p><p class="copyright">&copy; 2026 Jason Page</p></div></footer>
+
+<script>
+  (function () {
+    var sel = document.getElementById('phone-model');
+    if (sel) sel.addEventListener('change', function () {
+      var v = sel.value, out = document.getElementById('phone-result');
+      var u = document.getElementById('usb-c-kit'), l = document.getElementById('lightning-kit');
+      u.classList.toggle('dim', v === 'lightning' || v === 'old'); l.classList.toggle('dim', v === 'usbc' || v === 'old');
+      out.textContent = v === 'usbc' ? 'Your iPhone takes the USB-C Kit.' : v === 'lightning' ? 'Your iPhone takes the Lightning Kit.' : v === 'old' ? 'Pawl needs iOS 18, which this iPhone cannot run.' : '';
+    });
+    var nav = document.querySelector('.home-nav');
+    function updateNav() { nav.classList.toggle('scrolled', window.scrollY > 16); }
+    updateNav();
+    window.addEventListener('scroll', updateNav, { passive: true });
+  })();
+</script>
 
 </body>
 </html>
