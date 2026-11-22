@@ -15,7 +15,8 @@
 @media(prefers-reduced-motion:reduce){.hero-art>img{animation:none}.store-button{transition:none}}
 .story-art img{object-fit:cover;padding:16px;border-radius:34px}
 .hero-actions{flex-wrap:wrap;row-gap:16px}.hero-actions a{white-space:nowrap}
-.page-hero{min-height:auto;padding:140px 0 70px}.page-hero .hero-art{min-height:440px}.page-hero .hero-art>img{width:100%;margin:0}.page-hero .hero-copy h1{font-size:clamp(48px,5.6vw,78px)}
+.page-hero{min-height:auto;padding:140px 0 70px}.page-hero .hero-art{min-height:440px}.page-hero .hero-art>img{width:100%;margin:0;border-radius:34px}.page-hero .hero-copy h1{font-size:clamp(48px,5.6vw,78px)}
+img[src*="/img/scenes/"]{border-radius:34px}
 .give-note{margin:22px 0 0;color:#bbcca9;font-size:14px;font-weight:650}
 .price-details{max-width:760px;margin:22px auto 0;color:var(--home-muted);font-size:15px;line-height:1.55;text-align:center}.price-details summary{cursor:pointer;color:var(--moss);font-weight:750}.price-details p{margin:12px 0 0}
 @media(max-width:640px){.page-hero{padding:104px 0 50px}.page-hero .hero-art{min-height:300px}}
