@@ -95,7 +95,7 @@ def questions(items, links=True):
 '''
 
 Q = [
-  ("What if I lose the key?", "Pair a new key in the Pawl app. It takes over after a wait of at least 15 minutes, so a spare key is never a shortcut."),
+  ("What if I lose the key?", "Pair a new key in the Pawl app. It takes over only after a wait, so a spare key is never a shortcut."),
   ("Why a key and not an NFC sticker?", "A sticker can be copied with another phone. A key cannot. Its secret never leaves the chip."),
   ("How long do apps stay open?", "30 minutes by default, then they block again. You can change that time in the app."),
   ("Do I need an account?", "No account and no tracking. Pawl does not collect what you block or browse. The code is public."),
@@ -126,10 +126,9 @@ TRUST = '\n        <ul class="trust-list" aria-label="Pawl privacy facts"><li>On
 # ---------- HOME ----------
 home = head_of("index.html") + '<body class="home-page">\n\n' + NAV + '\n<main>\n'
 home += hero("The app blocker with a key", "Block the app.<br>Hide the key.",
-  "The blocker you cannot undo from your phone. Keep the physical key somewhere inconvenient. If you go get it, Pawl still makes you wait 15 minutes.",
+  "The blocker you cannot undo from your phone. Keep the physical key somewhere inconvenient. To unblock, you have to go get it.",
   BADGE + '\n          <a class="text-link" href="/get">Get a kit</a>',
-  "/img/onboarding/welcome.webp", "Kiki, a calm tabby cat, sitting behind a green USB-C security key.", TRUST,
-  extra_art='\n        <div class="key-note"><span class="key-note-label">The whole idea</span><strong>No key nearby. No instant unlock.</strong></div>')
+  "/img/onboarding/welcome.webp", "Kiki, a calm tabby cat, sitting behind a green USB-C security key.", TRUST)
 home += '''
   <section id="how" class="how-section" aria-labelledby="how-title">
     <div class="home-wrap">
@@ -137,7 +136,7 @@ home += '''
       <div class="story-steps">
         <article class="story-card"><div class="story-art"><img src="/img/scenes/pick-blocks.webp" alt="Kiki chooses one of three blank app tiles beside a phone." width="1536" height="1024" loading="lazy"></div><div class="story-copy"><span>1</span><h3>Pick what to block</h3><p>The apps and sites you keep opening.</p></div></article>
         <article class="story-card"><div class="story-art"><img src="/img/scenes/hide-key.webp" alt="A hand puts the green Pawl key into a high drawer while Kiki watches." width="1536" height="1024" loading="lazy"></div><div class="story-copy"><span>2</span><h3>Hide the key</h3><p>Somewhere inconvenient, or with someone you trust. It cannot be copied.</p></div></article>
-        <article class="story-card"><div class="story-art"><img src="/img/scenes/wait-relock.webp" alt="Kiki waits beside the green Pawl key and an hourglass as apps open briefly, then close again." width="1536" height="1024" loading="lazy"></div><div class="story-copy"><span>3</span><h3>Wait 15 minutes</h3><p>Even with the key, you wait. Then your apps open for a while and block again.</p></div></article>
+        <article class="story-card"><div class="story-art"><img src="/img/scenes/wait-relock.webp" alt="Kiki waits beside the green Pawl key and an hourglass as apps open briefly, then close again." width="1536" height="1024" loading="lazy"></div><div class="story-copy"><span>3</span><h3>Open for a while</h3><p>With the key, your apps open for a while, then block again. You can add a wait too.</p></div></article>
       </div>
     </div>
   </section>
@@ -170,7 +169,7 @@ give += hero("A gift for someone who asked", "Give someone<br>a little distance.
 give += '\n' + kits("Which iPhone do they have?", "Pick their phone and we send the right key.")
 give += '\n' + questions([
   ("Ask first", "Pawl is for someone who wants the friction. It is not parental control or a way to watch them."),
-  ("What if they lose the key?", "They pair a new key in the app. It takes over after a wait of at least 15 minutes."),
+  ("What if they lose the key?", "They pair a new key in the app. It takes over only after a wait."),
   ("Shipping and returns", "Kits ship to US addresses within 3 business days. Full refund within 30 days if the key is unopened."),
 ], links=False) + '</main>\n\n' + FOOTER
 
