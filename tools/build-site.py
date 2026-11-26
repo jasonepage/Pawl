@@ -12,7 +12,7 @@ def head_of(name, extra_fix=None):
     s = open(f"{site}/{name}", encoding="utf-8").read()
     h = s[:s.index("</head>")]
     h = re.sub(r'<link rel="stylesheet"[^>]*>\s*', '', h)
-    h = h.rstrip() + '\n<link rel="stylesheet" href="/pawl.css">\n<link rel="stylesheet" href="/home.css?v=6">\n</head>\n'
+    h = h.rstrip() + '\n<link rel="stylesheet" href="/pawl.css">\n<link rel="stylesheet" href="/home.css?v=7">\n</head>\n'
     if extra_fix: h = extra_fix(h)
     return h
 
@@ -66,15 +66,11 @@ def kits(title, intro, extra=""):
       <div class="quick-products">
         <article id="usb-c-kit" class="quick-product featured-product">
           <div class="product-badge">Most iPhones today</div>
-          <img src="/img/connector-usbc.svg" alt="USB-C is a small rounded oval connector." width="640" height="260">
+          <img src="/img/connector-usbc.svg?v=2" alt="USB-C is a small rounded oval connector." width="640" height="260">
           <div class="quick-product-copy"><p class="phone-fit">USB-C Kit</p><h3>iPhone 15 or newer</h3><div class="quick-price"><strong>$49</strong><span>+ $5.95 shipping</span></div><a href="{USBC}" class="buy-now">Buy the USB-C Kit</a></div>
         </article>
         <article id="lightning-kit" class="quick-product">
-          <div class="dual-key-demo" role="img" aria-label="A matte black security key demonstrates its USB-C and Lightning connector ends.">
-            <span class="demo-port demo-port-usbc" aria-hidden="true"></span>
-            <img src="/img/scenes/yubikey-5ci-cutout.webp" alt="" width="1200" height="675">
-            <span class="demo-port demo-port-lightning" aria-hidden="true"></span>
-          </div>
+          <img src="/img/connector-lightning.svg?v=2" alt="Lightning is a narrow flat connector with visible metal contacts." width="640" height="260">
           <div class="quick-product-copy"><p class="phone-fit">Lightning Kit</p><h3>iPhone 14 or older</h3><div class="quick-price"><strong>$119</strong><span>+ $5.95 shipping</span></div><a href="{LIGHT}" class="buy-now">Buy the Lightning Kit</a></div>
         </article>
       </div>
