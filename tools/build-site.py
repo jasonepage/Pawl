@@ -130,6 +130,10 @@ home += hero("The app blocker with a key", "Block the app.<br>Hide the key.",
   BADGE + '\n          <a class="text-link" href="/get">Get a kit</a>',
   "/img/onboarding/welcome.webp", "Kiki, a calm tabby cat, sitting behind a green USB-C security key.", TRUST)
 home += '''
+  <section class="video-section" aria-label="Pawl in one minute">
+    <div class="home-wrap"><video class="explainer" controls preload="metadata" playsinline poster="/img/pawl-explainer-poster.jpg" width="1920" height="1080"><source src="/pawl-explainer.mp4" type="video/mp4"></video></div>
+  </section>
+
   <section id="how" class="how-section" aria-labelledby="how-title">
     <div class="home-wrap">
       <div class="section-heading"><p class="section-index">How it works</p><h2 id="how-title">Three steps.</h2></div>
@@ -148,10 +152,6 @@ home += '''
     </div>
   </section>
 
-'''
-home += '''  <section class="quote-section" aria-label="App Store review">
-    <div class="home-wrap"><figure class="quote-card"><blockquote>"Super helpful for blocking apps and setting up a really nice way to be productive."</blockquote><figcaption>Webfoot85, <a href="https://apps.apple.com/app/id6783119309">App Store review</a></figcaption></figure></div>
-  </section>
 '''
 home += '\n' + questions(Q) + '</main>\n\n' + FOOTER
 
