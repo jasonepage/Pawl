@@ -49,14 +49,17 @@
   @media(min-width:760px){.two{grid-template-columns:1fr 1fr;gap:var(--s-7)}}
 
   /* the key */
-  .keysec .art{margin-top:var(--s-6);border-radius:var(--r-3);overflow:hidden}
-  .keysec .art img{width:100%;height:auto}
+  .key-visual{position:relative;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);min-height:390px;margin-top:var(--s-6);overflow:hidden;border-radius:32px;color:#f7f2e4;background:radial-gradient(circle at 28% 46%,#416d29 0,#214714 38%,#0d2608 76%);box-shadow:0 24px 58px rgba(24,52,15,.16)}
+  .key-product{position:relative;display:grid;place-items:center;min-height:390px;overflow:hidden}
+  .key-product::before,.key-product::after{content:"";position:absolute;border:1px solid rgba(216,235,190,.17);border-radius:50%}.key-product::before{width:390px;height:390px}.key-product::after{width:270px;height:270px}
+  .key-product img{position:relative;z-index:2;width:min(82%,610px);height:auto;filter:drop-shadow(0 25px 24px rgba(0,0,0,.38));transform:rotate(-8deg)}
+  .key-spec{position:absolute;z-index:3;left:28px;bottom:25px;display:flex;gap:8px;flex-wrap:wrap}.key-spec span{padding:7px 10px;border:1px solid rgba(255,255,255,.17);border-radius:999px;background:rgba(8,27,5,.62);color:#d8ebbe;font-size:12px;font-weight:750}
+  .key-route{display:grid;align-content:center;gap:12px;padding:34px 34px 34px 0}.key-route div{padding:18px 20px;border:1px solid rgba(255,255,255,.13);border-radius:18px;background:rgba(247,242,228,.08);box-shadow:inset 0 1px rgba(255,255,255,.06)}.key-route strong{display:block;color:#f7f2e4;font-size:17px}.key-route span{display:block;margin-top:4px;color:#bcd0ae;font-size:14px;line-height:1.4}
+  @media(max-width:760px){.key-visual{grid-template-columns:1fr}.key-product{min-height:300px}.key-product img{width:88%}.key-route{padding:0 18px 18px}.key-spec{left:18px;bottom:16px}}
   .keysec .grid{display:grid;grid-template-columns:1fr;gap:var(--s-5);margin-top:var(--s-6)}
   @media(min-width:760px){.keysec .grid{grid-template-columns:1fr 1fr 1fr}}
   .keysec .grid p{margin-top:var(--s-2);font-size:var(--fs-0);color:var(--ink)}
-  .buy{display:grid;grid-template-columns:1fr;gap:var(--s-4);align-items:center;margin-top:var(--s-6)}
-  @media(min-width:760px){.buy{grid-template-columns:280px 1fr;gap:var(--s-5)}}
-  .buy img{width:100%;max-width:280px;height:auto;justify-self:center}
+  .buy{margin-top:var(--s-6)}
   .note{margin-top:0;background:var(--green-100);border-radius:var(--r-2);padding:var(--s-4) var(--s-5);font-size:var(--fs-0);color:var(--green-700)}
 
   /* open source */
@@ -94,7 +97,7 @@
   footer .sp{margin-left:auto}
   footer .help{width:100%;border-top:1px solid rgba(255,255,255,.14);padding-top:var(--s-4);margin-top:var(--s-2);line-height:1.5}
 </style>
-<link rel="stylesheet" href="/home.css?v=5">
+<link rel="stylesheet" href="/home.css?v=7">
 </head>
 <body class="home-page solid-page">
 
@@ -125,13 +128,16 @@
   <div class="wrap">
     <h2>The key is the whole trick</h2>
     <p class="lead">Pawl is an app blocker with a key. You give the key away. Then nothing on your phone can turn the block off.</p>
-    <div class="art"><img src="/img/key-steps.svg?v=2" alt="Three drawings. One: a small security key plugged into the bottom of a phone. Two: the same key left inside a house that is not yours. Three: a moon over a long road between a phone and the house." width="900" height="300"></div>
+    <div class="key-visual">
+      <div class="key-product"><img src="/img/scenes/yubikey-5ci-cutout.webp" alt="A matte black dual-connector security key with USB-C on one end and Lightning on the other" width="1200" height="675"><div class="key-spec" aria-hidden="true"><span>USB-C</span><span>Lightning</span><span>Touch required</span></div></div>
+      <div class="key-route" aria-label="How the Pawl key works"><div><strong>Pair it once</strong><span>Pawl remembers this physical key.</span></div><div><strong>Put it somewhere else</strong><span>Distance removes the instant decision.</span></div><div><strong>Return when you mean to</strong><span>Your apps close again on their own.</span></div></div>
+    </div>
     <div class="grid">
       <div><h3>Plug it in once</h3><p>When you set Pawl up, you plug a security key into your phone and tap it. Pawl remembers that key and only that key.</p></div>
       <div><h3>Leave it somewhere else</h3><p>Give it to a friend, put it in your car, or lock it in a drawer at work. The further away it is, the longer the urge has to fade.</p></div>
       <div><h3>Getting it back takes time</h3><p>When you do get the key, the block lifts for a short window (30 minutes by default) and comes back on by itself. You can add a wait before it lifts.</p></div>
     </div>
-    <div class="buy"><img src="/img/security-key.svg" alt="A drawing of a small green security key with a USB-C plug and a keyring loop" width="320" height="130"><p class="note"><strong>Which key to buy:</strong> any FIDO2 security key that plugs into your iPhone. It needs no app or account. Or get a <a href="/get">Pawl kit</a> with the key included.</p></div>
+    <div class="buy"><p class="note"><strong>Which key to buy:</strong> any FIDO2 security key that plugs into your iPhone. The Lightning kit includes a dual-connector YubiKey 5Ci; the USB-C kit includes a USB-C key. Neither needs an app or account. Or get a <a href="/get">Pawl kit</a> with the right key included.</p></div>
   </div>
 </section>
 
