@@ -71,11 +71,14 @@
   .repo a.btn{display:inline-block;margin-top:var(--s-3);background:var(--green-500);color:#fff;text-decoration:none;font-weight:600;padding:10px 16px;border-radius:var(--r-pill);font-size:var(--fs-0)}
 
   /* limits */
-  .promise{list-style:none;padding:0;margin:var(--s-5) 0 0;display:grid;gap:var(--s-3);max-width:70ch}
-  .promise li{padding:var(--s-4) var(--s-4) var(--s-4) 44px;position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-2);font-size:var(--fs-0)}
+  #limits .wrap{max-width:1120px}
+  .promise{list-style:none;padding:0;margin:var(--s-5) 0 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-3);max-width:none}
+  .promise li{height:100%;padding:var(--s-4) var(--s-4) var(--s-4) 44px;position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-2);font-size:var(--fs-0)}
+  .promise li:last-child:nth-child(odd){grid-column:1/-1}
   .promise li::before{content:"";position:absolute;left:16px;top:20px;width:14px;height:14px;border-radius:50%;border:3px solid var(--green-400)}
   .promise strong{display:block;color:var(--green-700);margin-bottom:2px}
   .readme{margin-top:var(--s-4);font-size:var(--fs-0);color:var(--muted)}
+  @media(max-width:760px){.promise{grid-template-columns:1fr}.promise li:last-child:nth-child(odd){grid-column:auto}}
 
   /* the name */
   .name .wrap{display:flex;align-items:center;gap:var(--s-5)}
