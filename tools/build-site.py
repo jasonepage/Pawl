@@ -12,7 +12,7 @@ def head_of(name, extra_fix=None):
     s = open(f"{site}/{name}", encoding="utf-8").read()
     h = s[:s.index("</head>")]
     h = re.sub(r'<link rel="stylesheet"[^>]*>\s*', '', h)
-    h = h.rstrip() + '\n<link rel="stylesheet" href="/pawl.css">\n<link rel="stylesheet" href="/home.css?v=10">\n</head>\n'
+    h = h.rstrip() + '\n<link rel="stylesheet" href="/pawl.css">\n<link rel="stylesheet" href="/home.css?v=9">\n</head>\n'
     if extra_fix: h = extra_fix(h)
     return h
 
