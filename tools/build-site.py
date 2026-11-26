@@ -131,7 +131,7 @@ home += hero("The app blocker with a key", "Block the app.<br>Hide the key.",
   "/img/onboarding/welcome.webp", "Kiki, a calm tabby cat, sitting behind a green USB-C security key.", TRUST)
 home += '''
   <section class="video-section" aria-label="Pawl in one minute">
-    <div class="home-wrap"><video class="explainer" controls preload="metadata" playsinline poster="/img/pawl-explainer-poster.jpg" width="1920" height="1080"><source src="/pawl-explainer.mp4" type="video/mp4"></video></div>
+    <div class="home-wrap"><video class="explainer" controls autoplay muted playsinline preload="metadata" poster="/img/pawl-explainer-poster.jpg" width="1920" height="1080"><source src="/pawl-explainer.mp4" type="video/mp4"></video></div>
   </section>
 
   <section id="how" class="how-section" aria-labelledby="how-title">
