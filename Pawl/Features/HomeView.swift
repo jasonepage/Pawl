@@ -53,10 +53,13 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 16) {
+                // 2.4: two columns on iPad (status on the left, the week and what's blocked on the
+                // right), one column on iPhone in exactly the same order as before.
+                PadColumns {
                     if screenTimeOff { screenTimeBanner }
                     weekHero
                     if needsKey { keyNudge }
+                } trailing: {
                     if let week = vm.week {
                         WeekCard(report: week,
                                  hoursPerDay: hoursPerDay,
@@ -74,7 +77,6 @@ struct HomeView: View {
                     if !vm.history.isEmpty { historyCard }
                     noteLink
                 }
-                .padding(20)
             }
             .background(PawlColor.groupedBg)
             .toolbar(.hidden, for: .navigationBar)

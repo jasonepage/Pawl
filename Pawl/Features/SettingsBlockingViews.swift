@@ -257,6 +257,7 @@ struct FrictionView: View {
                 .fixedSize(horizontal: false, vertical: true)
             }
             .padding(20)
+            .padReadableWidth()
         }
         .background(PawlColor.groupedBg)
         .navigationTitle("Unlock timing")

@@ -42,8 +42,11 @@ struct UnlockView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 22) {
+                // 2.4: on iPad the status hero sits on the left and everything you act on
+                // sits on the right. iPhone keeps the single column.
+                PadColumns(spacing: 22) {
                     statusHero
+                } trailing: {
                     if isLocked, vm.isPaired, !showScreenTimeOff, let model {
                         timingCard(model)
                     }
@@ -67,7 +70,6 @@ struct UnlockView: View {
                     devControls
                     #endif
                 }
-                .padding(20)
             }
             .background(PawlColor.groupedBg)
             .toolbar(.hidden, for: .navigationBar)
