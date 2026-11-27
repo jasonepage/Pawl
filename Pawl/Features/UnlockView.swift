@@ -46,6 +46,9 @@ struct UnlockView: View {
                 // sits on the right. iPhone keeps the single column.
                 PadColumns(spacing: 22) {
                     statusHero
+                        #if DEBUG
+                        .onTapGesture { if ScreenshotMode.isOn { vm.screenshotNextState() } }
+                        #endif
                 } trailing: {
                     if isLocked, vm.isPaired, !showScreenTimeOff, let model {
                         timingCard(model)
@@ -67,13 +70,19 @@ struct UnlockView: View {
                     }
                     footerArea
                     #if DEBUG
-                    devControls
+                    if !ScreenshotMode.isOn { devControls }
                     #endif
                 }
             }
             .background(PawlColor.groupedBg)
             .toolbar(.hidden, for: .navigationBar)
-            .task { vm.syncFromShared(); await vm.checkAllyDecision() }
+            .task {
+                #if DEBUG
+                if ScreenshotMode.isOn { vm.screenshotSetUp(); return }
+                #endif
+                vm.syncFromShared()
+                await vm.checkAllyDecision()
+            }
         }
         .tint(PawlColor.brand)
     }

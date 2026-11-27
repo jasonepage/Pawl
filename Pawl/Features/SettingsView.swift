@@ -32,6 +32,7 @@ struct SettingsView: View {
     @State private var showPaywall = false
     #if DEBUG
     @State private var confirmErase = false
+    @AppStorage(ScreenshotMode.defaultsKey) private var screenshotMode = false
     #endif
     // Mirror of Pro entitlement in local @State so rows re-render reliably on lifecycle events
     // (purchase, sheet close, appear) without relying on cross-object Observation timing.
@@ -255,6 +256,9 @@ struct SettingsView: View {
     #if DEBUG
     private var developerSection: some View {
         Section {
+            Toggle(isOn: $screenshotMode) {
+                SettingsRows.label("camera.fill", .purple, "Screenshot mode")
+            }
             Button(role: .destructive) {
                 confirmErase = true
             } label: {
@@ -280,7 +284,7 @@ struct SettingsView: View {
         } header: {
             Text("Developer")
         } footer: {
-            Text("Xcode builds only, never in the App Store build. Erase everything is a true fresh start. Run setup again only re-runs setup. Allow deletion re-enables uninstall so you can reinstall a dev build.")
+            Text("Xcode builds only, never in the App Store build. Screenshot mode makes Pawl look fully set up for App Store screenshots: quit and reopen Pawl after switching it, then tap the big card on Unlock to switch between Blocked, Waiting and Open. Erase everything is a true fresh start. Run setup again only re-runs setup. Allow deletion re-enables uninstall so you can reinstall a dev build.")
         }
     }
     #endif

@@ -107,11 +107,20 @@ struct ContentView: View {
         }
     }
 
+    /// Settings > Developer > Screenshot mode (Debug builds only). Always false in Release.
+    private var screenshotMode: Bool {
+        #if DEBUG
+        return ScreenshotMode.isOn
+        #else
+        return false
+        #endif
+    }
+
     private var mainTabs: some View {
         TabView(selection: $tab) {
             HomeView(
-                needsKey: !model.isKeyPaired && model.allyPairing == nil,   // 2.4: an ally counts
-                screenTimeOff: !model.auth.isApproved,
+                needsKey: !screenshotMode && !model.isKeyPaired && model.allyPairing == nil,   // 2.4: an ally counts
+                screenTimeOff: !screenshotMode && !model.auth.isApproved,
                 blockedItems: model.blockedSummaryParts,
                 activeSetName: model.activeScheduledSetName,
                 hoursPerDay: model.hoursPerDay,
@@ -129,7 +138,7 @@ struct ContentView: View {
             UnlockView(
                 shield: model.shield,
                 selection: model.selectionStore.load(),
-                screenTimeOff: !model.auth.isApproved,
+                screenTimeOff: !screenshotMode && !model.auth.isApproved,
                 model: model,
                 commitmentProvider: { model.activeCommitment }
             )

@@ -357,6 +357,25 @@ public final class UnlockViewModel {
         }
     }
 
+    #if DEBUG
+    /// DEV ONLY, screenshot mode: show a paired key and the Blocked state. Display only; the
+    /// key store and the shield are not touched.
+    public func screenshotSetUp() {
+        pairedCredential = "screenshot"
+        message = nil
+        state = .locked
+    }
+
+    /// DEV ONLY, screenshot mode: Blocked, then Waiting, then Open, then back to Blocked.
+    public func screenshotNextState() {
+        switch state {
+        case .locked:     state = .coolingOff(endsAt: Date().addingTimeInterval(14 * 60 + 32))
+        case .coolingOff: state = .unshielded(graceEndsAt: Date().addingTimeInterval(28 * 60 + 10))
+        default:          state = .locked
+        }
+    }
+    #endif
+
     /// DEV ONLY: skip the wait to exercise the transition without sitting for 15 min.
     public func devSkipWait() {
         switch state {

@@ -57,6 +57,25 @@ public final class HomeViewModel {
 
     public func refresh() async {
         guard let c = commitment else { return }
+        #if DEBUG
+        // Screenshot mode: a key paired six days ago, a full protected week, a few blocked
+        // tries, and no notes. Display only; nothing is saved.
+        if ScreenshotMode.isOn {
+            let now = Date()
+            let start = Calendar.current.date(byAdding: .day, value: -6,
+                                              to: Calendar.current.startOfDay(for: now)) ?? now
+            let attempts: [Date] = (0..<9).map { now.addingTimeInterval(-Double($0) * 15 * 3600 - 1800) }
+            keyPairedAt = start
+            relapses = []
+            urges = []
+            week = WeeklyReport.make(commitmentStart: start, relapses: [], urges: [], attempts: attempts,
+                                     completedUnlocks: [], now: now)
+            facts = WeekFacts.make(commitmentStart: start, hoursPerDay: max(hoursPerDay, 2), unlocks: [],
+                                   attempts: attempts, urges: [], now: now)
+            cleanDays = 7
+            return
+        }
+        #endif
         if let snap = try? await repo.loadActiveCommitment() { keyPairedAt = snap.keyPairing?.pairedAt }
         // No key yet: nothing was ever locked, so the week shows no days on and the count is 0.
         let trackedSince = keyPairedAt.map { max(c.startedAt, $0) } ?? .distantFuture
