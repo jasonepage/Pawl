@@ -110,11 +110,11 @@ struct HardLockView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.top, 2)
         }
-        .confirmationDialog("Reset the hard lock?", isPresented: $showResetConfirm, titleVisibility: .visible) {
+        .alert("Reset the hard lock?", isPresented: $showResetConfirm) {
             Button("Reset hard lock", role: .destructive) { onReset(); dismiss() }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("This clears Pawl's record so you can set it up again. It does NOT change the device Screen Time passcode itself. To turn that off, go to Settings → Screen Time.")
+            Text("This only clears Pawl's record, so you can set it up again. The Screen Time passcode stays on.\n\nTo turn it off: Settings → Screen Time → Change Screen Time Passcode → Turn Off Screen Time Passcode.")
         }
     }
 

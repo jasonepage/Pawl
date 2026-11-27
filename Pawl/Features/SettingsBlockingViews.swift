@@ -232,12 +232,12 @@ struct FrictionView: View {
             VStack(alignment: .leading, spacing: 16) {
                 timeline
                 choiceCard(.wait, title: "Wait before unlocking",
-                           detail: "After your key, nothing opens until this ends.",
+                           detail: "Starts when you use your key.",
                            choices: options(Self.waitChoices, current: currentWait, picked: waitMin, kind: .wait),
                            selection: $waitMin, current: currentWait)
                 choiceCard(.open, title: "Then open for",
-                           detail: openMin == 0 ? "Apps stay open until you tap Lock now."
-                                                : "After this, Pawl locks again by itself.",
+                           detail: openMin == 0 ? "Open until you tap Lock now."
+                                                : "Then Pawl locks again.",
                            choices: options(Self.openChoices, current: currentOpen, picked: openMin, kind: .open),
                            selection: $openMin, current: currentOpen)
                 if waitMin == 0 || openMin == 0 { cautionCard }
@@ -248,10 +248,13 @@ struct FrictionView: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(PawlColor.cleanText)
                 }
-                Text("A longer wait or a shorter open time saves right away. The other way waits out your current wait first, so there's no shortcut in the moment.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 6) {
+                    Label("Stricter saves now.", systemImage: "checkmark.circle")
+                    Label("Looser waits out your current wait first.", systemImage: "clock")
+                }
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
             }
             .padding(20)
         }
@@ -310,10 +313,10 @@ struct FrictionView: View {
     private var timelineSentence: String {
         let open = DurationText.short(minutes: openMin)
         switch (waitMin == 0, openMin == 0) {
-        case (true, true):   return "Your key opens apps right away, and they stay open until you tap Lock now."
-        case (true, false):  return "Your key opens apps right away for \(open), then they lock again on their own."
-        case (false, true):  return "Your key, then a \(DurationText.short(minutes: waitMin)) wait, then apps stay open until you tap Lock now."
-        case (false, false): return "Your key, then a \(DurationText.short(minutes: waitMin)) wait, then apps open for \(open), then they lock again on their own."
+        case (true, true):   return "Key, then open until you tap Lock now."
+        case (true, false):  return "Key, then \(open) open, then locked again."
+        case (false, true):  return "Key, then \(DurationText.short(minutes: waitMin)) wait, then open until you tap Lock now."
+        case (false, false): return "Key, then \(DurationText.short(minutes: waitMin)) wait, then \(open) open, then locked again."
         }
     }
 
@@ -411,11 +414,11 @@ struct FrictionView: View {
         PawlCard {
             VStack(alignment: .leading, spacing: 8) {
                 if waitMin == 0 {
-                    Label("No wait means your key opens apps the moment you use it. Where you keep the key is then your only protection.",
+                    Label("No wait: your key opens apps at once. Hide it well.",
                           systemImage: "key.fill")
                 }
                 if openMin == 0 {
-                    Label("Until I lock it means nothing locks your apps again until you tap Lock now on the Unlock tab.",
+                    Label("Until I lock it: apps stay open until you tap Lock now.",
                           systemImage: "hand.tap.fill")
                 }
             }
@@ -585,12 +588,17 @@ struct ProtectionInfoView: View {
     var body: some View {
         List {
             Section("How Pawl protects you") {
-                Text("Pawl's shield can't be removed from iOS Settings. Only Pawl can lift it, and only after your physical key plus the wait you chose. While Pawl is protecting you it also can't be deleted by long-pressing the icon. Only \u{201C}Remove from Home Screen\u{201D} is allowed, and it keeps running underneath. The one remaining way out is turning off Screen Time in Settings, which removes protection. For a full lock, someone you trust can set a Screen Time passcode for you. That's Hard lock in Settings.")
-                    .font(.footnote).foregroundStyle(.secondary)
+                infoRow("lock.shield.fill", "iOS Settings can't remove the shield.")
+                infoRow("key.fill", "Only your key plus the wait lifts it.")
+                infoRow("trash.slash.fill", "While protecting you, Pawl can't be deleted. Remove from Home Screen only hides it.")
+                infoRow("hourglass", "The one way out: turn off Screen Time.")
+                infoRow("person.badge.key.fill", "Hard lock: someone you trust sets a Screen Time passcode.")
             }
             Section("Removing Pawl") {
-                Text("While Pawl is protecting you it can't be deleted by long-pressing its icon. That's intentional. To remove it completely:\n\n1.  Open Settings, then Screen Time.\n2.  Turn off Screen Time, or remove Pawl under \u{201C}Apps with Screen Time Access.\u{201D}\n3.  Then delete Pawl from your Home Screen.\n\nTurning off Screen Time removes your protection.")
-                    .font(.footnote).foregroundStyle(.secondary)
+                infoRow("1.circle.fill", "Open Settings, then Screen Time.")
+                infoRow("2.circle.fill", "Turn off Screen Time, or remove Pawl under Apps with Screen Time Access.")
+                infoRow("3.circle.fill", "Delete Pawl from your Home Screen.")
+                infoRow("exclamationmark.triangle.fill", "Turning off Screen Time ends your protection.")
             }
             Section("Get help") {
                 Text(showGamblingHelp
@@ -601,5 +609,14 @@ struct ProtectionInfoView: View {
         }
         .navigationTitle("How Pawl works")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    /// One idea per row.
+    private func infoRow(_ symbol: String, _ text: String) -> some View {
+        Label {
+            Text(text).font(.subheadline).fixedSize(horizontal: false, vertical: true)
+        } icon: {
+            Image(systemName: symbol).foregroundStyle(PawlColor.brand)
+        }
     }
 }
